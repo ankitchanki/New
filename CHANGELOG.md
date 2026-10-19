@@ -2,6 +2,19 @@
 
 All notable StashDrop changes are recorded here. Versions follow Semantic Versioning.
 
+## [0.1.1] - 2026-10-19
+
+### Added
+
+- GitHub Actions workflow: debug APK, tests, screenshot verification, and lint on every push; signed APK/AAB GitHub release on version tags.
+
+### Fixed
+
+- Taps inside the floating shelf sheet no longer close it.
+- Circle Studio Stash, Lens, and Share reuse one saved cutout instead of saving duplicates.
+- The Shelf collection filter falls back to "All" when its collection disappears.
+- Floating overlays reappear after screen-on on devices without a lock screen.
+
 ## [0.1.0] - 2026-10-19
 
 ### Added
