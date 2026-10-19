@@ -7,6 +7,10 @@ import java.io.ByteArrayOutputStream
 
 /** Runs under Shizuku's shell identity. No caller-supplied shell commands are accepted. */
 class ShellUserService : IPrivilegedService.Stub() {
+    companion object {
+        const val OWN_PACKAGE = "com.vibe.stashdrop"
+        const val ACCESSIBILITY = "$OWN_PACKAGE/$OWN_PACKAGE.core.shizuku.CaptureAccessibilityService"
+    }
     init { HiddenApiBypassInitializer.initialize() }
     private fun command(vararg args: String): String {
         val process = ProcessBuilder(*args).redirectErrorStream(true).start()
@@ -14,23 +18,37 @@ class ShellUserService : IPrivilegedService.Stub() {
         check(process.waitFor() == 0) { text.take(400) }
         return text.trim()
     }
-    override fun setAssistant(assistant: String?, voice: String?): String = runCatching {
-        val keys=listOf("assistant", "voice_interaction_service")
-        val previous=keys.map { command("/system/bin/settings", "get", "secure", it).takeUnless { value -> value == "null" } }
-        fun write(key: String,value: String?) {
-            if(value.isNullOrEmpty()) command("/system/bin/settings", "delete", "secure", key)
-            else command("/system/bin/settings", "put", "secure", key, value)
-        }
-        try {
-            keys.zip(listOf(assistant,voice)).forEach { (key,value) -> write(key,value) }
-            val actual=keys.map { command("/system/bin/settings", "get", "secure", it).takeUnless { value -> value == "null" } }
-            check(actual == listOf(assistant?.ifEmpty { null },voice?.ifEmpty { null })) { "System did not retain assistant settings" }
-        } catch(e: Exception) {
-            keys.zip(previous).forEach { (key,value) -> runCatching { write(key,value) } }
-            throw e
-        }
-        "Assistant settings saved"
+    private val assistantRole = "android.app.role.ASSISTANT"
+    private val packageName = Regex("[A-Za-z][A-Za-z0-9_]*(\\.[A-Za-z0-9_]+)+")
+    override fun getAssistantRole(userId: Int): String = runCatching {
+        command("/system/bin/cmd", "role", "get-role-holders", "--user", userId.toString(), assistantRole).lineSequence().firstOrNull { it.isNotBlank() }.orEmpty()
     }.getOrElse { "Error: ${it.message}" }
+    /** Hands the assistant role to [target] (validated package name), or clears it when empty. */
+    override fun setAssistantRole(target: String?, userId: Int): String = runCatching {
+        val user = userId.toString()
+        if (target.isNullOrEmpty()) command("/system/bin/cmd", "role", "clear-role-holders", "--user", user, assistantRole)
+        else {
+            require(packageName.matches(target)) { "Invalid package" }
+            command("/system/bin/cmd", "role", "add-role-holder", "--user", user, assistantRole, target)
+        }
+        check(getAssistantRole(userId) == target.orEmpty()) { "The system did not accept the assistant change" }
+        "Digital assistant updated"
+    }.getOrElse { "Error: ${it.message}" }
+    /** Grants StashDrop's own overlay, notification, and screenshot-accessibility access. */
+    override fun grantSetup(userId: Int): String {
+        val user = userId.toString()
+        val done = mutableListOf<String>()
+        runCatching { command("/system/bin/appops", "set", "--user", user, OWN_PACKAGE, "SYSTEM_ALERT_WINDOW", "allow"); done += "floating shelf" }
+        if (Build.VERSION.SDK_INT >= 33) runCatching { command("/system/bin/pm", "grant", "--user", user, OWN_PACKAGE, "android.permission.POST_NOTIFICATIONS"); done += "notifications" }
+        runCatching {
+            val current = command("/system/bin/settings", "--user", user, "get", "secure", "enabled_accessibility_services").takeUnless { it == "null" }.orEmpty()
+            val services = current.split(':').filter { it.isNotBlank() }
+            if (ACCESSIBILITY !in services) command("/system/bin/settings", "--user", user, "put", "secure", "enabled_accessibility_services", (services + ACCESSIBILITY).joinToString(":"))
+            command("/system/bin/settings", "--user", user, "put", "secure", "accessibility_enabled", "1")
+            done += "screenshot access"
+        }
+        return if (done.isEmpty()) "Error: Shizuku could not change any setting" else "Enabled " + done.joinToString(", ")
+    }
     private fun clipboard(): Any {
         val manager = Class.forName("android.os.ServiceManager")
         val binder = manager.getMethod("getService", String::class.java).invoke(null, "clipboard") as IBinder

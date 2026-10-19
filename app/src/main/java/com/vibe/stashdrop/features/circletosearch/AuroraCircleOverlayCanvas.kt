@@ -19,9 +19,12 @@ fun AuroraCircleOverlayCanvas(bitmap: Bitmap, modifier: Modifier = Modifier, onS
     initialSelection: List<Offset> = emptyList()) {
     var points by remember(bitmap) { mutableStateOf(initialSelection) }
     var dimensions by remember { mutableStateOf(IntSize.Zero) }
+    val context = androidx.compose.ui.platform.LocalContext.current
+    val haptics = remember { com.vibe.stashdrop.core.haptics.TactileHapticEngine(context) }
     Canvas(modifier.onSizeChanged { dimensions=it }.pointerInput(bitmap) {
-        detectDragGestures(onDragStart={ points=listOf(it) }, onDragCancel={ points=emptyList() },
-            onDragEnd={ if(points.size>=3) onSelection(points,dimensions) }, onDrag={ change,_ -> change.consume(); points=points.takeLast(2047)+change.position })
+        detectDragGestures(onDragStart={ points=listOf(it); haptics.reset(); haptics.select() }, onDragCancel={ points=emptyList() },
+            onDragEnd={ if(points.size>=3) { haptics.confirm(); onSelection(points,dimensions) } },
+            onDrag={ change,amount -> change.consume(); haptics.travel(amount.getDistance()/density, 36f); points=points.takeLast(2047)+change.position })
     }) {
         drawImage(bitmap.asImageBitmap(),dstSize=IntSize(size.width.toInt(),size.height.toInt()))
         drawRect(Color.Black.copy(alpha=.12f))

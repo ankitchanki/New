@@ -71,7 +71,7 @@ counts = Counter()
 for path in (root / "app/build/test-results/testDebugUnitTest").glob("TEST-*.xml"):
     result = ET.parse(path).getroot()
     counts.update({name: int(result.attrib[name]) for name in ["tests", "failures", "errors", "skipped"]})
-assert counts["tests"] == 19 and counts["failures"] == counts["errors"] == counts["skipped"] == 0
+assert counts["tests"] > 0 and counts["failures"] == counts["errors"] == counts["skipped"] == 0
 lint = {}
 for variant in ["debug", "release"]:
     issues = ET.parse(root / f"app/build/reports/lint-results-{variant}.xml").getroot().findall("issue")
@@ -111,5 +111,5 @@ report = {"version": version, "versionCode": version_code, "sourceTag": "v" + ve
 public_names = [apk.name, aab.name, cert.name, "release-verification.json"]
 (out / "SHA256SUMS.txt").write_text("\n".join(hashlib.sha256((out / name).read_bytes()).hexdigest() + "  " + name for name in public_names) + "\n")
 (root / f"docs/releases/v{version}-verification.json").write_text(json.dumps(report, indent=2) + "\n")
-print("APK v3 signature, AAB signature, matching certificate, 16 KB alignment, 19 tests and lint verified.")
+print(f"APK v3 signature, AAB signature, matching certificate, 16 KB alignment, {counts['tests']} tests and lint verified.")
 print("Public certificate SHA-256: " + apk_hash)

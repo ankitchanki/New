@@ -33,12 +33,14 @@ class OneUiThumbDockService: LifecycleService(), SavedStateRegistryOwner, ViewMo
         val running=MutableStateFlow(false)
         val clipboardStatus=MutableStateFlow("Start the floating shelf to monitor the clipboard")
         const val STOP="stop"
+        const val SEARCH="search"
     }
     private val saved=SavedStateRegistryController.create(this)
     override val savedStateRegistry get()=saved.savedStateRegistry
     override val viewModelStore=ViewModelStore()
     private val windows by lazy { getSystemService(WindowManager::class.java) }
     private val density get()=resources.displayMetrics.density
+    private val haptics by lazy { com.vibe.stashdrop.core.haptics.TactileHapticEngine(this) }
     private lateinit var dock: ComposeView
     private var sheet: ComposeView?=null
     private lateinit var wave: ComposeView
@@ -73,6 +75,7 @@ class OneUiThumbDockService: LifecycleService(), SavedStateRegistryOwner, ViewMo
     private fun params(width: Int,height: Int,touchable: Boolean=true)=WindowManager.LayoutParams(width,height,
         WindowManager.LayoutParams.TYPE_APPLICATION_OVERLAY,
         WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE or WindowManager.LayoutParams.FLAG_NOT_TOUCH_MODAL or
+            WindowManager.LayoutParams.FLAG_HARDWARE_ACCELERATED or
             (if(touchable) 0 else WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE),PixelFormat.TRANSLUCENT).apply {
             // Android 12+ blocks touches through non-touchable overlays above the obscuring-opacity limit.
             alpha=if(touchable) 1f else .7f
@@ -85,9 +88,12 @@ class OneUiThumbDockService: LifecycleService(), SavedStateRegistryOwner, ViewMo
         notifications.createNotificationChannel(NotificationChannel("dock","Floating shelf",NotificationManager.IMPORTANCE_LOW))
         val open=PendingIntent.getActivity(this,0,Intent(this,MainActivity::class.java),PendingIntent.FLAG_IMMUTABLE)
         val stop=PendingIntent.getService(this,1,Intent(this,javaClass).setAction(STOP),PendingIntent.FLAG_IMMUTABLE)
+        // An activity target collapses the notification shade before the screenshot.
+        val search=PendingIntent.getActivity(this,2,Intent(this,AssistActivity::class.java),PendingIntent.FLAG_IMMUTABLE)
         startForeground(1,NotificationCompat.Builder(this,"dock").setSmallIcon(android.R.drawable.ic_menu_save)
-            .setContentTitle("StashDrop shelf is active").setContentText("Tap to configure · Stop to remove overlays")
-            .setContentIntent(open).addAction(android.R.drawable.ic_menu_close_clear_cancel,"Stop",stop).setOngoing(true).build())
+            .setContentTitle("StashDrop shelf is active").setContentText("Hold the bubble or swipe up to Circle to Search")
+            .setContentIntent(open).addAction(android.R.drawable.ic_menu_search,"Circle to Search",search)
+            .addAction(android.R.drawable.ic_menu_close_clear_cancel,"Stop",stop).setOngoing(true).build())
         if(!Settings.canDrawOverlays(this)) { stopSelf(); return }
         try {
             wave=compose().apply { setContent { AuroraWave(waveProgress.value,Offset(waveX,resources.displayMetrics.heightPixels.toFloat()),Modifier.fillMaxSize()) } }
@@ -99,11 +105,11 @@ class OneUiThumbDockService: LifecycleService(), SavedStateRegistryOwner, ViewMo
                 flags=flags or WindowManager.LayoutParams.FLAG_LAYOUT_NO_LIMITS
             }
             dock=compose().apply {
-                setContent { StashDropTheme { ThumbDockIconComposable(stash.size,absorbing,::showSheet,{launchSearch(false)},::dragDock,::endDockDrag) } }
+                setContent { StashDropTheme { ThumbDockIconComposable(stash.size,absorbing,{haptics.tick(); showSheet()},::launchSearch,::dragDock,::endDockDrag) } }
                 setOnDragListener { _,event ->
                     when(event.action) {
                         DragEvent.ACTION_DRAG_STARTED -> { absorbing=true; true }
-                        DragEvent.ACTION_DRAG_ENTERED -> { absorbing=true; true }
+                        DragEvent.ACTION_DRAG_ENTERED -> { absorbing=true; haptics.tick(.5f); true }
                         DragEvent.ACTION_DRAG_EXITED -> { absorbing=false; true }
                         DragEvent.ACTION_DROP -> {
                             val clip=event.clipData
@@ -111,6 +117,7 @@ class OneUiThumbDockService: LifecycleService(), SavedStateRegistryOwner, ViewMo
                                 toast("Share files to StashDrop to grant access; overlay drops support text")
                                 return@setOnDragListener false
                             }
+                            haptics.confirm()
                             lifecycleScope.launch {
                                 runCatching {
                                     for(i in 0 until minOf(clip.itemCount,30)) {
@@ -133,7 +140,7 @@ class OneUiThumbDockService: LifecycleService(), SavedStateRegistryOwner, ViewMo
                 val velocity=waveProgress.velocity
                 waveJob?.cancel()
                 waveJob=lifecycleScope.launch { waveProgress.animateTo(p,IosSpringSpecs.follow(),initialVelocity=velocity) }
-            },{launchSearch(false)})
+            },::launchSearch)
             clipboard=ShizukuClipboardMonitor(this,stashApp.shizuku,stashApp.repository,lifecycleScope)
             lifecycleScope.launch { clipboard.status.collect { clipboardStatus.value=it } }
             lifecycleScope.launch { stashApp.repository.items.collect { stash=it } }
@@ -148,6 +155,7 @@ class OneUiThumbDockService: LifecycleService(), SavedStateRegistryOwner, ViewMo
     override fun onStartCommand(intent: Intent?,flags: Int,startId: Int): Int {
         super.onStartCommand(intent,flags,startId)
         if(intent?.action==STOP) stopSelf()
+        else if(intent?.action==SEARCH) launchSearch()
         return Service.START_NOT_STICKY
     }
     private fun configureBar() {
@@ -158,9 +166,9 @@ class OneUiThumbDockService: LifecycleService(), SavedStateRegistryOwner, ViewMo
     }
     override fun onConfigurationChanged(newConfig: Configuration) { super.onConfigurationChanged(newConfig); configureBar(); if(::dock.isInitialized) endDockDrag() }
     private fun toast(text: String) { Toast.makeText(this,text,Toast.LENGTH_LONG).show() }
-    private fun launchSearch(builtIn: Boolean) {
+    private fun launchSearch() {
         if(searchJob?.isActive==true) return
-        hideSheet(); idleJob?.cancel()
+        haptics.confirm(); hideSheet(); idleJob?.cancel()
         searchJob=lifecycleScope.launch {
             try {
                 val velocity=waveProgress.velocity
@@ -170,7 +178,7 @@ class OneUiThumbDockService: LifecycleService(), SavedStateRegistryOwner, ViewMo
                 waveJob?.cancel(); waveProgress.snapTo(0f)
                 dock.visibility=View.INVISIBLE; wave.visibility=View.INVISIBLE
                 delay(80) // Let SurfaceFlinger remove our overlay before screenshot acquisition.
-                CircleToSearchOrchestrator(this@OneUiThumbDockService).launch(builtIn)
+                CircleToSearchOrchestrator(this@OneUiThumbDockService).launch()
             } catch(e: Exception) { toast(e.message ?: "Search unavailable") }
             finally { dock.visibility=View.VISIBLE; wave.visibility=View.VISIBLE; schedulePeek() }
         }
@@ -180,17 +188,20 @@ class OneUiThumbDockService: LifecycleService(), SavedStateRegistryOwner, ViewMo
         val now=SystemClock.uptimeMillis()
         if(lastDragTime>0) snapVelocity=(amount.x*1000f/(now-lastDragTime).coerceAtLeast(1)).coerceIn(-5000f,5000f)
         lastDragTime=now
+        if(dragged==Offset.Zero) haptics.reset()
+        haptics.travel(amount.getDistance()/density)
         dragged+=amount; dockParams.x+=amount.x.toInt(); dockParams.y+=amount.y.toInt()
         runCatching { windows.updateViewLayout(dock,dockParams) }.onFailure { stopSelf() }
     }
+    /** Repositioning only: the dock snaps to the nearest edge and never launches anything on release. */
     private fun endDockDrag() {
-        val inward=if(left) dragged.x else -dragged.x
-        val downward=dragged.y
+        val moved=dragged!=Offset.Zero
         dragged=Offset.Zero; lastDragTime=0L
         left=dockParams.x+ dockParams.width/2 < resources.displayMetrics.widthPixels/2
-        dockParams.y=dockParams.y.coerceIn((resources.displayMetrics.heightPixels*.45f).toInt(),(resources.displayMetrics.heightPixels*.75f).toInt())
-        springX(if(left) 0 else resources.displayMetrics.widthPixels-dockParams.width)
-        if(inward>64*density) launchSearch(false) else if(downward>72*density) launchSearch(true)
+        val metrics=resources.displayMetrics
+        dockParams.y=dockParams.y.coerceIn((metrics.heightPixels*.12f).toInt(),(metrics.heightPixels*.85f).toInt())
+        springX(if(left) 0 else metrics.widthPixels-dockParams.width)
+        if(moved) haptics.tick(.6f)
         schedulePeek()
     }
     private fun springX(target: Int) {
@@ -212,7 +223,7 @@ class OneUiThumbDockService: LifecycleService(), SavedStateRegistryOwner, ViewMo
         if(peeked) { peeked=false; springX(if(left) 0 else resources.displayMetrics.widthPixels-dockParams.width) }
         idleJob?.cancel(); if(sheet!=null) { hideSheet(); return }
         val root=compose()
-        root.setContent { StashDropTheme { IosFanOutStashSheet(stash,stashApp.repository,::hideSheet,
+        root.setContent { StashDropTheme { IosFanOutStashSheet(stash,stashApp.repository,::hideSheet,::launchSearch,
             {items,whatsapp->runCatching { VisualLensBridge.share(this,stashApp.repository,items,whatsapp); hideSheet() }.onFailure { toast(it.message.orEmpty()) }},
             {item->lifecycleScope.launch { stashApp.repository.delete(item) }},
             {view,items->startGlobalDrag(root,view,items)}) } }
@@ -221,7 +232,7 @@ class OneUiThumbDockService: LifecycleService(), SavedStateRegistryOwner, ViewMo
     private fun startGlobalDrag(root: ComposeView,source: View,items: List<StashItemEntity>) {
         root.setOnDragListener { _,event ->
             if(event.action==DragEvent.ACTION_DRAG_ENDED) {
-                if(!event.result) toast("Drop was not accepted. Your items remain on the shelf.")
+                if(event.result) haptics.confirm() else toast("Drop was not accepted. Your items remain on the shelf.")
                 hideSheet()
             }
             true

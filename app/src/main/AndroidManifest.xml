@@ -11,7 +11,10 @@
     <application android:name=".StashDropApplication" android:theme="@style/AppTheme" android:label="@string/app_name" android:allowBackup="false" android:dataExtractionRules="@xml/data_extraction_rules" android:icon="@mipmap/ic_launcher" android:roundIcon="@mipmap/ic_launcher" android:supportsRtl="true">
         <meta-data android:name="moe.shizuku.client.V3_SUPPORT" android:value="true"/>
         <activity android:name=".MainActivity" android:exported="true"><intent-filter><action android:name="android.intent.action.MAIN"/><category android:name="android.intent.category.LAUNCHER"/></intent-filter></activity>
-        <activity android:name=".features.circletosearch.CircleStudioActivity" android:exported="false"/>
+        <activity android:name=".features.circletosearch.CircleSearchActivity" android:exported="false" android:taskAffinity="" android:excludeFromRecents="true"/>
+        <activity android:name=".features.circletosearch.AssistActivity" android:exported="true" android:theme="@style/AssistTheme" android:taskAffinity="" android:excludeFromRecents="true" android:noHistory="true">
+            <intent-filter><action android:name="android.intent.action.ASSIST"/><category android:name="android.intent.category.DEFAULT"/></intent-filter>
+        </activity>
         <activity android:name=".features.circletosearch.CaptureConsentActivity" android:exported="false"/>
         <activity android:name=".features.stashshelf.ReceiveShareActivity" android:exported="true"><intent-filter><action android:name="android.intent.action.SEND"/><action android:name="android.intent.action.SEND_MULTIPLE"/><category android:name="android.intent.category.DEFAULT"/><data android:mimeType="*/*"/></intent-filter></activity>
         <service android:name=".features.floatingdock.OneUiThumbDockService" android:exported="false" android:foregroundServiceType="specialUse"><property android:name="android.app.PROPERTY_SPECIAL_USE_FGS_SUBTYPE" android:value="User-enabled floating stash shelf and gesture controls"/></service>

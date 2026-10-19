@@ -13,7 +13,7 @@ import com.vibe.stashdrop.core.shaders.AuroraWave
 import com.vibe.stashdrop.core.shizuku.ShizukuConnectionManager
 import com.vibe.stashdrop.features.floatingdock.IosFanOutStashSheet
 import com.vibe.stashdrop.features.stashshelf.*
-import com.vibe.stashdrop.ui.dashboard.DashboardScreen
+import com.vibe.stashdrop.ui.dashboard.*
 import com.vibe.stashdrop.ui.theme.StashDropTheme
 import org.junit.Rule
 import org.junit.Test
@@ -39,9 +39,8 @@ class ReadmeScreenshots {
         StashDropTheme {
             DashboardScreen(
                 items = samples, settings = StashSettings(), shizuku = ShizukuConnectionManager.State(),
-                running = false, overlayAllowed = false, message = "", clipboardStatus = "Auto-stash is off",
-                onToggleDock = {}, onShizuku = {}, onAccessibility = {}, onSearch = {}, onPreference = {_,_->},
-                onBounce = {}, onAssistant = {}, onAddText = {}, onDelete = {}, onShare = {_,_->}, onCollect = {_,_->}, initialTab = initialTab,
+                running = false, setup = SetupState(overlay = true), message = "", clipboardStatus = "Auto-stash is off",
+                actions = DashboardActions(), initialTab = initialTab,
             )
         }
     }
@@ -51,7 +50,7 @@ class ReadmeScreenshots {
             androidx.compose.runtime.CompositionLocalProvider(androidx.compose.ui.platform.LocalInspectionMode provides true) {
                 StashDropTheme {
                     Box(Modifier.fillMaxSize().background(Color(0xFF0C0E15))) {
-                        IosFanOutStashSheet(samples, repository, {}, {_,_->}, {}, {_,_->})
+                        IosFanOutStashSheet(samples, repository, {}, {}, {_,_->}, {}, {_,_->})
                     }
                 }
             }
@@ -67,7 +66,7 @@ class ReadmeScreenshots {
         canvas.drawColor(android.graphics.Color.rgb(242, 241, 237))
         val paint = android.graphics.Paint(android.graphics.Paint.ANTI_ALIAS_FLAG)
         paint.color = android.graphics.Color.rgb(37, 45, 58); paint.textSize = 30f
-        canvas.drawText("SAMPLE CONTENT · STUDIO PREVIEW", 72f, 160f, paint)
+        canvas.drawText("SAMPLE CONTENT · CIRCLE TO SEARCH PREVIEW", 72f, 160f, paint)
         paint.textSize = 94f; paint.typeface = android.graphics.Typeface.create("sans-serif", android.graphics.Typeface.BOLD)
         canvas.drawText("Keep the", 72f, 350f, paint)
         canvas.drawText("good parts.", 72f, 465f, paint)
@@ -80,7 +79,7 @@ class ReadmeScreenshots {
         paint.color = android.graphics.Color.rgb(37, 45, 58); paint.textSize = 55f
         canvas.drawText("A note worth keeping.", 72f, 1690f, paint)
         paint.textSize = 38f; paint.typeface = android.graphics.Typeface.DEFAULT
-        canvas.drawText("Circle it. Extract it. Stash it.", 72f, 1800f, paint)
+        canvas.drawText("Circle it. Search it. Stash it.", 72f, 1800f, paint)
         val points = (0..80).map { index ->
             val angle = index / 80f * kotlin.math.PI.toFloat() * 2f
             androidx.compose.ui.geometry.Offset(540f + 440f * kotlin.math.cos(angle), 1050f + 480f * kotlin.math.sin(angle))

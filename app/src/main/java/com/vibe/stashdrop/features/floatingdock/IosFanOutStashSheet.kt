@@ -25,7 +25,7 @@ import com.vibe.stashdrop.features.dragdrop.IosCardStackDragShadow
 import com.vibe.stashdrop.features.stashshelf.*
 
 @Composable
-fun IosFanOutStashSheet(items: List<StashItemEntity>, repository: StashRepository, onDismiss: ()->Unit,
+fun IosFanOutStashSheet(items: List<StashItemEntity>, repository: StashRepository, onDismiss: ()->Unit, onSearch: ()->Unit,
     onShare: (List<StashItemEntity>,Boolean)->Unit, onDelete: (StashItemEntity)->Unit,
     onGlobalDrag: (View,List<StashItemEntity>)->Unit) {
     var selected by remember { mutableStateOf(emptySet<String>()) }
@@ -33,6 +33,8 @@ fun IosFanOutStashSheet(items: List<StashItemEntity>, repository: StashRepositor
     val currentSelected by rememberUpdatedState(selected)
     LaunchedEffect(items) { selected=selected.intersect(items.map { it.id }.toSet()) }
     val view=LocalView.current
+    val context=androidx.compose.ui.platform.LocalContext.current
+    val haptics=remember { com.vibe.stashdrop.core.haptics.TactileHapticEngine(context) }
     var dragVelocity by remember { mutableStateOf(androidx.compose.ui.geometry.Offset.Zero) }
     val tracker=remember { androidx.compose.ui.input.pointer.util.VelocityTracker() }
     val inspection = androidx.compose.ui.platform.LocalInspectionMode.current
@@ -44,32 +46,36 @@ fun IosFanOutStashSheet(items: List<StashItemEntity>, repository: StashRepositor
             Column(Modifier.padding(horizontal=20.dp,vertical=12.dp)) {
                 Box(Modifier.align(Alignment.CenterHorizontally).width(38.dp).height(4.dp).background(Color.White.copy(alpha=.2f),RoundedCornerShape(3.dp)))
                 Row(Modifier.fillMaxWidth().padding(vertical=16.dp),horizontalArrangement=Arrangement.SpaceBetween,verticalAlignment=Alignment.CenterVertically) {
-                    Column { Text("Your shelf",style=MaterialTheme.typography.headlineSmall); Text("${items.size} items · hold a card to drag",style=MaterialTheme.typography.labelMedium,color=MaterialTheme.colorScheme.primary) }
+                    Column(Modifier.weight(1f)) {
+                        Text("Your shelf",style=MaterialTheme.typography.titleLarge,maxLines=1)
+                        Text("${items.size} items · hold a card to drag",style=MaterialTheme.typography.labelMedium,color=MaterialTheme.colorScheme.primary,maxLines=1,overflow=TextOverflow.Ellipsis)
+                    }
+                    FilledTonalIconButton(onClick=onSearch) { Icon(Icons.Outlined.Search,"Circle to Search") }
                     IconButton(onClick=onDismiss) { Icon(Icons.Outlined.Close,"Close shelf") }
                 }
                 if(selected.isNotEmpty()) Row(Modifier.fillMaxWidth(),verticalAlignment=Alignment.CenterVertically) {
                     Box(Modifier.width(118.dp).height(88.dp).pointerInput(selected) {
-                        detectDragGesturesAfterLongPress(onDragStart={onGlobalDrag(view,currentItems.filter {it.id in currentSelected})},onDrag={change,_->change.consume()})
+                        detectDragGesturesAfterLongPress(onDragStart={haptics.confirm(); onGlobalDrag(view,currentItems.filter {it.id in currentSelected})},onDrag={change,_->change.consume()})
                     },contentAlignment=Alignment.Center) {
                         val stack=items.filter {it.id in selected}.take(3)
                         stack.reversed().forEachIndexed { index,item ->
                             Surface(Modifier.width(92.dp).height(64.dp).graphicsLayer {
                                 rotationZ=listOf(-4f,2f,5f)[index%3]; translationY=-index*5*density; shadowElevation=8*density
                             },shape=RoundedCornerShape(12.dp),color=MaterialTheme.colorScheme.primaryContainer) {
-                                Text(item.text ?: item.mimeType,Modifier.padding(10.dp),maxLines=2,overflow=TextOverflow.Ellipsis,style=MaterialTheme.typography.labelSmall)
+                                Text(item.text ?: "Image",Modifier.padding(10.dp),maxLines=2,overflow=TextOverflow.Ellipsis,style=MaterialTheme.typography.labelSmall)
                             }
                         }
                         Text("${selected.size}",Modifier.align(Alignment.TopEnd).background(MaterialTheme.colorScheme.primary,RoundedCornerShape(12.dp)).padding(6.dp),color=MaterialTheme.colorScheme.onPrimary)
                     }
-                    Column {
-                        Button(onClick={onShare(items.filter { it.id in selected },true)}) { Text("WhatsApp") }
-                        TextButton(onClick={onShare(items.filter { it.id in selected },false)}) { Text("Share selection") }
+                    Row(horizontalArrangement=Arrangement.spacedBy(8.dp)) {
+                        Button(onClick={haptics.select(); onShare(items.filter { it.id in selected },true)}) { Text("WhatsApp",maxLines=1) }
+                        OutlinedButton(onClick={haptics.select(); onShare(items.filter { it.id in selected },false)}) { Text("Share",maxLines=1) }
                     }
                 }
-                if(items.isEmpty()) Column(Modifier.fillMaxSize(),verticalArrangement=Arrangement.Center) {
+                if(items.isEmpty()) Column(Modifier.fillMaxSize(),verticalArrangement=Arrangement.Center,horizontalAlignment=Alignment.CenterHorizontally) {
                     Icon(Icons.Outlined.Inventory2,null,tint=MaterialTheme.colorScheme.primary)
-                    Text("Keep something close",style=MaterialTheme.typography.titleLarge)
-                    Text("Share text or images to StashDrop, or capture a cutout in Circle Studio.",color=MaterialTheme.colorScheme.onSurfaceVariant)
+                    Text("Keep something close",Modifier.padding(top=8.dp),style=MaterialTheme.typography.titleMedium,maxLines=1)
+                    Text("Share to StashDrop or circle something to save it",color=MaterialTheme.colorScheme.onSurfaceVariant,maxLines=1,overflow=TextOverflow.Ellipsis,style=MaterialTheme.typography.bodySmall)
                 }
                 LazyColumn(verticalArrangement=Arrangement.spacedBy(10.dp)) {
                     itemsIndexed(items,key={_,item->item.id}) { index,item ->
@@ -81,7 +87,7 @@ fun IosFanOutStashSheet(items: List<StashItemEntity>, repository: StashRepositor
                             rotationY=MagneticTrajectoryEngine.tilt(dragVelocity.x)
                         }
                             .pointerInput(item.id) { detectDragGesturesAfterLongPress(onDragStart={
-                                tracker.resetTracking()
+                                tracker.resetTracking(); haptics.confirm()
                                 val picked=currentItems.filter { it.id in currentSelected }.ifEmpty { listOf(item) }
                                 onGlobalDrag(view,picked)
                             },onDragEnd={dragVelocity=androidx.compose.ui.geometry.Offset.Zero},onDragCancel={dragVelocity=androidx.compose.ui.geometry.Offset.Zero},onDrag={change,_->
@@ -89,13 +95,13 @@ fun IosFanOutStashSheet(items: List<StashItemEntity>, repository: StashRepositor
                                 val velocity=tracker.calculateVelocity()
                                 dragVelocity=androidx.compose.ui.geometry.Offset(velocity.x,velocity.y)
                             }) },
-                            onClick={ selected=if(chosen) selected-item.id else selected+item.id },
+                            onClick={ haptics.select(); selected=if(chosen) selected-item.id else selected+item.id },
                             colors=CardDefaults.cardColors(containerColor=if(chosen) MaterialTheme.colorScheme.primaryContainer else MaterialTheme.colorScheme.surfaceVariant)) {
                             Row(Modifier.fillMaxWidth().padding(14.dp),verticalAlignment=Alignment.CenterVertically) {
                                 Icon(if(item.fileName!=null) Icons.Outlined.Image else Icons.AutoMirrored.Outlined.Notes,null,Modifier.padding(end=12.dp),tint=MaterialTheme.colorScheme.primary)
                                 Column(Modifier.weight(1f)) {
-                                    Text(item.text ?: item.mimeType,maxLines=3,overflow=TextOverflow.Ellipsis,style=MaterialTheme.typography.bodyMedium)
-                                    Text(item.collection,style=MaterialTheme.typography.labelSmall,color=MaterialTheme.colorScheme.primary)
+                                    Text(item.text?.replace('\n',' ') ?: "Image",maxLines=1,overflow=TextOverflow.Ellipsis,style=MaterialTheme.typography.bodyMedium)
+                                    Text(item.collection,style=MaterialTheme.typography.labelSmall,color=MaterialTheme.colorScheme.primary,maxLines=1)
                                 }
                                 IconButton(onClick={onShare(listOf(item),true)}) { Icon(Icons.AutoMirrored.Outlined.Send,"Send to WhatsApp") }
                                 IconButton(onClick={onDelete(item)}) { Icon(Icons.Outlined.DeleteOutline,"Delete item") }

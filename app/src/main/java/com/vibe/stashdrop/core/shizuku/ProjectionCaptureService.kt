@@ -9,7 +9,7 @@ import android.media.ImageReader
 import android.media.projection.*
 import android.os.*
 import androidx.core.app.NotificationCompat
-import com.vibe.stashdrop.features.circletosearch.CircleStudioActivity
+import com.vibe.stashdrop.features.circletosearch.CircleSearchActivity
 
 /** One consent token, one virtual display, one screenshot. Never retains a capture session. */
 class ProjectionCaptureService : Service() {
@@ -22,7 +22,7 @@ class ProjectionCaptureService : Service() {
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
         val notifications = getSystemService(NotificationManager::class.java)
         notifications.createNotificationChannel(NotificationChannel("capture", "Screen capture", NotificationManager.IMPORTANCE_LOW))
-        val notification = NotificationCompat.Builder(this, "capture").setContentTitle("Capturing for Circle Studio")
+        val notification = NotificationCompat.Builder(this, "capture").setContentTitle("Capturing for Circle to Search")
             .setSmallIcon(android.R.drawable.ic_menu_camera).setOngoing(true).build()
         if (Build.VERSION.SDK_INT >= 29) startForeground(2, notification, ServiceInfo.FOREGROUND_SERVICE_TYPE_MEDIA_PROJECTION)
         else startForeground(2, notification)
@@ -56,7 +56,7 @@ class ProjectionCaptureService : Service() {
         release()
         if (bitmap != null) {
             CapturedFrame.put(bitmap)
-            startActivity(Intent(this, CircleStudioActivity::class.java).addFlags(Intent.FLAG_ACTIVITY_NEW_TASK))
+            startActivity(Intent(this, CircleSearchActivity::class.java).addFlags(Intent.FLAG_ACTIVITY_NEW_TASK))
         }
         stopSelf()
     }

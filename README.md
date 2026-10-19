@@ -36,14 +36,14 @@ These images render the **actual Compose components with sample content** using 
     <th>Controls &amp; connections</th>
   </tr>
   <tr>
-    <td width="33%"><a href="docs/assets/screenshots/overview.png"><img src="docs/assets/screenshots/overview.png" alt="Implemented overview with motion playground and Circle Studio entry points" width="100%" /></a></td>
+    <td width="33%"><a href="docs/assets/screenshots/overview.png"><img src="docs/assets/screenshots/overview.png" alt="Implemented home screen with motion playground and Circle to Search entry point" width="100%" /></a></td>
     <td width="33%"><a href="docs/assets/screenshots/shelf.png"><img src="docs/assets/screenshots/shelf.png" alt="Implemented shelf tab with sample notes, links, collections, and share actions" width="100%" /></a></td>
     <td width="33%"><a href="docs/assets/screenshots/controls.png"><img src="docs/assets/screenshots/controls.png" alt="Implemented controls tab with Shizuku connection and opt-in gestures" width="100%" /></a></td>
   </tr>
 </table>
 
 <table>
-  <tr><th>Floating shelf component</th><th>Circle Studio selection canvas</th></tr>
+  <tr><th>Floating shelf component</th><th>Circle to Search selection canvas</th></tr>
   <tr>
     <td width="50%" align="center"><a href="docs/assets/screenshots/floating-shelf.png"><img src="docs/assets/screenshots/floating-shelf.png" alt="Implemented floating shelf sheet showing sample stash cards" width="320" /></a></td>
     <td width="50%" align="center"><a href="docs/assets/screenshots/circle-canvas.png"><img src="docs/assets/screenshots/circle-canvas.png" alt="Implemented iridescent lasso canvas over clearly identified sample artwork" width="320" /></a></td>
@@ -86,9 +86,11 @@ Explore [shaders](app/src/main/java/com/vibe/stashdrop/core/shaders), [physics](
 | Floating thumb dock | Draggable dock, magnetic edge snap, idle peek, foreground notification | Overlay permission required |
 | Local stash shelf | Notes, links, imported files/images, collections, deletion | Room + private app files |
 | Share into StashDrop | Android `SEND` and `SEND_MULTIPLE` receivers | Up to 30 attachments; 50 MB per attachment |
-| Circle Studio | Screen capture, freehand lasso, masked cutouts, stash/copy/share actions | Capture permission or consent required |
+| Circle to Search | Screen capture, freehand lasso, Google search of circled text, Lens image search, copy/stash/share | Capture permission or consent required |
 | Offline text & codes | Bundled Latin-script ML Kit text recognition and barcode scanning | Built-in path; no backend key |
-| Native Google search | Best-effort contextual-search/voice-session bridge with Studio fallback | Shizuku, ROM, Google package, and eligibility dependent |
+| Default digital assistant | Long-press home opens StashDrop Circle to Search; set or restore from Settings | One tap with Shizuku; otherwise the system default-apps screen |
+| In-app setup | Overlay, notifications, screenshot access and assistant status with one-tap fixes | Shizuku applies them directly; otherwise opens the exact system screen |
+| Haptic feedback | Detents while dragging the bubble and drawing a circle; clicks when stacking cards | Toggle in Settings |
 | Clean links | Removes `utm_*`, `fbclid`, `gclid`, `si`, `igshid`, `ref`, and related tracking keys | Preserves raw query encoding and prose punctuation |
 | Background text clipboard | Opt-in shell listener plus permitted foreground fallback | Shizuku/OEM access rules apply; off by default |
 | Multi-select & global drag | Selection stack, custom drag shadow, URI read grants | Receiver must accept the content |
@@ -128,20 +130,19 @@ The debug APK uses a development signing key. Signed release builds require a se
 
 ### First run
 
-1. Open StashDrop and allow **display over other apps** when enabling the floating shelf.
-2. Return to the app and tap **Start floating shelf**. The notification's **Stop** action removes the overlays and clipboard listener.
-3. Share a note, link, photo, or file **to StashDrop**, or add a note from the Shelf tab.
-4. Open **Circle Studio**. It tries Shizuku capture, accessibility screenshots on API 30+, then one-shot screen-sharing consent.
-5. Circle an area, then copy extracted text, stash the cutout, or share it.
-6. Optional: install/start Shizuku separately and authorize StashDrop in Controls. Gesture strips and auto-stash are opt-in.
+1. Open StashDrop, go to **Settings → Setup**, and fix anything marked Off. With Shizuku connected, **Set up everything with Shizuku** does it in one tap.
+2. On Home, tap **Show floating bubble**. Tap the bubble for your shelf; hold it (or swipe up on the gesture strip) for Circle to Search.
+3. Optional: set **Default assistant → Use StashDrop** so long-pressing home opens Circle to Search instead of Gemini.
+4. Circle an area, then search its text on Google, search the image with Lens, copy, stash, or share it.
+5. Share a note, link, photo, or file **to StashDrop**, or add a note from the Shelf tab. Gesture strips and auto-stash are opt-in.
 
 ## Signed releases and changelog
 
-Version `0.1.1` uses Android version code `2` and the existing StashDrop production certificate. Signed APK/app-bundle packages include checksums, the public certificate, and a verification report. Version-tag builds use [GitHub Actions](.github/workflows/android.yml); the four signing secrets must be configured before publication. Private signing keys are kept separately.
+Version `0.2.0` uses Android version code `3` and the existing StashDrop production certificate. Signed APK/app-bundle packages include checksums, the public certificate, and a verification report. Version-tag builds use [GitHub Actions](.github/workflows/android.yml); the four signing secrets must be configured before publication. Private signing keys are kept separately.
 
 - [Changelog](CHANGELOG.md)
+- [Version 0.2.0 notes](docs/releases/v0.2.0.md)
 - [Version 0.1.1 notes](docs/releases/v0.1.1.md)
-- [Signed build verification](docs/releases/v0.1.1-verification.json)
 - [Release build and publication instructions](docs/RELEASING.md)
 - [GitHub Releases](https://github.com/ankitchanki/StashDrop/releases) for versions that have completed publication
 
@@ -154,13 +155,13 @@ flowchart LR
     Share[Android Share] --> Shelf[Local stash shelf]
     Copy[Opt-in text clipboard] --> Clean[URL privacy sanitizer]
     Clean --> Shelf
-    Dock[Floating thumb dock] --> Search{Search route}
-    Search -->|Eligible Google / Shizuku| Native[Native Google interface]
-    Search -->|Built-in or fallback| Capture[Screen capture]
-    Capture --> Studio[Circle Studio lasso]
-    Studio --> ML[Offline OCR and barcodes]
-    Studio --> Shelf
-    Studio --> Lens[Lens / compatible image app]
+    Dock[Floating bubble / gestures] --> Capture[Screen capture]
+    Assist[Default assistant long-press] --> Capture
+    Capture --> Circle[Circle to Search lasso]
+    Circle --> ML[Offline OCR and barcodes]
+    ML --> Google[Google search]
+    Circle --> Lens[Google Lens]
+    Circle --> Shelf
     Shelf --> Out[Share or global drag]
 ```
 

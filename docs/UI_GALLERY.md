@@ -16,7 +16,7 @@ All UI images below are rendered from the production Jetpack Compose components 
 | [Circle selection canvas](assets/screenshots/circle-canvas.png) | Production lasso canvas over synthetic sample artwork | `AuroraCircleOverlayCanvas`, initial sample selection |
 | [Aurora still](assets/screenshots/aurora-wave.png) | Production shader/Canvas composable with sample pull progress | `AuroraWave` |
 
-The Studio render shows its selection canvas, not a completed screen-capture or OCR session. The sample path is supplied as component state. Callback functions in the presentation fixture are inert because this is rendering, not end-to-end interaction testing.
+The Circle to Search render shows its selection canvas, not a completed screen-capture or OCR session. The sample path is supplied as component state. Callback functions in the presentation fixture are inert because this is rendering, not end-to-end interaction testing.
 
 ### Regenerate UI renders
 

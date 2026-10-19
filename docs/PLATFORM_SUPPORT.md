@@ -3,7 +3,7 @@
 StashDrop targets Android 9+ with different capabilities depending on OS permissions, hardware, and receiving apps.
 
 
-- Native Google Circle to Search is a best-effort hidden-API request. Android version alone does not establish support. Google's package, ROM permissions, app version, and server/device eligibility matter. A rejected invocation routes to Studio. A Binder call's success cannot prove that Google displayed the requested visual interface.
+- Circle to Search is StashDrop's own capture-and-lasso screen; it never hands off to Gemini. Long-press home opens it when StashDrop holds the default assistant role (Android 10+), which Settings sets through Shizuku or the system default-apps screen.
 - Switching the default assistant is an explicit Controls action through Shizuku, with previous values saved for restoration. No assistant setting is changed during app startup. No private API can guarantee universal “zero-settings” Google support.
 - A normal app cannot capture `FLAG_SECURE`, DRM, or other protected content. Capture is asynchronous, not zero latency. No `SurfaceControl` signature-permission bypass is claimed.
 - Android 9–10 require Shizuku capture or MediaProjection consent. Accessibility screenshots require API 30+, user enablement, and a permitted target window.

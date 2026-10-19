@@ -40,7 +40,8 @@ fun LiquidMetaball(absorption: Float, modifier: Modifier = Modifier) {
     LaunchedEffect(absorption > .01f) { if (absorption > .01f) { val start=withFrameNanos { it }; while(true) withFrameNanos { time=(it-start)/1e9f } } }
     val runtime = remember { if (Build.VERSION.SDK_INT>=33) runCatching { MetaballRuntime() }.getOrNull() else null }
     Canvas(modifier) {
-        if (Build.VERSION.SDK_INT>=33 && runtime!=null) {
+        // RuntimeShader throws on software canvases (e.g. non-accelerated overlay windows).
+        if (Build.VERSION.SDK_INT>=33 && runtime!=null && drawContext.canvas.nativeCanvas.isHardwareAccelerated) {
             runtime.shader.setFloatUniform("u_resolution",size.width,size.height)
             runtime.shader.setFloatUniform("u_time",time); runtime.shader.setFloatUniform("u_absorption",absorption)
             drawContext.canvas.nativeCanvas.drawRect(0f,0f,size.width,size.height,runtime.paint)

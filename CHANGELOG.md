@@ -2,6 +2,29 @@
 
 All notable StashDrop changes are recorded here. Versions follow Semantic Versioning.
 
+## [0.2.0] - 2026-10-19
+
+### Fixed
+
+- Starting the floating bubble no longer force-closes the app. Overlay windows were software-rendered and the dock's AGSL shader threw `Software rendering doesn't support RuntimeShader`; overlays now request hardware acceleration and shaders fall back to Canvas drawing on software canvases.
+- Swiping up (and every other trigger) opens StashDrop's own Circle to Search instead of handing off to Gemini or the system assistant.
+- Moving the bubble no longer launches search when you drag it inward or downward, and it can be placed anywhere from 12% to 85% of the screen height.
+
+### Added
+
+- Default digital assistant support: StashDrop can hold the assistant role so long-pressing home opens Circle to Search. Set or restore it from Settings (one tap with Shizuku).
+- Settings → Setup shows overlay, notification, Shizuku, screenshot and assistant status with one-tap fixes, plus "Set up everything with Shizuku".
+- Haptic feedback while dragging the bubble, drawing a circle, selecting and stacking cards, and on drops and search launch, with an in-app toggle.
+- Circle to Search actions: Google search of circled text, Lens image search, copy, stash, and share in one row; a Circle to Search button in the floating shelf and the bubble's notification.
+- Robolectric regression test that starts the floating service and draws every overlay with native graphics.
+
+### Changed
+
+- Circle Studio is merged into Circle to Search; the native Google/Gemini bridge is removed.
+- New round floating bubble with gradient rim, mint count badge, and drop glow.
+- Titles, labels, and list rows sit on a single line; Controls is now Settings.
+- Android version name is `0.2.0` and version code is `3`.
+
 ## [0.1.1] - 2026-10-19
 
 ### Added
