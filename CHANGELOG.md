@@ -2,6 +2,18 @@
 
 All notable StashDrop changes are recorded here. Versions follow Semantic Versioning.
 
+## [0.3.1] - 2026-10-19
+
+### Fixed
+
+- "Background task failed" and the earlier force close a few seconds after touching the bubble: the bubble's edge-snap, idle-peek and aurora animations ran without a Compose frame clock (`MonotonicFrameClock is not available`). They now run on `AndroidUiDispatcher.Main`. Found from the in-app crash report on a Xiaomi 23049PCD8I, Android 15.
+- Tests now fail on any error the bubble records, and cover the idle peek, Circle to Search from the bubble, and dropping the bubble on the dismiss target.
+
+### Added
+
+- Chat-head style dismiss target: drag the bubble to the X at the bottom of the screen to hide it, with a magnetic snap and haptics.
+- Google Circle to Search with StashDrop as the digital assistant: Settings → Digital assistant → Connect (Shizuku) routes the corner swipe / long-press home to StashDrop while keeping Google's voice service on, so StashDrop opens Google Circle to Search.
+
 ## [0.3.0] - 2026-10-19
 
 ### Changed

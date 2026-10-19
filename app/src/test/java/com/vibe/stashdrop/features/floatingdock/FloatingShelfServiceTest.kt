@@ -36,6 +36,10 @@ class FloatingShelfServiceTest {
         val event = MotionEvent.obtain(down, SystemClock.uptimeMillis(), action, x, y, 0)
         view.dispatchTouchEvent(event); event.recycle()
     }
+    private val context get() = ApplicationProvider.getApplicationContext<android.content.Context>()
+    /** Guarded failures are recorded instead of crashing; any record is a failed test. */
+    private fun assertNoErrors() = org.junit.Assert.assertNull("recorded error", com.vibe.stashdrop.core.diagnostics.CrashReporter.read(context))
+    @org.junit.Before fun clearErrors() = com.vibe.stashdrop.core.diagnostics.CrashReporter.clear(context)
     private fun startService() = Robolectric.buildService(OneUiThumbDockService::class.java).create().startCommand(0, 1).also { idle() }
     private fun dock(): View = views().first { (it.layoutParams as WindowManager.LayoutParams).width in 1 until 1000 }
 
@@ -45,6 +49,8 @@ class FloatingShelfServiceTest {
         assertTrue("service should report running", OneUiThumbDockService.running.value)
         assertTrue("dock and aurora overlays attached, got ${views().size}", views().size >= 2)
         drawAll()
+        idle(5000) // The idle peek animation runs three seconds after start.
+        assertNoErrors()
         controller.destroy(); idle()
     }
 
@@ -65,8 +71,37 @@ class FloatingShelfServiceTest {
         down = SystemClock.uptimeMillis()
         touch(dock, MotionEvent.ACTION_DOWN, c, c, down)
         for (step in 1..20) { touch(dock, MotionEvent.ACTION_MOVE, c - step * 15f, c + step * 10f, down); idle(16) }
-        touch(dock, MotionEvent.ACTION_UP, c - 300f, c + 200f, down); idle()
+        touch(dock, MotionEvent.ACTION_UP, c - 300f, c + 200f, down); idle(5000)
         drawAll()
+        assertNoErrors()
+        controller.destroy(); idle()
+    }
+
+    @Test @Config(sdk = [35]) fun circleToSearchFromTheBubbleRecordsNoError() {
+        ShadowSettings.setCanDrawOverlays(true)
+        val controller = startService()
+        controller.withIntent(android.content.Intent().setAction(OneUiThumbDockService.SEARCH)).startCommand(0, 2)
+        idle(4000)
+        drawAll()
+        assertNoErrors()
+        controller.destroy(); idle()
+    }
+
+    @Test @Config(sdk = [35]) fun droppingTheBubbleOnTheXHidesIt() {
+        ShadowSettings.setCanDrawOverlays(true)
+        val controller = startService()
+        val dock = dock(); val params = dock.layoutParams as WindowManager.LayoutParams
+        val target = views().first { (it.layoutParams as WindowManager.LayoutParams).gravity == android.view.Gravity.BOTTOM }
+        val down = SystemClock.uptimeMillis(); val c = dock.width / 2f
+        touch(dock, MotionEvent.ACTION_DOWN, c, c, down); idle(50)
+        // Move in small steps from the bubble's position to the target's centre.
+        val location = IntArray(2).also(target::getLocationOnScreen)
+        val dx = location[0] + target.width / 2f - (params.x + dock.width / 2f)
+        val dy = location[1] + target.height / 2f - (params.y + dock.height / 2f)
+        for (step in 1..30) { touch(dock, MotionEvent.ACTION_MOVE, c + dx * step / 30, c + dy * step / 30, down); idle(16) }
+        touch(dock, MotionEvent.ACTION_UP, c + dx, c + dy, down); idle()
+        assertNoErrors()
+        assertTrue("dropping on the X should hide the bubble", org.robolectric.Shadows.shadowOf(controller.get()).isStoppedBySelf)
         controller.destroy(); idle()
     }
 }

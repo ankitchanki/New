@@ -101,6 +101,7 @@ class MainActivity: ComponentActivity() {
                 listOfNotNull(granted,role).joinToString(" · ")
             }) },
             chooseAssistant={ open(*defaultApps) },
+            linkGoogle={ shizukuOr({ assistant.linkGoogle() }) },
             copyCrash={ report ->
                 getSystemService(ClipboardManager::class.java).setPrimaryClip(ClipData.newPlainText("StashDrop crash report",report))
                 message="Crash report copied"

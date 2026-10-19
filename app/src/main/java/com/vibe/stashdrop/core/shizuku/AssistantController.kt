@@ -12,9 +12,16 @@ class AssistantController(private val context: Context, private val manager: Shi
     private val backup = context.getSharedPreferences("assistant-backup", Context.MODE_PRIVATE)
     private val user get() = Process.myUid() / 100_000 // Android user id
     val supported get() = Build.VERSION.SDK_INT >= 29
-    fun isDefault(): Boolean = supported && runCatching {
+    /** StashDrop receives assistant presses: it holds the role, or presses are routed to its assist screen. */
+    fun isDefault(): Boolean = (supported && runCatching {
         context.getSystemService(RoleManager::class.java).isRoleHeld(RoleManager.ROLE_ASSISTANT)
-    }.getOrDefault(false)
+    }.getOrDefault(false)) || runCatching { android.provider.Settings.Secure.getString(context.contentResolver, "assistant") }.getOrNull() == ShellUserService.ASSIST_ACTIVITY
+    /** Keeps StashDrop on assistant presses while switching Google's voice service back on for Circle to Search. */
+    suspend fun linkGoogle(): String? = withContext(Dispatchers.IO) {
+        val service = manager.service ?: return@withContext null
+        val google = com.vibe.stashdrop.features.circletosearch.GoogleCircleToSearch.googleService(context) ?: return@withContext "Error: Google app is not installed"
+        service.routeAssistantToStashDrop(google.flattenToString(), user)
+    }
     /** Null when Shizuku is unavailable and the caller should open the system default-apps screen instead. */
     suspend fun makeDefault(): String? = withContext(Dispatchers.IO) {
         val service = manager.service ?: return@withContext null

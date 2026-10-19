@@ -9,5 +9,6 @@ interface IPrivilegedService {
     ParcelFileDescriptor captureToPipe() = 4;
     String getAssistantRole(int userId) = 5;
     String grantSetup(int userId) = 6;
+    String routeAssistantToStashDrop(String googleVoiceService, int userId) = 7;
     void destroy() = 16777114;
 }

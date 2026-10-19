@@ -14,7 +14,7 @@ class CircleToSearchOrchestrator(private val context: Context) {
             if (GoogleCircleToSearch.launch(context)) return true
             val reason = when (GoogleCircleToSearch.readiness(context)) {
                 GoogleCircleToSearch.Readiness.GOOGLE_MISSING -> "Google app not found"
-                GoogleCircleToSearch.Readiness.GOOGLE_NOT_ASSISTANT -> "Google isn't your digital assistant"
+                GoogleCircleToSearch.Readiness.GOOGLE_NOT_ASSISTANT -> "Connect Google in StashDrop Settings"
                 GoogleCircleToSearch.Readiness.READY -> "Google did not respond"
             }
             Toast.makeText(context, "$reason · using StashDrop circle", Toast.LENGTH_SHORT).show()

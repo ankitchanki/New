@@ -14,7 +14,7 @@ class ShizukuConnectionManager(private val context: Context) {
     @Volatile var service: IPrivilegedService? = null; private set
     private var binding = false
     private val args = Shizuku.UserServiceArgs(ComponentName(context, ShellUserService::class.java))
-        .daemon(false).processNameSuffix("privileged").debuggable(false).version(2)
+        .daemon(false).processNameSuffix("privileged").debuggable(false).version(3)
     private val connection = object : ServiceConnection {
         override fun onServiceConnected(name: ComponentName, binder: IBinder) {
             service = IPrivilegedService.Stub.asInterface(binder); binding = false

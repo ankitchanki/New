@@ -10,6 +10,7 @@ class ShellUserService : IPrivilegedService.Stub() {
     companion object {
         const val OWN_PACKAGE = "com.vibe.stashdrop"
         const val ACCESSIBILITY = "$OWN_PACKAGE/$OWN_PACKAGE.core.shizuku.CaptureAccessibilityService"
+        const val ASSIST_ACTIVITY = "$OWN_PACKAGE/$OWN_PACKAGE.features.circletosearch.AssistActivity"
     }
     init { HiddenApiBypassInitializer.initialize() }
     private fun command(vararg args: String): String {
@@ -33,6 +34,18 @@ class ShellUserService : IPrivilegedService.Stub() {
         }
         check(getAssistantRole(userId) == target.orEmpty()) { "The system did not accept the assistant change" }
         "Digital assistant updated"
+    }.getOrElse { "Error: ${it.message}" }
+    /**
+     * Assistant presses (corner swipe, long-press home) open StashDrop's assist screen while Google's voice service stays
+     * active, so StashDrop can hand them to Google Circle to Search. Only these two fixed values are accepted.
+     */
+    override fun routeAssistantToStashDrop(googleVoiceService: String?, userId: Int): String = runCatching {
+        val service = googleVoiceService.orEmpty()
+        require(service.startsWith("com.google.android.googlequicksearchbox/") && packageName.matches(service.substringAfter('/').removePrefix("."))) { "Not a Google voice service" }
+        val user = userId.toString()
+        command("/system/bin/settings", "--user", user, "put", "secure", "voice_interaction_service", service)
+        command("/system/bin/settings", "--user", user, "put", "secure", "assistant", ASSIST_ACTIVITY)
+        "Corner swipe and long-press home now open Google Circle to Search through StashDrop"
     }.getOrElse { "Error: ${it.message}" }
     /** Grants StashDrop's own overlay, notification, and screenshot-accessibility access. */
     override fun grantSetup(userId: Int): String {

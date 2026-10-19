@@ -48,8 +48,15 @@ class OneUiThumbDockService: LifecycleService(), SavedStateRegistryOwner, ViewMo
         toast("$where failed: ${error.message ?: error.javaClass.simpleName}")
     }
     private val guard=CoroutineExceptionHandler { _,error -> report("Background task",error) }
+    /** Compose animations need a frame clock; AndroidUiDispatcher supplies one tied to the Choreographer. */
+    private val ui get()=androidx.compose.ui.platform.AndroidUiDispatcher.Main+guard
     private lateinit var dock: ComposeView
     private var sheet: View?=null
+    private var dismiss: ComposeView?=null
+    private var dismissShown by mutableStateOf(false)
+    private var dismissHot by mutableStateOf(false)
+    private var freeX=0f
+    private var freeY=0f
     private lateinit var wave: ComposeView
     private lateinit var bar: BottomBarGestureOverlay
     private lateinit var clipboard: ShizukuClipboardMonitor
@@ -131,7 +138,7 @@ class OneUiThumbDockService: LifecycleService(), SavedStateRegistryOwner, ViewMo
                                 return@setOnDragListener false
                             }
                             haptics.confirm()
-                            lifecycleScope.launch(guard) {
+                            lifecycleScope.launch(ui) {
                                 runCatching {
                                     for(i in 0 until minOf(clip.itemCount,30)) {
                                         val item=clip.getItemAt(i)
@@ -147,17 +154,20 @@ class OneUiThumbDockService: LifecycleService(), SavedStateRegistryOwner, ViewMo
                     }
                 }
             }
+            // Added before the dock so the bubble stays above it.
+            dismiss=compose().apply { setContent { DismissTarget(dismissShown,dismissHot) } }
+            windows.addView(dismiss,params(-1,(170*density).toInt(),false).apply { gravity=Gravity.BOTTOM })
             windows.addView(dock,dockParams)
             bar=BottomBarGestureOverlay(this,windows,{p,x->
                 waveX=x
                 val velocity=waveProgress.velocity
                 waveJob?.cancel()
-                waveJob=lifecycleScope.launch(guard) { waveProgress.animateTo(p,IosSpringSpecs.follow(),initialVelocity=velocity) }
+                waveJob=lifecycleScope.launch(ui) { waveProgress.animateTo(p,IosSpringSpecs.follow(),initialVelocity=velocity) }
             },{ safely("Circle to Search",::launchSearch) })
             clipboard=ShizukuClipboardMonitor(this,stashApp.shizuku,stashApp.repository,lifecycleScope)
-            lifecycleScope.launch(guard) { clipboard.status.collect { clipboardStatus.value=it } }
-            lifecycleScope.launch(guard) { stashApp.repository.items.collect { stash=it } }
-            lifecycleScope.launch(guard) { stashApp.preferences.settings.collect { value -> settings=value; configureBar(); if(value.autoStash) clipboard.start() else clipboard.stop() } }
+            lifecycleScope.launch(ui) { clipboard.status.collect { clipboardStatus.value=it } }
+            lifecycleScope.launch(ui) { stashApp.repository.items.collect { stash=it } }
+            lifecycleScope.launch(ui) { stashApp.preferences.settings.collect { value -> settings=value; configureBar(); if(value.autoStash) clipboard.start() else clipboard.stop() } }
             androidx.core.content.ContextCompat.registerReceiver(this,screenState,
                 IntentFilter().apply { addAction(Intent.ACTION_SCREEN_OFF); addAction(Intent.ACTION_SCREEN_ON); addAction(Intent.ACTION_USER_PRESENT) },
                 androidx.core.content.ContextCompat.RECEIVER_NOT_EXPORTED)
@@ -182,7 +192,7 @@ class OneUiThumbDockService: LifecycleService(), SavedStateRegistryOwner, ViewMo
     private fun launchSearch() {
         if(searchJob?.isActive==true) return
         haptics.confirm(); hideSheet(); idleJob?.cancel()
-        searchJob=lifecycleScope.launch(guard) {
+        searchJob=lifecycleScope.launch(ui) {
             var google=false
             try {
                 val velocity=waveProgress.velocity
@@ -204,13 +214,30 @@ class OneUiThumbDockService: LifecycleService(), SavedStateRegistryOwner, ViewMo
         val now=SystemClock.uptimeMillis()
         if(lastDragTime>0) snapVelocity=(amount.x*1000f/(now-lastDragTime).coerceAtLeast(1)).coerceIn(-5000f,5000f)
         lastDragTime=now
-        if(dragged==Offset.Zero) haptics.reset()
+        if(dragged==Offset.Zero) { haptics.reset(); freeX=dockParams.x.toFloat(); freeY=dockParams.y.toFloat(); dismissShown=true }
         haptics.travel(amount.getDistance()/density)
-        dragged+=amount; dockParams.x+=amount.x.toInt(); dockParams.y+=amount.y.toInt()
+        dragged+=amount; freeX+=amount.x; freeY+=amount.y
+        // Magnet: near the dismiss target the bubble snaps onto it, like a chat head.
+        val target=dismissCenter()
+        val hot=target!=null && kotlin.math.hypot(freeX+dockParams.width/2-target.x,freeY+dockParams.height/2-target.y)<84*density
+        if(hot!=dismissHot) { dismissHot=hot; if(hot) haptics.select() else haptics.tick() }
+        if(hot && target!=null) { dockParams.x=(target.x-dockParams.width/2).toInt(); dockParams.y=(target.y-dockParams.height/2).toInt() }
+        else { dockParams.x=freeX.toInt(); dockParams.y=freeY.toInt() }
         runCatching { windows.updateViewLayout(dock,dockParams) }.onFailure { stopSelf() }
     }
     /** Repositioning only: the dock snaps to the nearest edge and never launches anything on release. */
+    private fun dismissCenter(): Offset? {
+        val view=dismiss?.takeIf { it.isAttachedToWindow && it.height>0 } ?: return null
+        val location=IntArray(2).also(view::getLocationOnScreen)
+        return Offset(location[0]+view.width/2f,location[1]+view.height/2f)
+    }
     private fun endDockDrag() {
+        dismissShown=false
+        if(dismissHot) {
+            dismissHot=false; haptics.confirm()
+            toast("Bubble hidden · turn it on again in StashDrop")
+            stopSelf(); return
+        }
         val moved=dragged!=Offset.Zero
         dragged=Offset.Zero; lastDragTime=0L
         left=dockParams.x+ dockParams.width/2 < resources.displayMetrics.widthPixels/2
@@ -222,7 +249,7 @@ class OneUiThumbDockService: LifecycleService(), SavedStateRegistryOwner, ViewMo
     }
     private fun springX(target: Int) {
         val initialVelocity=snapVelocity
-        snapJob?.cancel(); snapJob=lifecycleScope.launch(guard) {
+        snapJob?.cancel(); snapJob=lifecycleScope.launch(ui) {
             Animatable(dockParams.x.toFloat()).animateTo(target.toFloat(),IosSpringSpecs.follow(),initialVelocity=initialVelocity) {
                 snapVelocity=velocity
                 dockParams.x=value.toInt(); if(dock.isAttachedToWindow) windows.updateViewLayout(dock,dockParams)
@@ -230,7 +257,7 @@ class OneUiThumbDockService: LifecycleService(), SavedStateRegistryOwner, ViewMo
         }
     }
     private fun schedulePeek() {
-        idleJob?.cancel(); idleJob=lifecycleScope.launch(guard) { delay(3000); if(sheet==null) {
+        idleJob?.cancel(); idleJob=lifecycleScope.launch(ui) { delay(3000); if(sheet==null) {
             peeked=true
             springX(if(left) (-dockParams.width*.6f).toInt() else (resources.displayMetrics.widthPixels-dockParams.width*.4f).toInt())
         } }
@@ -251,7 +278,7 @@ class OneUiThumbDockService: LifecycleService(), SavedStateRegistryOwner, ViewMo
         host.addView(root)
         root.setContent { StashDropTheme { IosFanOutStashSheet(stash,stashApp.repository,::hideSheet,{ safely("Circle to Search",::launchSearch) },
             {items,whatsapp->runCatching { VisualLensBridge.share(this,stashApp.repository,items,whatsapp); hideSheet() }.onFailure { toast(it.message.orEmpty()) }},
-            {item->lifecycleScope.launch(guard) { stashApp.repository.delete(item) }},
+            {item->lifecycleScope.launch(ui) { stashApp.repository.delete(item) }},
             {view,items->safely("Dragging cards") { startGlobalDrag(host,view,items) }}) } }
         val layout=params(-1,-1).apply { flags=flags and WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE.inv() }
         windows.addView(host,layout); sheet=host
@@ -284,6 +311,7 @@ class OneUiThumbDockService: LifecycleService(), SavedStateRegistryOwner, ViewMo
         sheet?.let { runCatching { windows.removeViewImmediate(it) } }
         if(::dock.isInitialized) runCatching { windows.removeViewImmediate(dock) }
         if(::wave.isInitialized) runCatching { windows.removeViewImmediate(wave) }
+        dismiss?.let { runCatching { windows.removeViewImmediate(it) } }
         viewModelStore.clear(); super.onDestroy()
     }
 }

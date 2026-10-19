@@ -83,7 +83,7 @@ Explore [shaders](app/src/main/java/com/vibe/stashdrop/core/shaders), [physics](
 
 | Feature | Implementation | Availability |
 | --- | --- | --- |
-| Floating thumb dock | Draggable dock, magnetic edge snap, idle peek, foreground notification | Overlay permission required |
+| Floating thumb dock | Draggable bubble, magnetic edge snap, idle peek, drag-to-X dismiss, foreground notification | Overlay permission required |
 | Local stash shelf | Notes, links, imported files/images, collections, deletion | Room + private app files |
 | Share into StashDrop | Android `SEND` and `SEND_MULTIPLE` receivers | Up to 30 attachments; 50 MB per attachment |
 | Google Circle to Search | Opens Google's own Circle to Search from the bubble, bottom swipe, notification and Settings | Google must be the digital assistant; Google decides device eligibility |
@@ -140,9 +140,10 @@ The debug APK uses a development signing key. Signed release builds require a se
 
 ## Signed releases and changelog
 
-Version `0.3.0` uses Android version code `4` and the existing StashDrop production certificate. Signed APK/app-bundle packages include checksums, the public certificate, and a verification report. Version-tag builds use [GitHub Actions](.github/workflows/android.yml); the four signing secrets must be configured before publication. Private signing keys are kept separately.
+Version `0.3.1` uses Android version code `5` and the existing StashDrop production certificate. Signed APK/app-bundle packages include checksums, the public certificate, and a verification report. Version-tag builds use [GitHub Actions](.github/workflows/android.yml); the four signing secrets must be configured before publication. Private signing keys are kept separately.
 
 - [Changelog](CHANGELOG.md)
+- [Version 0.3.1 notes](docs/releases/v0.3.1.md)
 - [Version 0.3.0 notes](docs/releases/v0.3.0.md)
 - [Version 0.2.0 notes](docs/releases/v0.2.0.md)
 - [Version 0.1.1 notes](docs/releases/v0.1.1.md)

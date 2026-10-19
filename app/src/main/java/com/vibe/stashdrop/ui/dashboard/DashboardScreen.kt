@@ -39,7 +39,7 @@ data class SetupState(val overlay: Boolean = false, val notifications: Boolean =
 /** Whether Google's Circle to Search can be opened from StashDrop. */
 enum class GoogleState(val label: String) {
     READY("Google is your digital assistant · ready"),
-    NOT_ASSISTANT("Needs Google as your digital assistant"),
+    NOT_ASSISTANT("Google's assistant service is off"),
     MISSING("Google app is not installed"),
 }
 
@@ -50,7 +50,7 @@ class DashboardActions(
     val share: (List<StashItemEntity>,Boolean)->Unit = {_,_->}, val collect: (StashItemEntity,String)->Unit = {_,_->},
     val allowOverlay: ()->Unit = {}, val allowNotifications: ()->Unit = {}, val enableAccessibility: ()->Unit = {},
     val makeAssistant: ()->Unit = {}, val restoreAssistant: ()->Unit = {}, val setupAll: ()->Unit = {},
-    val chooseAssistant: ()->Unit = {}, val copyCrash: (String)->Unit = {}, val dismissCrash: ()->Unit = {},
+    val chooseAssistant: ()->Unit = {}, val linkGoogle: ()->Unit = {}, val copyCrash: (String)->Unit = {}, val dismissCrash: ()->Unit = {},
     val messageShown: ()->Unit = {},
 )
 
@@ -128,14 +128,24 @@ fun DashboardScreen(items: List<StashItemEntity>, settings: StashSettings, shizu
                             Modifier.padding(horizontal=16.dp,vertical=4.dp),style=MaterialTheme.typography.labelSmall,color=MaterialTheme.colorScheme.onSurfaceVariant,maxLines=1,overflow=TextOverflow.Ellipsis)
                         Row(Modifier.fillMaxWidth().padding(horizontal=12.dp),horizontalArrangement=Arrangement.spacedBy(8.dp)) {
                             TextButton(onClick=actions.search) { Icon(Icons.Outlined.CropFree,null,Modifier.size(18.dp)); Spacer(Modifier.width(6.dp)); Text("Try it now",maxLines=1) }
-                            if(settings.googleCircle && setup.google==GoogleState.NOT_ASSISTANT) TextButton(onClick=actions.chooseAssistant) { Text("Choose Google",maxLines=1) }
+                            if(settings.googleCircle && setup.google==GoogleState.NOT_ASSISTANT) TextButton(onClick=if(setup.assistant) actions.linkGoogle else actions.chooseAssistant) {
+                                Text(if(setup.assistant) "Connect Google" else "Choose Google",maxLines=1)
+                            }
                         }
                     }
                     if(setup.assistantSupported) {
                         SectionTitle("Digital assistant","Pick it by hand in system settings")
                         Card {
                             SetupRow(Icons.Outlined.AssistantPhoto,"StashDrop as assistant",setup.assistant,"Choose",actions.chooseAssistant,
-                                statusText=if(setup.assistant) "Corner swipe or long-press home opens StashDrop" else if(setup.google==GoogleState.READY) "Google is the assistant" else "Another app is the assistant")
+                                statusText=when {
+                                    setup.assistant && setup.google==GoogleState.READY -> "Corner swipe → Google Circle to Search"
+                                    setup.assistant -> "Corner swipe → StashDrop circle"
+                                    setup.google==GoogleState.READY -> "Google is the assistant"
+                                    else -> "Another app is the assistant"
+                                })
+                            if(setup.assistant && setup.google==GoogleState.NOT_ASSISTANT) SetupRow(Icons.Outlined.Link,"Google Circle to Search",false,
+                                if(shizuku.connected) "Connect" else "Shizuku",if(shizuku.connected) actions.linkGoogle else actions.connectShizuku,
+                                statusText="Off while StashDrop is assistant")
                             Text("Google: its Circle to Search · StashDrop: own circle",
                                 Modifier.padding(horizontal=16.dp,vertical=4.dp),style=MaterialTheme.typography.labelSmall,color=MaterialTheme.colorScheme.onSurfaceVariant,maxLines=1,overflow=TextOverflow.Ellipsis)
                             Row(Modifier.fillMaxWidth().padding(horizontal=12.dp),horizontalArrangement=Arrangement.spacedBy(8.dp)) {
