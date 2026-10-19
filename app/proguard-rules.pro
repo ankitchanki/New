@@ -1,0 +1,3 @@
+-keep class com.vibe.stashdrop.core.shizuku.ShellUserService { *; }
+-keep class com.vibe.stashdrop.core.shizuku.IPrivilegedService** { *; }
+-keep class org.lsposed.hiddenapibypass.** { *; }
