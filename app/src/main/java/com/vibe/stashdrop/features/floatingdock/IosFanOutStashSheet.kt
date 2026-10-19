@@ -35,8 +35,9 @@ fun IosFanOutStashSheet(items: List<StashItemEntity>, repository: StashRepositor
     val view=LocalView.current
     var dragVelocity by remember { mutableStateOf(androidx.compose.ui.geometry.Offset.Zero) }
     val tracker=remember { androidx.compose.ui.input.pointer.util.VelocityTracker() }
-    val reveal=remember { Animatable(300f) }
-    LaunchedEffect(Unit) { reveal.animateTo(0f,IosSpringSpecs.liquid()) }
+    val inspection = androidx.compose.ui.platform.LocalInspectionMode.current
+    val reveal=remember { Animatable(if (inspection) 0f else 300f) }
+    LaunchedEffect(Unit) { if (!inspection) reveal.animateTo(0f,IosSpringSpecs.liquid()) }
     Box(Modifier.fillMaxSize().background(Color.Black.copy(alpha=.24f)).clickable(onClick=onDismiss),contentAlignment=Alignment.BottomCenter) {
         Surface(Modifier.fillMaxWidth().fillMaxHeight(.55f).graphicsLayer { translationY=reveal.value }.clickable(enabled=false) {},
             shape=RoundedCornerShape(topStart=32.dp,topEnd=32.dp),color=MaterialTheme.colorScheme.surface) {

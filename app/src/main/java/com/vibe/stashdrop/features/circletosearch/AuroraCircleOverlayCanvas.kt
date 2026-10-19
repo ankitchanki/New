@@ -15,8 +15,9 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 
 @Composable
-fun AuroraCircleOverlayCanvas(bitmap: Bitmap, modifier: Modifier = Modifier, onSelection: (List<Offset>, IntSize) -> Unit) {
-    var points by remember(bitmap) { mutableStateOf(emptyList<Offset>()) }
+fun AuroraCircleOverlayCanvas(bitmap: Bitmap, modifier: Modifier = Modifier, onSelection: (List<Offset>, IntSize) -> Unit,
+    initialSelection: List<Offset> = emptyList()) {
+    var points by remember(bitmap) { mutableStateOf(initialSelection) }
     var dimensions by remember { mutableStateOf(IntSize.Zero) }
     Canvas(modifier.onSizeChanged { dimensions=it }.pointerInput(bitmap) {
         detectDragGestures(onDragStart={ points=listOf(it) }, onDragCancel={ points=emptyList() },

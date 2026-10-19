@@ -1,0 +1,11 @@
+{
+  "repository": "ankitchanki/New",
+  "name": "StashDrop",
+  "description": "StashDrop: a native Android floating productivity shelf with Circle Studio, offline OCR, clean links, spring-driven Compose UI, and optional Shizuku integration.",
+  "topics": [
+    "android", "kotlin", "jetpack-compose", "material3", "shizuku",
+    "productivity", "clipboard-manager", "floating-window", "screen-capture",
+    "circle-to-search", "ocr", "ml-kit", "room-database", "datastore",
+    "agsl", "android-development", "drag-and-drop", "privacy", "kotlin-coroutines", "paparazzi"
+  ]
+}

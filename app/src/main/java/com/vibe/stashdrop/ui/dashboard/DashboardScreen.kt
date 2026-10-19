@@ -34,8 +34,9 @@ fun DashboardScreen(items: List<StashItemEntity>,settings: StashSettings,shizuku
     running: Boolean,overlayAllowed: Boolean,message: String,clipboardStatus: String,onToggleDock: ()->Unit,onShizuku: ()->Unit,
     onAccessibility: ()->Unit,onSearch: (Boolean)->Unit,onPreference: (String,Boolean)->Unit,onBounce: (Float)->Unit,
     onAssistant: (Boolean)->Unit,onAddText: (String)->Unit,onDelete: (StashItemEntity)->Unit,
-    onShare: (List<StashItemEntity>,Boolean)->Unit,onCollect: (StashItemEntity,String)->Unit) {
-    var tab by remember { mutableIntStateOf(0) }
+    onShare: (List<StashItemEntity>,Boolean)->Unit,onCollect: (StashItemEntity,String)->Unit,
+    initialTab: Int = 0) {
+    var tab by remember { mutableIntStateOf(initialTab.coerceIn(0,2)) }
     var adding by remember { mutableStateOf(false) }
     var text by remember { mutableStateOf("") }
     var collectionItem by remember { mutableStateOf<StashItemEntity?>(null) }

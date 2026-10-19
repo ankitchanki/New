@@ -1,0 +1,48 @@
+{
+  "renderer": "Paparazzi 1.3.5 / production Compose components",
+  "content": "Sample data; not phone screenshots",
+  "images": [
+    {
+      "file": "overview.png",
+      "width": 1080,
+      "height": 2340,
+      "sha256": "bb7d191d7e5c81cff8b21331318f7151af0737dd03e603214502c491d705631b"
+    },
+    {
+      "file": "shelf.png",
+      "width": 1080,
+      "height": 2340,
+      "sha256": "b4b924fcf408e6f4354c48d44491712db96f8d659c15748ba59ddd5300a2760b"
+    },
+    {
+      "file": "controls.png",
+      "width": 1080,
+      "height": 2340,
+      "sha256": "d347c91bc6f56e2b3daa9a36ebaaa98c5fc307129f974c45895c71841b8b4221"
+    },
+    {
+      "file": "controls-full.png",
+      "width": 1080,
+      "height": 5200,
+      "sha256": "52e3c6814233ea208637c644bca549b19ccd0591d9235f9cb068415fbeec3483"
+    },
+    {
+      "file": "floating-shelf.png",
+      "width": 1080,
+      "height": 2340,
+      "sha256": "259f10c81a03947d8004413a163b246b52921b0af71aebdec8c3464d9c8a90ac"
+    },
+    {
+      "file": "circle-canvas.png",
+      "width": 1080,
+      "height": 2340,
+      "sha256": "b819a21140e8ccd074e3eb30a3d2b1b5b144371c15c723950182a4455a251ead"
+    },
+    {
+      "file": "aurora-wave.png",
+      "width": 1080,
+      "height": 2340,
+      "sha256": "864494ec6f58634f6b22448084659493d5a4dbcd3c383a0fbdb51ddff0161265"
+    }
+  ]
+}
