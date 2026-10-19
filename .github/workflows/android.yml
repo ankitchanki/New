@@ -28,9 +28,6 @@ jobs:
           distribution: temurin
           java-version: "21"
       - uses: gradle/actions/setup-gradle@v4
-      - uses: android-actions/setup-android@v3
-      - name: Install pinned Android SDK components
-        run: sdkmanager "platforms;android-35" "build-tools;35.0.0"
       - name: Build debug APK and run checks
         run: ./gradlew :app:assembleDebug :app:testDebugUnitTest :app:verifyPaparazziDebug :app:lintDebug
       - uses: actions/upload-artifact@v4
@@ -66,9 +63,6 @@ jobs:
           distribution: temurin
           java-version: "21"
       - uses: gradle/actions/setup-gradle@v4
-      - uses: android-actions/setup-android@v3
-      - name: Install pinned Android SDK components
-        run: sdkmanager "platforms;android-35" "build-tools;35.0.0"
       - name: Check version and release notes
         run: |
           VERSION=$(grep -oP 'versionName = "\K[^"]+' app/build.gradle.kts)
