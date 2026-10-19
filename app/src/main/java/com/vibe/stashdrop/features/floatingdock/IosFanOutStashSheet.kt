@@ -39,7 +39,7 @@ fun IosFanOutStashSheet(items: List<StashItemEntity>, repository: StashRepositor
     val reveal=remember { Animatable(if (inspection) 0f else 300f) }
     LaunchedEffect(Unit) { if (!inspection) reveal.animateTo(0f,IosSpringSpecs.liquid()) }
     Box(Modifier.fillMaxSize().background(Color.Black.copy(alpha=.24f)).clickable(onClick=onDismiss),contentAlignment=Alignment.BottomCenter) {
-        Surface(Modifier.fillMaxWidth().fillMaxHeight(.55f).graphicsLayer { translationY=reveal.value }.clickable(enabled=false) {},
+        Surface(Modifier.fillMaxWidth().fillMaxHeight(.55f).graphicsLayer { translationY=reveal.value }.clickable(interactionSource=null,indication=null) {},
             shape=RoundedCornerShape(topStart=32.dp,topEnd=32.dp),color=MaterialTheme.colorScheme.surface) {
             Column(Modifier.padding(horizontal=20.dp,vertical=12.dp)) {
                 Box(Modifier.align(Alignment.CenterHorizontally).width(38.dp).height(4.dp).background(Color.White.copy(alpha=.2f),RoundedCornerShape(3.dp)))

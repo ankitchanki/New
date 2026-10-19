@@ -15,6 +15,19 @@ Alternatively, use `scripts/build-release.py --credentials /private/path/release
 
 No private signing configuration or keystore belongs in Git, a README, CI logs, or public release assets. Retain a secure offline backup of the first release's signing identity; losing it prevents compatible APK updates.
 
+## Build on GitHub Actions
+
+`.github/workflows/android.yml` builds a debug APK, runs the unit/screenshot tests and lint on every push and pull request, and uploads the APK as the `StashDrop-debug-apk` workflow artifact.
+
+Signed releases run when a `v*` tag is pushed, or manually from the Actions tab. Add these repository secrets first (Settings → Secrets and variables → Actions):
+
+- `STASHDROP_KEYSTORE_BASE64`: the keystore file, base64-encoded (`base64 -w0 release.p12`).
+- `STASHDROP_RELEASE_KEY_ALIAS`, `STASHDROP_RELEASE_STORE_PASSWORD`, `STASHDROP_RELEASE_KEY_PASSWORD`.
+
+To create a new key: `keytool -genkeypair -keystore release.p12 -storetype PKCS12 -alias stashdrop -keyalg RSA -keysize 4096 -validity 10000 -dname "CN=StashDrop"`. Back it up offline; every future update must be signed with it.
+
+A tag push builds the signed APK and AAB, writes `SHA256SUMS.txt`, and publishes a GitHub release using `docs/releases/<tag>.md` as notes when present. The workflow must exist on the tagged commit, so the existing `v0.1.0` tag (created before the workflow) cannot trigger it: bump `versionCode`/`versionName` and push a new tag such as `v0.1.1`.
+
 ## Build and validate
 
 Activate the prepared cloud toolchain when using the cloud snapshot:

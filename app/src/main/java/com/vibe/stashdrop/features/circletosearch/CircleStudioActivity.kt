@@ -29,6 +29,9 @@ class StudioModel(app: Application): AndroidViewModel(app) {
     var busy by mutableStateOf(false); private set
     var message by mutableStateOf("")
     private val processor=OcrAndBarcodeProcessor()
+    private var saved: com.vibe.stashdrop.features.stashshelf.StashItemEntity?=null
+    /** Stash, Lens and Share reuse one saved copy of the current cutout. */
+    suspend fun saveCrop()=saved ?: getApplication<Application>().stashApp.repository.addBitmap(crop!!).also { saved=it }
     fun select(points: List<androidx.compose.ui.geometry.Offset>, size: androidx.compose.ui.unit.IntSize) {
         if(busy) return
         val bitmap=source ?: return
@@ -36,12 +39,12 @@ class StudioModel(app: Application): AndroidViewModel(app) {
         viewModelScope.launch {
             try {
                 val selected=cropLasso(bitmap,points,size)
-                crop?.recycle(); crop=selected; result=null
+                crop?.recycle(); crop=selected; saved=null; result=null
                 result=processor.process(selected)
             } catch(e: Exception) { message=e.message ?: "Selection failed" } finally { busy=false }
         }
     }
-    fun reset() { if(!busy) { crop?.recycle(); crop=null; result=null } }
+    fun reset() { if(!busy) { crop?.recycle(); crop=null; saved=null; result=null } }
     override fun onCleared() { processor.close(); source?.recycle(); crop?.recycle() }
 }
 class CircleStudioActivity: ComponentActivity() {
@@ -72,7 +75,7 @@ class CircleStudioActivity: ComponentActivity() {
                             if(extracted.isNotEmpty()) Text(extracted,Modifier.padding(bottom=12.dp))
                             Row(horizontalArrangement=Arrangement.spacedBy(8.dp)) {
                                 Button(enabled=!model.busy && !saving,onClick={ saving=true; scope.launch {
-                                    runCatching { stashApp.repository.addBitmap(model.crop!!) }.onSuccess {
+                                    runCatching { model.saveCrop() }.onSuccess {
                                         val metrics=resources.displayMetrics
                                         flight=com.vibe.stashdrop.core.physics.MagneticTrajectoryEngine.flight(
                                             com.vibe.stashdrop.core.physics.Vector2(metrics.widthPixels*.5f,metrics.heightPixels*.45f),
@@ -90,12 +93,12 @@ class CircleStudioActivity: ComponentActivity() {
                             }
                             Row(horizontalArrangement=Arrangement.spacedBy(8.dp)) {
                                 OutlinedButton(enabled=!model.busy && !saving,onClick={ saving=true; scope.launch {
-                                    runCatching { val item=stashApp.repository.addBitmap(model.crop!!); VisualLensBridge.lens(this@CircleStudioActivity,stashApp.repository.uri(item)!!) }
+                                    runCatching { val item=model.saveCrop(); VisualLensBridge.lens(this@CircleStudioActivity,stashApp.repository.uri(item)!!) }
                                         .onFailure { model.message=it.message.orEmpty() }
                                     saving=false
                                 } }) { Text("Lens") }
                                 OutlinedButton(enabled=!model.busy && !saving,onClick={ saving=true; scope.launch {
-                                    runCatching { val item=stashApp.repository.addBitmap(model.crop!!); VisualLensBridge.share(this@CircleStudioActivity,stashApp.repository,listOf(item)) }
+                                    runCatching { val item=model.saveCrop(); VisualLensBridge.share(this@CircleStudioActivity,stashApp.repository,listOf(item)) }
                                         .onFailure { model.message=it.message.orEmpty() }
                                     saving=false
                                 } }) { Text("Share cutout") }

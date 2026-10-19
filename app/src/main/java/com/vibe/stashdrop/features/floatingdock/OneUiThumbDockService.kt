@@ -58,7 +58,8 @@ class OneUiThumbDockService: LifecycleService(), SavedStateRegistryOwner, ViewMo
         override fun onReceive(context: Context,intent: Intent) {
             if(intent.action==Intent.ACTION_SCREEN_OFF) {
                 hideSheet(); bar.close(); dock.visibility=View.INVISIBLE; wave.visibility=View.INVISIBLE
-            } else if(intent.action==Intent.ACTION_USER_PRESENT) {
+            } else if(intent.action==Intent.ACTION_USER_PRESENT ||
+                (intent.action==Intent.ACTION_SCREEN_ON && !getSystemService(KeyguardManager::class.java).isKeyguardLocked)) {
                 dock.visibility=View.VISIBLE; wave.visibility=View.VISIBLE; configureBar(); schedulePeek()
             }
         }
@@ -138,7 +139,7 @@ class OneUiThumbDockService: LifecycleService(), SavedStateRegistryOwner, ViewMo
             lifecycleScope.launch { stashApp.repository.items.collect { stash=it } }
             lifecycleScope.launch { stashApp.preferences.settings.collect { value -> settings=value; configureBar(); if(value.autoStash) clipboard.start() else clipboard.stop() } }
             androidx.core.content.ContextCompat.registerReceiver(this,screenState,
-                IntentFilter().apply { addAction(Intent.ACTION_SCREEN_OFF); addAction(Intent.ACTION_USER_PRESENT) },
+                IntentFilter().apply { addAction(Intent.ACTION_SCREEN_OFF); addAction(Intent.ACTION_SCREEN_ON); addAction(Intent.ACTION_USER_PRESENT) },
                 androidx.core.content.ContextCompat.RECEIVER_NOT_EXPORTED)
             receiverRegistered=true
             running.value=true; schedulePeek()

@@ -85,8 +85,10 @@ fun DashboardScreen(items: List<StashItemEntity>,settings: StashSettings,shizuku
                 1 -> {
                     Text("Everything,\nwithin reach.",style=MaterialTheme.typography.displaySmall,modifier=Modifier.padding(top=28.dp))
                     Row(Modifier.fillMaxWidth(),horizontalArrangement=Arrangement.SpaceBetween) { Text("${items.size} saved items",color=Ice); TextButton(onClick={adding=true}) { Text("＋ Add note") } }
+                    val collections=listOf("All")+items.map { it.collection }.distinct()
+                    if(selectedCollection !in collections) selectedCollection="All"
                     Row(Modifier.horizontalScroll(rememberScrollState()),horizontalArrangement=Arrangement.spacedBy(8.dp)) {
-                        (listOf("All")+items.map { it.collection }.distinct()).forEach { name -> FilterChip(selectedCollection==name,{selectedCollection=name},label={Text(name)}) }
+                        collections.forEach { name -> FilterChip(selectedCollection==name,{selectedCollection=name},label={Text(name)}) }
                     }
                     val visible=items.filter { selectedCollection=="All" || it.collection==selectedCollection }
                     if(visible.isEmpty()) Text("Nothing here yet. Share text, photos, or files to StashDrop.",Modifier.padding(vertical=40.dp))
