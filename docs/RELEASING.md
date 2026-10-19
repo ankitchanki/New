@@ -82,3 +82,7 @@ GitHub release creation needs `api.github.com` and asset upload needs `uploads.g
 ## Attribution cleanup limits
 
 The project uses `StashDrop Contributors` for local commit/tag metadata. The two original commits were rewritten with neutral author/committer fields and unchanged file trees. Old local reflogs and unreachable objects were pruned. Force-updating a branch removes the old identities from reachable project history; it does not erase third-party clones, forks, GitHub caches, account profiles, or this chat. GitHub support/account controls may be needed for externally retained copies.
+
+### Releasing without pushing a tag
+
+Actions → Android build → Run workflow on `main` with `release_tag` set to `v<versionName>` builds that commit and publishes the release. If the tag does not exist yet, the release step creates it on the built commit; an existing tag is rebuilt as tagged.
