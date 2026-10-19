@@ -24,9 +24,22 @@ Signed releases run when a `v*` tag is pushed, or manually from the Actions tab.
 - `STASHDROP_KEYSTORE_BASE64`: the keystore file, base64-encoded (`base64 -w0 release.p12`).
 - `STASHDROP_RELEASE_KEY_ALIAS`, `STASHDROP_RELEASE_STORE_PASSWORD`, `STASHDROP_RELEASE_KEY_PASSWORD`.
 
-To create a new key: `keytool -genkeypair -keystore release.p12 -storetype PKCS12 -alias stashdrop -keyalg RSA -keysize 4096 -validity 10000 -dname "CN=StashDrop"`. Back it up offline; every future update must be signed with it.
+The production key already exists and signed the prepared 0.1.0 build. **Restore that key and its credentials from the private owner backup for 0.1.1 and later updates. Do not generate a replacement.** Keep an offline backup. The workflow rejects a certificate that differs from the original public verification report.
 
-A tag push builds the signed APK and AAB, writes `SHA256SUMS.txt`, and publishes a GitHub release using `docs/releases/<tag>.md` as notes when present. The workflow must exist on the tagged commit, so the existing `v0.1.0` tag (created before the workflow) cannot trigger it: bump `versionCode`/`versionName` and push a new tag such as `v0.1.1`.
+Only for a completely new application that has never had a signing identity, create a key with `keytool -genkeypair -keystore release.p12 -storetype PKCS12 -alias stashdrop -keyalg RSA -keysize 4096 -validity 10000 -dname "CN=StashDrop"`.
+
+An owner with repository Secrets write permission can install all four secrets from the private JSON backup without displaying their values:
+
+```bash
+chmod 600 /private/path/release-signing.json
+python scripts/configure-actions-signing.py --credentials /private/path/release-signing.json
+```
+
+Use an existing authorized `gh` connection. Secret values are sent on stdin and encrypted by the GitHub CLI; they are not placed in command arguments or printed. Alternatively, enter the four values securely in GitHub Settings. This cloud session's integration returned HTTP 403 for the Actions secrets API, so that connection cannot configure them. A fine-grained owner token needs repository Secrets write permission for setup, plus Contents write for release operations; never paste it into chat or Git.
+
+A tag push builds and tests the signed APK and AAB, verifies their signatures and original certificate, checks alignment, writes `SHA256SUMS.txt` and `release-verification.json`, and publishes a GitHub release using `docs/releases/<tag>.md`. The workflow must exist on the tagged commit. Version 0.1.1 uses `versionName = "0.1.1"` and `versionCode = 2`; the tag must be `v0.1.1`. The older `v0.1.0` tag predates the workflow and is preserved.
+
+If a tag run failed because secrets were missing, configure the secrets and rerun that tag's workflow from Actions. Do not move or delete the version tag. Manual workflow dispatch builds signed artifacts; publication occurs on version-tag runs. CI uses its own repository-scoped `github.token` with Contents write permission for publication.
 
 ## Build and validate
 
@@ -41,7 +54,7 @@ python scripts/build-release.py --credentials /private/path/release-signing.json
 Collect the public outputs and verify them with:
 
 ```bash
-python scripts/prepare-release.py --credentials /private/path/release-signing.json --output /path/to/public/release-assets --version 0.1.0
+python scripts/prepare-release.py --credentials /private/path/release-signing.json --output /path/to/public/release-assets --version 0.1.1
 ```
 
 On another machine, use your own Java/Android SDK environment. The helper runs `assembleRelease` and `bundleRelease`; `--verify` also runs the logic/visual tests and debug/release lint. Builds fail rather than silently producing an unsigned release if signing input is missing.
@@ -53,12 +66,12 @@ Verify the final APK with SDK `apksigner verify --verbose --print-certs` and `zi
 1. Update `CHANGELOG.md` and the versioned notes in `docs/releases/`.
 2. Commit with the repository's neutral project attribution. Review the staged files; private signing material must be absent.
 3. Create an annotated version tag on the verified source commit and push it.
-4. Run `python scripts/publish-release.py --version 0.1.0 --assets /path/to/public/release-assets`.
+4. Let the version-tag workflow publish, or use `python scripts/publish-release.py --version 0.1.1 --assets /path/to/public/release-assets` from an authorized connection if CI publication is not being used. Do not race both publishers.
 5. Verify the resulting GitHub release and every uploaded asset.
 
 The publishing script verifies the remote tag, checks public artifact checksums, and uploads only its explicit public-file allowlist. It does not create credentials, publish private signing material, overwrite release assets, or bypass network policy.
 
-GitHub release creation needs `api.github.com` and asset upload needs `uploads.github.com`. These destinations were blocked by the active cloud network policy during preparation. Domain additions are saved in the environment draft; review/save and publish the environment settings before retrying when required. Existing Git push access does not establish GitHub API access.
+GitHub release creation needs `api.github.com` and asset upload needs `uploads.github.com`. Domain additions are saved in the cloud environment draft; review/save and publish environment changes when required. The latest direct cloud publication attempt reached the API but uploads returned HTTP 401; repository metadata and Actions-secret operations returned HTTP 403. Existing Git push access does not establish API/upload authorization. GitHub Actions runs with its own scoped token.
 
 ## Attribution cleanup limits
 

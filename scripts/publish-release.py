@@ -37,9 +37,9 @@ remote = subprocess.check_output(["git", "ls-remote", "origin", "refs/tags/" + t
 if not remote.strip():
     raise SystemExit("Push the verified version tag before publishing")
 # The gh CLI uses the configured HTTPS proxy and existing credentials normally.
-subprocess.run(["gh", "api", "repos/ankitchanki/New", "--jq", ".full_name"], cwd=root, check=True)
-command = ["gh", "release", "create", tag, "--repo", "ankitchanki/New", "--verify-tag", "--latest",
+subprocess.run(["gh", "api", "repos/ankitchanki/StashDrop", "--jq", ".full_name"], cwd=root, check=True)
+command = ["gh", "release", "create", tag, "--repo", "ankitchanki/StashDrop", "--verify-tag", "--latest",
            "--title", "StashDrop " + version, "--notes-file", str(root / "docs/releases" / (tag + ".md"))]
 command += [str(assets / name) for name in required]
 subprocess.run(command, cwd=root, check=True)
-subprocess.run(["gh", "release", "view", tag, "--repo", "ankitchanki/New", "--json", "url,tagName,isDraft,isPrerelease,assets"], cwd=root, check=True)
+subprocess.run(["gh", "release", "view", tag, "--repo", "ankitchanki/StashDrop", "--json", "url,tagName,isDraft,isPrerelease,assets"], cwd=root, check=True)

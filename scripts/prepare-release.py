@@ -58,8 +58,14 @@ run([java / "keytool", "-exportcert", "-rfc", "-alias", values["keyAlias"], "-ke
      "-storepass:env", "STASHDROP_RELEASE_STORE_PASSWORD", "-file", cert], env=env)
 der = base64.b64decode("".join(line for line in cert.read_text().splitlines() if not line.startswith("---")))
 assert hashlib.sha256(der).hexdigest() == apk_hash == bundle_hash
+# Preserve the signing identity already used for the first distributed build.
+original_report = json.loads((root / "docs/releases/v0.1.0-verification.json").read_text())
+assert apk_hash == original_report["certificateSha256"], "Signing certificate differs from the original StashDrop release key"
 badging = run([sdk / "aapt", "dump", "badging", apk])
 assert "name='com.vibe.stashdrop'" in badging and f"versionName='{version}'" in badging
+version_code = int(re.search(r"versionCode='(\d+)'", badging).group(1))
+configured_code = int(re.search(r"versionCode\s*=\s*(\d+)", (root / "app/build.gradle.kts").read_text()).group(1))
+assert version_code == configured_code
 assert "sdkVersion:'28'" in badging and "targetSdkVersion:'35'" in badging and "application-debuggable" not in badging
 counts = Counter()
 for path in (root / "app/build/test-results/testDebugUnitTest").glob("TEST-*.xml"):
@@ -91,7 +97,7 @@ with zipfile.ZipFile(apk) as z:
         assert min(alignments) >= 16384
         libraries.append(name)
 assert libraries
-report = {"version": version, "sourceTag": "v" + version, "package": "com.vibe.stashdrop", "minSdk": 28,
+report = {"version": version, "versionCode": version_code, "sourceTag": "v" + version, "package": "com.vibe.stashdrop", "minSdk": 28,
           "targetSdk": 35, "signingIdentity": "StashDrop",
           "keyAlgorithm": re.search(r"key algorithm: (\S+)", verified).group(1),
           "keySizeBits": int(re.search(r"key size \(bits\): (\d+)", verified).group(1)),

@@ -63,6 +63,6 @@ For the prepared cloud snapshot, use `PYTHONPATH=/workspace/toolchains/shader-va
 
 ## Repository About and topics
 
-[Repository metadata](../.github/repository-metadata.json) is the source for the proposed About description and 20 topic tags. Run `python scripts/apply-github-metadata.py` with existing GitHub CLI authentication and permission to administer `ankitchanki/New` to apply the description and add topics while preserving existing topics.
+[Repository metadata](../.github/repository-metadata.json) is the source for the proposed About description and 20 topic tags. Run `python scripts/apply-github-metadata.py` with existing GitHub CLI authentication and permission to administer `ankitchanki/StashDrop` to apply the description and add topics while preserving existing topics.
 
 During preparation, the environment proxy denied `api.github.com`. The required domain addition was saved to the environment draft; saving the draft alone does not apply network access. Repository file publication and GitHub About/topic metadata are separate operations.

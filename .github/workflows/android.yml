@@ -8,7 +8,7 @@ on:
   workflow_dispatch:
 
 permissions:
-  contents: write
+  contents: read
 
 jobs:
   build:
@@ -20,6 +20,8 @@ jobs:
           distribution: temurin
           java-version: "21"
       - uses: gradle/actions/setup-gradle@v4
+      - name: Install pinned Android SDK components
+        run: sdkmanager "platforms;android-35" "build-tools;35.0.0"
       - name: Build debug APK and run checks
         run: ./gradlew :app:assembleDebug :app:testDebugUnitTest :app:verifyPaparazziDebug :app:lintDebug
       - uses: actions/upload-artifact@v4
@@ -38,6 +40,8 @@ jobs:
     if: startsWith(github.ref, 'refs/tags/v') || github.event_name == 'workflow_dispatch'
     needs: build
     runs-on: ubuntu-latest
+    permissions:
+      contents: write
     env:
       KEYSTORE_BASE64: ${{ secrets.STASHDROP_KEYSTORE_BASE64 }}
       STASHDROP_RELEASE_KEY_ALIAS: ${{ secrets.STASHDROP_RELEASE_KEY_ALIAS }}
@@ -50,29 +54,48 @@ jobs:
           distribution: temurin
           java-version: "21"
       - uses: gradle/actions/setup-gradle@v4
-      - name: Restore signing keystore
-        run: |
-          if [ -z "$KEYSTORE_BASE64" ]; then
-            echo "::error::Secret STASHDROP_KEYSTORE_BASE64 is not set. See docs/RELEASING.md."
-            exit 1
-          fi
-          echo "$KEYSTORE_BASE64" | base64 -d > "$RUNNER_TEMP/release.keystore"
-          echo "STASHDROP_RELEASE_KEYSTORE=$RUNNER_TEMP/release.keystore" >> "$GITHUB_ENV"
-      - name: Build signed APK and AAB
-        run: ./gradlew :app:assembleRelease :app:bundleRelease
-      - name: Collect release assets
+      - name: Install pinned Android SDK components
+        run: sdkmanager "platforms;android-35" "build-tools;35.0.0"
+      - name: Check version and release notes
         run: |
           VERSION=$(grep -oP 'versionName = "\K[^"]+' app/build.gradle.kts)
-          mkdir -p dist
-          cp app/build/outputs/apk/release/app-release.apk "dist/StashDrop-v$VERSION.apk"
-          cp app/build/outputs/bundle/release/app-release.aab "dist/StashDrop-v$VERSION.aab"
-          "$ANDROID_HOME/build-tools/$(ls "$ANDROID_HOME/build-tools" | sort -V | tail -1)/apksigner" verify --print-certs "dist/StashDrop-v$VERSION.apk"
-          (cd dist && sha256sum * > SHA256SUMS.txt)
-          rm -f "$RUNNER_TEMP/release.keystore"
+          if [[ "$GITHUB_REF" == refs/tags/* && "$GITHUB_REF_NAME" != "v$VERSION" ]]; then
+            echo "::error::The version tag must match versionName."
+            exit 1
+          fi
+          test -f "docs/releases/v$VERSION.md"
+          echo "RELEASE_VERSION=$VERSION" >> "$GITHUB_ENV"
+      - name: Restore signing keystore
+        run: |
+          python - <<'PY'
+          import base64, json, os
+          from pathlib import Path
+          required = ["KEYSTORE_BASE64", "STASHDROP_RELEASE_KEY_ALIAS", "STASHDROP_RELEASE_STORE_PASSWORD", "STASHDROP_RELEASE_KEY_PASSWORD"]
+          missing = [name for name in required if not os.environ.get(name)]
+          if missing:
+              raise SystemExit("Missing signing secret names: " + ", ".join(missing) + ". See docs/RELEASING.md.")
+          private = Path(os.environ["RUNNER_TEMP"]) / "stashdrop-signing"
+          private.mkdir(mode=0o700)
+          key = private / "release.p12"
+          key.touch(mode=0o600)
+          key.write_bytes(base64.b64decode(os.environ["KEYSTORE_BASE64"], validate=True))
+          config = private / "release-signing.json"
+          config.touch(mode=0o600)
+          config.write_text(json.dumps({"storeFile": str(key), "keyAlias": os.environ["STASHDROP_RELEASE_KEY_ALIAS"], "storePassword": os.environ["STASHDROP_RELEASE_STORE_PASSWORD"], "keyPassword": os.environ["STASHDROP_RELEASE_KEY_PASSWORD"]}))
+          PY
+      - name: Build signed APK and AAB and run checks
+        run: python scripts/build-release.py --credentials "$RUNNER_TEMP/stashdrop-signing/release-signing.json" --verify
+      - name: Verify and collect public release assets
+        run: |
+          python scripts/prepare-release.py --credentials "$RUNNER_TEMP/stashdrop-signing/release-signing.json" --output dist --version "$RELEASE_VERSION"
+      - name: Remove private signing files
+        if: always()
+        run: rm -rf "$RUNNER_TEMP/stashdrop-signing"
       - uses: actions/upload-artifact@v4
         with:
           name: StashDrop-release
           path: dist/
+          if-no-files-found: error
       - name: Publish GitHub release
         if: startsWith(github.ref, 'refs/tags/v')
         env:
@@ -81,4 +104,4 @@ jobs:
           TAG="${GITHUB_REF_NAME}"
           NOTES="docs/releases/$TAG.md"
           if [ -f "$NOTES" ]; then NOTES_ARG=(--notes-file "$NOTES"); else NOTES_ARG=(--generate-notes); fi
-          gh release create "$TAG" dist/* --verify-tag --title "StashDrop ${TAG#v}" "${NOTES_ARG[@]}"
+          gh release create "$TAG" dist/* --verify-tag --latest --title "StashDrop ${TAG#v}" "${NOTES_ARG[@]}"

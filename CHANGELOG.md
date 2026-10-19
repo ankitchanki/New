@@ -2,6 +2,36 @@
 
 All notable StashDrop changes are recorded here. Versions follow Semantic Versioning.
 
+## [0.1.1] - 2026-10-19
+
+### Added
+
+- GitHub Actions debug checks for pushes/pull requests and signed release publication for version tags.
+- Encrypted Actions signing-secret setup helper, using the existing private production key.
+- Release certificate continuity, tag/version consistency, signature, checksum, and 16 KB alignment checks before CI publication.
+- Version 0.1.1 release notes and public build verification report.
+
+### Fixed
+
+- Taps inside the floating shelf no longer fall through to its dismiss backdrop.
+- Circle Studio reuses the saved cutout for Stash, Lens, and Share instead of inserting duplicate copies.
+- The floating overlay is restored on screen-on when no keyguard is active.
+- Deleting the last item in a selected collection restores the Shelf's All filter.
+
+### Changed
+
+- Android version name is `0.1.1` and version code is `2`.
+- Production signing continues to use the same certificate as the prepared 0.1.0 build.
+- Release workflows publish the signed APK/AAB, public certificate, checksums, and verification report, and remove private signing files even when a build fails.
+
+### Verified
+
+- Signed 0.1.1 APK and AAB built locally with the original RSA-4096 certificate; signatures and matching fingerprints verified.
+- All 19 logic/visual tests passed; debug and release lint each completed with zero errors and 29 warnings.
+- APK ZIP alignment and bundled 64-bit native load-segment alignments passed 16 KB checks.
+- GitHub Actions workflow passed `actionlint`; signing restoration preserved the key and owner-only permissions and rejected missing secrets.
+- These checks establish the local build results; GitHub publication and phone behavior require their own verification.
+
 ## [0.1.0] - 2026-10-19
 
 ### Added

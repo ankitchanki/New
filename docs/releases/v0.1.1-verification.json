@@ -1,0 +1,48 @@
+{
+  "version": "0.1.1",
+  "versionCode": 2,
+  "sourceTag": "v0.1.1",
+  "package": "com.vibe.stashdrop",
+  "minSdk": 28,
+  "targetSdk": 35,
+  "signingIdentity": "StashDrop",
+  "keyAlgorithm": "RSA",
+  "keySizeBits": 4096,
+  "certificateSha256": "dbb75d23fd05e5cc228b039d4734c693235b07f0f7605bfe9ce206e4a2b59272",
+  "apkSignatureVerified": true,
+  "apkV2VerificationReported": false,
+  "apkV3SigningVerified": true,
+  "bundleSignatureVerified": true,
+  "apk16KbZipAlignmentVerified": true,
+  "native64Bit16KbAlignmentVerified": true,
+  "nativeLibrariesChecked": [
+    "lib/arm64-v8a/libandroidx.graphics.path.so",
+    "lib/arm64-v8a/libbarhopper_v3.so",
+    "lib/arm64-v8a/libdatastore_shared_counter.so",
+    "lib/arm64-v8a/libmlkit_google_ocr_pipeline.so",
+    "lib/x86_64/libandroidx.graphics.path.so",
+    "lib/x86_64/libbarhopper_v3.so",
+    "lib/x86_64/libdatastore_shared_counter.so",
+    "lib/x86_64/libmlkit_google_ocr_pipeline.so"
+  ],
+  "minified": true,
+  "resourceShrinking": true,
+  "tests": {
+    "tests": 19,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0
+  },
+  "lint": {
+    "debug": {
+      "errors": 0,
+      "warnings": 29
+    },
+    "release": {
+      "errors": 0,
+      "warnings": 29
+    }
+  },
+  "deviceRuntimeValidated": false,
+  "privateSigningKeyIncluded": false
+}

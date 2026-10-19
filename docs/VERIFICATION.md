@@ -17,7 +17,7 @@ The debug APK uses a development key. Release signing and minification were not 
 - Latest lint result: 0 errors, 29 warnings.
 - Seven published gallery copies match their recorded image hashes and dimensions. Both source-rendered shader animations contain 48 frames.
 - 47 local documentation references resolved when preparing the presentation update.
-- GitHub About/topic metadata remains pending because the environment proxy denies `api.github.com`; the proposed description and 20 topics are saved in `.github/repository-metadata.json`. This is independent of pushing the README and assets with Git.
+- GitHub About/topic metadata remains pending. The initial attempt was blocked by network policy; a later API attempt returned HTTP 403 for the current integration. The proposed description and 20 topics are saved in `.github/repository-metadata.json`. This is independent of pushing the README and assets with Git.
 
 ## Signed version 0.1.0 preparation
 
@@ -29,3 +29,14 @@ The debug APK uses a development key. Release signing and minification were not 
 - [Public verification report](releases/v0.1.0-verification.json) records the certificate fingerprint and exact validation scope.
 - Existing commits were rewritten with neutral project author/committer identities and unchanged trees. Old local reflogs/unreachable objects were pruned. Cached pages, forks, clones, account profiles, and chat history are outside repository cleanup scope.
 - Release creation/upload requires `api.github.com` and `uploads.github.com`; their domain additions are saved in the environment draft. GitHub publication is not established by these local signing checks.
+
+## Signed version 0.1.1 preparation
+
+- Integrated the release-workflow branch and its shelf, cutout reuse, screen-on, and collection-filter fixes. Version name is `0.1.1`, version code is `2`.
+- Built signed, minified APK and AAB using the original production key. Signature verification and public certificate SHA-256 continuity checks passed.
+- All 19 logic/visual tests passed, none failed or skipped. Debug and release lint each completed with zero errors and 29 warnings.
+- APK ZIP alignment and all bundled arm64-v8a/x86_64 native load-segment alignments passed 16 KB checks.
+- [Public verification report](releases/v0.1.1-verification.json) records the version and certificate facts.
+- The workflow passed `actionlint`. Its signing restoration was exercised with the existing private inputs: key bytes and owner-only permissions were preserved, and missing-secret input was rejected. Private test copies were removed.
+- Actions signing-secret setup returned HTTP 403 for this integration. A repository owner must configure the four documented secrets or provide authorized Secrets write access. This does not establish whether another owner has already configured them.
+- These are current-instance build results. A successful GitHub Actions run, published GitHub Release, fresh-environment restoration, and phone behavior each require separate evidence.

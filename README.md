@@ -103,7 +103,7 @@ For exact OS boundaries—including protected content, file clipboard access, an
 **Requirements:** JDK 17+ (the cloud build uses JDK 21), Android SDK platform 35, and build-tools 35.0.0. The included Gradle 8.11.1 wrapper has its distribution SHA-256 pinned.
 
 ```bash
-git clone https://github.com/ankitchanki/New.git StashDrop
+git clone https://github.com/ankitchanki/StashDrop.git StashDrop
 cd StashDrop
 # Set ANDROID_HOME to your SDK, or add sdk.dir to local.properties.
 ./gradlew :app:assembleDebug :app:testDebugUnitTest :app:lintDebug
@@ -137,13 +137,13 @@ The debug APK uses a development signing key. Signed release builds require a se
 
 ## Signed releases and changelog
 
-Version `0.1.0` has a signed, minified APK and a signed Android App Bundle, using a dedicated StashDrop certificate. Public release packages include checksums, the public certificate, and a verification report; private signing keys are kept separately.
+Version `0.1.1` uses Android version code `2` and the existing StashDrop production certificate. Signed APK/app-bundle packages include checksums, the public certificate, and a verification report. Version-tag builds use [GitHub Actions](.github/workflows/android.yml); the four signing secrets must be configured before publication. Private signing keys are kept separately.
 
 - [Changelog](CHANGELOG.md)
-- [Version 0.1.0 notes](docs/releases/v0.1.0.md)
-- [Signed build verification](docs/releases/v0.1.0-verification.json)
+- [Version 0.1.1 notes](docs/releases/v0.1.1.md)
+- [Signed build verification](docs/releases/v0.1.1-verification.json)
 - [Release build and publication instructions](docs/RELEASING.md)
-- [GitHub Releases](https://github.com/ankitchanki/New/releases) for versions that have completed publication
+- [GitHub Releases](https://github.com/ankitchanki/StashDrop/releases) for versions that have completed publication
 
 A release build/signature check does not replace the outstanding [device validation](docs/DEVICE_VALIDATION.md).
 
