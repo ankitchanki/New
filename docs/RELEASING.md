@@ -41,7 +41,7 @@ A tag push builds and tests the signed APK and AAB, verifies their signatures an
 
 If a tag run failed because secrets were missing, configure the secrets and rerun that tag's workflow from Actions. Do not move or delete the version tag. If the workflow itself needs correction, run the updated workflow on `main` with its `release_tag` input set to the existing tag. Both jobs check out that tag, validate its version, and publish its artifacts. Leaving the input empty produces artifacts without publication. CI uses its own repository-scoped `github.token` with Contents write permission for publication.
 
-For 0.1.1, the initial tag run stopped before compilation because `sdkmanager` was unavailable on PATH. The corrected workflow pins Ubuntu 24.04 and uses Android SDK setup before installing SDK 35. Run it from Actions → Android build → Run workflow, choose `main`, and set `release_tag` to `v0.1.1`; or use an authorized CLI connection:
+For 0.1.1, the initial tag run stopped before compilation because `sdkmanager` was unavailable on PATH. The corrected workflow pins Ubuntu 24.04 and installs platform-tools, SDK 35 and build-tools 35.0.0 through Android SDK setup (its default list includes the retired `tools` package, which fails). Run it from Actions → Android build → Run workflow, choose `main`, and set `release_tag` to `v0.1.1`; or use an authorized CLI connection:
 
 ```bash
 gh workflow run android.yml --repo ankitchanki/StashDrop --ref main -f release_tag=v0.1.1
