@@ -40,7 +40,8 @@ class CircleSearchModel(app: Application): AndroidViewModel(app) {
     var result by mutableStateOf<OcrAndBarcodeProcessor.Result?>(null); private set
     var busy by mutableStateOf(false); private set
     var message by mutableStateOf("")
-    private val processor=OcrAndBarcodeProcessor()
+    private val processor by lazy { OcrAndBarcodeProcessor() }
+    private var processorCreated=false
     private var saved: StashItemEntity?=null
     val extracted get()=result?.let { (listOf(it.text)+it.codes).filter(String::isNotBlank).distinct().joinToString("\n") }.orEmpty()
     /** Stash, Lens and Share reuse one saved copy of the current cutout. */
@@ -52,13 +53,15 @@ class CircleSearchModel(app: Application): AndroidViewModel(app) {
         viewModelScope.launch {
             try {
                 val selected=cropLasso(bitmap,points,size)
-                crop?.recycle(); crop=selected; saved=null; result=null; message=""
-                result=processor.process(selected)
+                crop=selected; saved=null; result=null; message=""
+                val reader=processor; processorCreated=true
+                result=reader.process(selected)
             } catch(e: Exception) { message=e.message ?: "Selection failed" } finally { busy=false }
         }
     }
-    fun reset() { if(!busy) { crop?.recycle(); crop=null; saved=null; result=null; message="" } }
-    override fun onCleared() { processor.close(); source?.recycle(); crop?.recycle() }
+    // Bitmaps are left to the garbage collector: recycling one the render thread still draws crashes the app.
+    fun reset() { if(!busy) { crop=null; saved=null; result=null; message="" } }
+    override fun onCleared() { if(processorCreated) runCatching { processor.close() } }
 }
 
 class CircleSearchActivity: ComponentActivity() {

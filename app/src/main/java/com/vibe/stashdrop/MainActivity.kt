@@ -39,7 +39,13 @@ class MainActivity: ComponentActivity() {
             .any { it.resolveInfo.serviceInfo.packageName==packageName }
         setup=SetupState(overlay=Settings.canDrawOverlays(this),
             notifications=Build.VERSION.SDK_INT<33 || ContextCompat.checkSelfPermission(this,Manifest.permission.POST_NOTIFICATIONS)==PackageManager.PERMISSION_GRANTED,
-            accessibility=accessibility,assistant=assistant.isDefault(),assistantSupported=assistant.supported)
+            accessibility=accessibility,assistant=assistant.isDefault(),assistantSupported=assistant.supported,
+            google=when(GoogleCircleToSearch.readiness(this)) {
+                GoogleCircleToSearch.Readiness.READY -> GoogleState.READY
+                GoogleCircleToSearch.Readiness.GOOGLE_NOT_ASSISTANT -> GoogleState.NOT_ASSISTANT
+                GoogleCircleToSearch.Readiness.GOOGLE_MISSING -> GoogleState.MISSING
+            },
+            crash=com.vibe.stashdrop.core.diagnostics.CrashReporter.read(this))
     }
     private fun open(vararg intents: Intent) {
         if(intents.none { runCatching { startActivity(it) }.isSuccess }) message="That setting is not available on this phone"
@@ -52,7 +58,8 @@ class MainActivity: ComponentActivity() {
     } }
     private val notificationSettings get()=Intent(Settings.ACTION_APP_NOTIFICATION_SETTINGS).putExtra(Settings.EXTRA_APP_PACKAGE,packageName)
     private val overlaySettings get()=Intent(Settings.ACTION_MANAGE_OVERLAY_PERMISSION,Uri.parse("package:$packageName"))
-    private val defaultApps get()=arrayOf(Intent(Settings.ACTION_MANAGE_DEFAULT_APPS_SETTINGS),Intent(Settings.ACTION_VOICE_INPUT_SETTINGS),Intent(Settings.ACTION_SETTINGS))
+    /** The system screen where the digital assistant app is picked by hand. */
+    private val defaultApps get()=arrayOf(Intent(Settings.ACTION_VOICE_INPUT_SETTINGS),Intent(Settings.ACTION_MANAGE_DEFAULT_APPS_SETTINGS),Intent(Settings.ACTION_SETTINGS))
     private fun startSearch() { lifecycleScope.launch {
         moveTaskToBack(true); delay(250)
         runCatching {
@@ -93,6 +100,12 @@ class MainActivity: ComponentActivity() {
                 val role=if(assistant.supported) assistant.makeDefault() else null
                 listOfNotNull(granted,role).joinToString(" · ")
             }) },
+            chooseAssistant={ open(*defaultApps) },
+            copyCrash={ report ->
+                getSystemService(ClipboardManager::class.java).setPrimaryClip(ClipData.newPlainText("StashDrop crash report",report))
+                message="Crash report copied"
+            },
+            dismissCrash={ com.vibe.stashdrop.core.diagnostics.CrashReporter.clear(this); refreshSetup() },
             messageShown={ message="" },
         )
         setContent { StashDropTheme {

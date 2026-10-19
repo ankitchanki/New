@@ -32,8 +32,15 @@ import kotlinx.coroutines.launch
 
 /** What the device has granted StashDrop; each missing item can be fixed from the Settings tab. */
 data class SetupState(val overlay: Boolean = false, val notifications: Boolean = true, val accessibility: Boolean = false,
-    val assistant: Boolean = false, val assistantSupported: Boolean = true) {
-    val complete get() = overlay && notifications && accessibility && (assistant || !assistantSupported)
+    val assistant: Boolean = false, val assistantSupported: Boolean = true, val google: GoogleState = GoogleState.READY,
+    val crash: String? = null) {
+    val complete get() = overlay && notifications && accessibility
+}
+/** Whether Google's Circle to Search can be opened from StashDrop. */
+enum class GoogleState(val label: String) {
+    READY("Google is your digital assistant · ready"),
+    NOT_ASSISTANT("Needs Google as your digital assistant"),
+    MISSING("Google app is not installed"),
 }
 
 class DashboardActions(
@@ -43,6 +50,7 @@ class DashboardActions(
     val share: (List<StashItemEntity>,Boolean)->Unit = {_,_->}, val collect: (StashItemEntity,String)->Unit = {_,_->},
     val allowOverlay: ()->Unit = {}, val allowNotifications: ()->Unit = {}, val enableAccessibility: ()->Unit = {},
     val makeAssistant: ()->Unit = {}, val restoreAssistant: ()->Unit = {}, val setupAll: ()->Unit = {},
+    val chooseAssistant: ()->Unit = {}, val copyCrash: (String)->Unit = {}, val dismissCrash: ()->Unit = {},
     val messageShown: ()->Unit = {},
 )
 
@@ -112,10 +120,32 @@ fun DashboardScreen(items: List<StashItemEntity>, settings: StashSettings, shizu
                         SetupRow(Icons.Outlined.Notifications,"Notifications",setup.notifications,"Allow",actions.allowNotifications)
                         SetupRow(Icons.Outlined.Hub,"Shizuku",shizuku.connected,if(shizuku.granted) "Check" else "Connect",actions.connectShizuku,statusText=if(shizuku.connected) "Connected" else shizuku.message)
                         SetupRow(Icons.Outlined.Screenshot,"Screenshot access",setup.accessibility,"Turn on",actions.enableAccessibility)
-                        if(setup.assistantSupported) SetupRow(Icons.Outlined.AssistantPhoto,"Default assistant",setup.assistant,"Use StashDrop",actions.makeAssistant,
-                            statusText=if(setup.assistant) "StashDrop · long-press home" else "Not StashDrop")
                     }
-                    if(setup.assistant) TextButton(onClick=actions.restoreAssistant) { Text("Restore previous assistant",maxLines=1) }
+                    SectionTitle("Circle to Search","Bubble, swipe and notification")
+                    Card {
+                        SettingSwitch("Use Google Circle to Search",if(settings.googleCircle) setup.google.label else "Off · StashDrop's own circle screen",settings.googleCircle) {actions.preference("google_cts",it)}
+                        Text(if(settings.googleCircle) "Gemini opens instead? Turn this off" else "Circle, then search with Google, Lens, copy or stash",
+                            Modifier.padding(horizontal=16.dp,vertical=4.dp),style=MaterialTheme.typography.labelSmall,color=MaterialTheme.colorScheme.onSurfaceVariant,maxLines=1,overflow=TextOverflow.Ellipsis)
+                        Row(Modifier.fillMaxWidth().padding(horizontal=12.dp),horizontalArrangement=Arrangement.spacedBy(8.dp)) {
+                            TextButton(onClick=actions.search) { Icon(Icons.Outlined.CropFree,null,Modifier.size(18.dp)); Spacer(Modifier.width(6.dp)); Text("Try it now",maxLines=1) }
+                            if(settings.googleCircle && setup.google==GoogleState.NOT_ASSISTANT) TextButton(onClick=actions.chooseAssistant) { Text("Choose Google",maxLines=1) }
+                        }
+                    }
+                    if(setup.assistantSupported) {
+                        SectionTitle("Digital assistant","Pick it by hand in system settings")
+                        Card {
+                            SetupRow(Icons.Outlined.AssistantPhoto,"StashDrop as assistant",setup.assistant,"Choose",actions.chooseAssistant,
+                                statusText=if(setup.assistant) "Corner swipe or long-press home opens StashDrop" else if(setup.google==GoogleState.READY) "Google is the assistant" else "Another app is the assistant")
+                            Text("Google: its Circle to Search · StashDrop: own circle",
+                                Modifier.padding(horizontal=16.dp,vertical=4.dp),style=MaterialTheme.typography.labelSmall,color=MaterialTheme.colorScheme.onSurfaceVariant,maxLines=1,overflow=TextOverflow.Ellipsis)
+                            Row(Modifier.fillMaxWidth().padding(horizontal=12.dp),horizontalArrangement=Arrangement.spacedBy(8.dp)) {
+                                TextButton(onClick=actions.chooseAssistant) { Text("Open assistant picker",maxLines=1) }
+                                if(shizuku.connected) TextButton(onClick=if(setup.assistant) actions.restoreAssistant else actions.makeAssistant) {
+                                    Text(if(setup.assistant) "Restore previous" else "Use StashDrop now",maxLines=1)
+                                }
+                            }
+                        }
+                    }
                     SectionTitle("Gestures","Bottom-edge touch strips")
                     Card {
                         SettingSwitch("Gesture strips","Touch areas above the nav bar",settings.gesturesEnabled) {actions.preference("bar",it)}
@@ -143,6 +173,13 @@ fun DashboardScreen(items: List<StashItemEntity>, settings: StashSettings, shizu
             Spacer(Modifier.height(20.dp))
         }
     }
+    setup.crash?.let { report -> AlertDialog(onDismissRequest=actions.dismissCrash,title={Text("StashDrop closed unexpectedly")},
+        text={ Column {
+            Text("Copy this report and send it so the exact problem can be fixed.",style=MaterialTheme.typography.bodyMedium)
+            Text(report,Modifier.padding(top=12.dp).heightIn(max=260.dp).verticalScroll(rememberScrollState()),
+                style=MaterialTheme.typography.labelSmall,fontFamily=androidx.compose.ui.text.font.FontFamily.Monospace)
+        } },
+        confirmButton={TextButton(onClick={actions.copyCrash(report)}) {Text("Copy report")}},dismissButton={TextButton(onClick=actions.dismissCrash) {Text("Dismiss")}}) }
     if(adding) AlertDialog(onDismissRequest={adding=false; text=""},title={Text("Keep a thought")},text={OutlinedTextField(text,{text=it},label={Text("Text or link")},minLines=3)},
         confirmButton={TextButton(enabled=text.isNotBlank(),onClick={actions.addText(text); text=""; adding=false}) {Text("Save")}},dismissButton={TextButton(onClick={adding=false; text=""}) {Text("Cancel")}})
     collectionItem?.let { item -> AlertDialog(onDismissRequest={collectionItem=null},title={Text("Move to collection")},text={OutlinedTextField(collection,{collection=it},label={Text("Collection name")},singleLine=true)},

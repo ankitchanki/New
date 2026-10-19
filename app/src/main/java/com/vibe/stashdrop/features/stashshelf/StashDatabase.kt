@@ -20,6 +20,7 @@ interface StashDao {
     @Query("SELECT * FROM stash ORDER BY createdAt DESC") fun observe(): Flow<List<StashItemEntity>>
     @Insert suspend fun insert(item: StashItemEntity)
     @Insert suspend fun record(item: ClipboardHistoryEntity)
+    @Query("SELECT COUNT(*) FROM clipboard_history WHERE digest=:digest") suspend fun seen(digest: String): Int
     @Query("DELETE FROM clipboard_history WHERE id NOT IN (SELECT id FROM clipboard_history ORDER BY createdAt DESC LIMIT 100)") suspend fun pruneHistory()
     @Query("DELETE FROM stash WHERE id=:id") suspend fun delete(id: String)
     @Query("UPDATE stash SET collection=:collection WHERE id=:id") suspend fun move(id: String, collection: String)

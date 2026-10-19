@@ -14,7 +14,8 @@ class StashDropApplication : Application() {
     val shizuku by lazy { ShizukuConnectionManager(this) }
     private val scope = CoroutineScope(SupervisorJob() + Dispatchers.Default)
     override fun onCreate() {
-        super.onCreate(); HiddenApiBypassInitializer.initialize(); shizuku.start()
+        super.onCreate(); com.vibe.stashdrop.core.diagnostics.CrashReporter.install(this)
+        HiddenApiBypassInitializer.initialize(); shizuku.start()
         scope.launch { preferences.settings.collect { TactileHapticEngine.enabled = it.haptics } }
     }
 }

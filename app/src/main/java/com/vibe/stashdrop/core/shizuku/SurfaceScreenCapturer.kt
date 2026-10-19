@@ -12,7 +12,8 @@ import kotlin.coroutines.resumeWithException
 
 object CapturedFrame {
     private val bitmap = AtomicReference<Bitmap?>()
-    fun put(value: Bitmap) { bitmap.getAndSet(value)?.recycle() }
+    // Never recycle here: an open Circle to Search screen may still be drawing the previous frame.
+    fun put(value: Bitmap) { bitmap.set(value) }
     fun take(): Bitmap? = bitmap.getAndSet(null)
 }
 class SurfaceScreenCapturer(private val context: android.content.Context) {

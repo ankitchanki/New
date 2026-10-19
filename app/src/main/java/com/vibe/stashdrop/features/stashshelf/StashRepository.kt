@@ -16,11 +16,13 @@ class StashRepository(private val context: Context, private val dao: StashDao) {
     suspend fun addText(raw: String, fromClipboard: Boolean = false) = withContext(Dispatchers.IO) {
         val text = UrlPrivacySanitizer.cleanText(raw).take(100_000)
         require(text.isNotBlank()) { "Nothing to stash" }
-        dao.insert(StashItemEntity(UUID.randomUUID().toString(), text, null, "text/plain"))
         if (fromClipboard) {
+            // Skip text auto-stashed recently (the last 100 copies), so copying it again does not duplicate it.
             val digest = MessageDigest.getInstance("SHA-256").digest(text.toByteArray()).joinToString("") { "%02x".format(it) }
+            if (dao.seen(digest) > 0) return@withContext
             dao.record(ClipboardHistoryEntity(digest = digest)); dao.pruneHistory()
         }
+        dao.insert(StashItemEntity(UUID.randomUUID().toString(), text, null, "text/plain"))
     }
     suspend fun addBitmap(bitmap: Bitmap): StashItemEntity = withContext(Dispatchers.IO) {
         val id = UUID.randomUUID().toString()

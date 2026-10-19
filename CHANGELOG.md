@@ -2,6 +2,26 @@
 
 All notable StashDrop changes are recorded here. Versions follow Semantic Versioning.
 
+## [0.3.0] - 2026-10-19
+
+### Changed
+
+- Circle to Search opens **Google's own Circle to Search** again by default. The request now goes from StashDrop's own process to the system voice-interaction service with the contextual-search entry point, the same request a long-press of the navigation handle sends, instead of the earlier Shizuku-shell bridge that ended up in Gemini. It needs Google as the digital assistant; StashDrop's built-in circle screen is the fallback and a switch in Settings.
+- Settings has a Circle to Search section (Google on/off, readiness, "Try it now") and a Digital assistant section that opens the system picker so StashDrop or Google can be chosen by hand; with StashDrop chosen, the corner swipe or long-press home opens StashDrop's circle screen.
+- Bottom gesture strips (swipe up to Circle to Search) are on by default.
+
+### Fixed
+
+- Every floating-bubble touch, drag, shelf and drag-and-drop path runs guarded; a failure is shown and recorded instead of closing the app. The foreground service starts with its explicit special-use type.
+- Circle to Search no longer recycles bitmaps that are still on screen, which could crash when circling again or capturing twice.
+- Back closes the floating shelf.
+- Auto-stash no longer saves the same copied text twice.
+
+### Added
+
+- Crash reporter: if StashDrop closes unexpectedly, the next launch shows the report with a Copy button. Release stack traces keep line numbers, and CI keeps the R8 mapping file with the build artifacts.
+- Robolectric tests that tap, hold and drag the bubble, open the shelf, and circle/reset in Circle to Search with native graphics.
+
 ## [0.2.0] - 2026-10-19
 
 ### Fixed

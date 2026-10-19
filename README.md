@@ -86,9 +86,11 @@ Explore [shaders](app/src/main/java/com/vibe/stashdrop/core/shaders), [physics](
 | Floating thumb dock | Draggable dock, magnetic edge snap, idle peek, foreground notification | Overlay permission required |
 | Local stash shelf | Notes, links, imported files/images, collections, deletion | Room + private app files |
 | Share into StashDrop | Android `SEND` and `SEND_MULTIPLE` receivers | Up to 30 attachments; 50 MB per attachment |
-| Circle to Search | Screen capture, freehand lasso, Google search of circled text, Lens image search, copy/stash/share | Capture permission or consent required |
+| Google Circle to Search | Opens Google's own Circle to Search from the bubble, bottom swipe, notification and Settings | Google must be the digital assistant; Google decides device eligibility |
+| StashDrop circle screen | Built-in fallback: capture, freehand lasso, Google search of circled text, Lens, copy/stash/share | Capture permission or consent required |
 | Offline text & codes | Bundled Latin-script ML Kit text recognition and barcode scanning | Built-in path; no backend key |
-| Default digital assistant | Long-press home opens StashDrop Circle to Search; set or restore from Settings | One tap with Shizuku; otherwise the system default-apps screen |
+| Digital assistant | StashDrop can be picked by hand in the system assistant picker; the corner swipe / long-press home then opens its circle screen | Android 10+; Shizuku can switch it in one tap |
+| Crash reports | The last crash is shown at launch with a Copy button | Stored only on the phone |
 | In-app setup | Overlay, notifications, screenshot access and assistant status with one-tap fixes | Shizuku applies them directly; otherwise opens the exact system screen |
 | Haptic feedback | Detents while dragging the bubble and drawing a circle; clicks when stacking cards | Toggle in Settings |
 | Clean links | Removes `utm_*`, `fbclid`, `gclid`, `si`, `igshid`, `ref`, and related tracking keys | Preserves raw query encoding and prose punctuation |
@@ -132,15 +134,16 @@ The debug APK uses a development signing key. Signed release builds require a se
 
 1. Open StashDrop, go to **Settings → Setup**, and fix anything marked Off. With Shizuku connected, **Set up everything with Shizuku** does it in one tap.
 2. On Home, tap **Show floating bubble**. Tap the bubble for your shelf; hold it (or swipe up on the gesture strip) for Circle to Search.
-3. Optional: set **Default assistant → Use StashDrop** so long-pressing home opens Circle to Search instead of Gemini.
-4. Circle an area, then search its text on Google, search the image with Lens, copy, stash, or share it.
+3. Keep **Google** as your digital assistant for Google's Circle to Search, or pick **StashDrop** in Settings → Digital assistant so the corner swipe opens StashDrop's circle screen.
+4. With StashDrop's circle screen, circle an area, then search its text on Google, search the image with Lens, copy, stash, or share it.
 5. Share a note, link, photo, or file **to StashDrop**, or add a note from the Shelf tab. Gesture strips and auto-stash are opt-in.
 
 ## Signed releases and changelog
 
-Version `0.2.0` uses Android version code `3` and the existing StashDrop production certificate. Signed APK/app-bundle packages include checksums, the public certificate, and a verification report. Version-tag builds use [GitHub Actions](.github/workflows/android.yml); the four signing secrets must be configured before publication. Private signing keys are kept separately.
+Version `0.3.0` uses Android version code `4` and the existing StashDrop production certificate. Signed APK/app-bundle packages include checksums, the public certificate, and a verification report. Version-tag builds use [GitHub Actions](.github/workflows/android.yml); the four signing secrets must be configured before publication. Private signing keys are kept separately.
 
 - [Changelog](CHANGELOG.md)
+- [Version 0.3.0 notes](docs/releases/v0.3.0.md)
 - [Version 0.2.0 notes](docs/releases/v0.2.0.md)
 - [Version 0.1.1 notes](docs/releases/v0.1.1.md)
 - [Release build and publication instructions](docs/RELEASING.md)
@@ -155,8 +158,10 @@ flowchart LR
     Share[Android Share] --> Shelf[Local stash shelf]
     Copy[Opt-in text clipboard] --> Clean[URL privacy sanitizer]
     Clean --> Shelf
-    Dock[Floating bubble / gestures] --> Capture[Screen capture]
-    Assist[Default assistant long-press] --> Capture
+    Dock[Floating bubble / gestures] --> Google{Google Circle to Search on?}
+    Google -->|Yes, Google is assistant| GCTS[Google Circle to Search]
+    Google -->|No or unavailable| Capture[Screen capture]
+    Assist[StashDrop as assistant] --> Capture
     Capture --> Circle[Circle to Search lasso]
     Circle --> ML[Offline OCR and barcodes]
     ML --> Google[Google search]

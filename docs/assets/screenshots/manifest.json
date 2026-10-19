@@ -18,13 +18,13 @@
       "file": "controls.png",
       "width": 1080,
       "height": 2340,
-      "sha256": "8798af3cbfb06faf33679fd306aaecab2b30aee34934933a13c15f912bf975ef"
+      "sha256": "194edca19635b186549f3a3f5047dc610f64270eb499a507165551269fb3427c"
     },
     {
       "file": "controls-full.png",
       "width": 1080,
       "height": 5200,
-      "sha256": "ead99c1f4e5819b535e43d5f3628b05311d1554d379934d01de394bc8a60184d"
+      "sha256": "ba3c39c1d41cf04845f7d23085b9fb13bf1b55fcc13b1232c1687d86835df5d8"
     },
     {
       "file": "floating-shelf.png",
