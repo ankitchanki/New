@@ -124,7 +124,7 @@ adb shell am start -n com.vibe.stashdrop/.MainActivity
 
 Package: `com.vibe.stashdrop` · Minimum SDK: `28` · Target SDK: `35`.
 
-The APK uses a development signing key. Release signing is configured separately. For the prepared cloud toolchain, see [cloud environment instructions](docs/CLOUD_ENVIRONMENT.md).
+The debug APK uses a development signing key. Signed release builds require a separate production key and enable code/resource shrinking; see [release signing and publication](docs/RELEASING.md). For the prepared cloud toolchain, see [cloud environment instructions](docs/CLOUD_ENVIRONMENT.md).
 
 ### First run
 
@@ -134,6 +134,18 @@ The APK uses a development signing key. Release signing is configured separately
 4. Open **Circle Studio**. It tries Shizuku capture, accessibility screenshots on API 30+, then one-shot screen-sharing consent.
 5. Circle an area, then copy extracted text, stash the cutout, or share it.
 6. Optional: install/start Shizuku separately and authorize StashDrop in Controls. Gesture strips and auto-stash are opt-in.
+
+## Signed releases and changelog
+
+Version `0.1.0` has a signed, minified APK and a signed Android App Bundle, using a dedicated StashDrop certificate. Public release packages include checksums, the public certificate, and a verification report; private signing keys are kept separately.
+
+- [Changelog](CHANGELOG.md)
+- [Version 0.1.0 notes](docs/releases/v0.1.0.md)
+- [Signed build verification](docs/releases/v0.1.0-verification.json)
+- [Release build and publication instructions](docs/RELEASING.md)
+- [GitHub Releases](https://github.com/ankitchanki/New/releases) for versions that have completed publication
+
+A release build/signature check does not replace the outstanding [device validation](docs/DEVICE_VALIDATION.md).
 
 ## How it fits together
 

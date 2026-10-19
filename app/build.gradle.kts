@@ -5,6 +5,14 @@ plugins {
     id("org.jetbrains.kotlin.plugin.compose")
     id("org.jetbrains.kotlin.kapt")
 }
+
+val releaseSigningNames = listOf(
+    "STASHDROP_RELEASE_KEYSTORE", "STASHDROP_RELEASE_KEY_ALIAS",
+    "STASHDROP_RELEASE_STORE_PASSWORD", "STASHDROP_RELEASE_KEY_PASSWORD"
+)
+val releaseSigningValues = releaseSigningNames.associateWith { providers.environmentVariable(it).orNull }
+val hasReleaseSigning = releaseSigningValues.values.all { !it.isNullOrBlank() }
+
 android {
     namespace = "com.vibe.stashdrop"
     compileSdk = 35
@@ -19,7 +27,25 @@ android {
     buildFeatures { compose = true; aidl = true }
     compileOptions { sourceCompatibility = JavaVersion.VERSION_17; targetCompatibility = JavaVersion.VERSION_17 }
     kotlinOptions { jvmTarget = "17" }
-    buildTypes { release { isMinifyEnabled = true; proguardFiles(getDefaultProguardFile("proguard-android-optimize.txt"), "proguard-rules.pro") } }
+    if (hasReleaseSigning) {
+        signingConfigs.create("production") {
+            storeFile = file(releaseSigningValues.getValue("STASHDROP_RELEASE_KEYSTORE")!!)
+            storePassword = releaseSigningValues.getValue("STASHDROP_RELEASE_STORE_PASSWORD")
+            keyAlias = releaseSigningValues.getValue("STASHDROP_RELEASE_KEY_ALIAS")
+            keyPassword = releaseSigningValues.getValue("STASHDROP_RELEASE_KEY_PASSWORD")
+            enableV1Signing = false
+            enableV2Signing = true
+            enableV3Signing = true
+        }
+    }
+    buildTypes {
+        release {
+            isMinifyEnabled = true
+            isShrinkResources = true
+            proguardFiles(getDefaultProguardFile("proguard-android-optimize.txt"), "proguard-rules.pro")
+            if (hasReleaseSigning) signingConfig = signingConfigs.getByName("production")
+        }
+    }
     testOptions { unitTests.isReturnDefaultValues = true; unitTests.isIncludeAndroidResources = true }
 }
 kapt { correctErrorTypes = true }
@@ -49,3 +75,12 @@ dependencies {
     implementation("com.google.mlkit:barcode-scanning:17.3.0")
     testImplementation("junit:junit:4.13.2")
 }
+
+val requireReleaseSigning by tasks.registering {
+    doLast {
+        val missing = releaseSigningNames.filter { releaseSigningValues[it].isNullOrBlank() }
+        check(missing.isEmpty()) { "Release signing is required. Missing environment variable names: ${missing.joinToString()}. See docs/RELEASING.md." }
+        check(file(releaseSigningValues.getValue("STASHDROP_RELEASE_KEYSTORE")!!).isFile) { "Release keystore file does not exist." }
+    }
+}
+tasks.matching { it.name == "preReleaseBuild" }.configureEach { dependsOn(requireReleaseSigning) }

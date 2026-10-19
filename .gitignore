@@ -5,3 +5,11 @@ local.properties
 **/build/
 .idea/
 *.jks
+*.keystore
+*.p12
+*.pfx
+*.key
+*.pem
+keystore.properties
+signing.properties
+.signing/
