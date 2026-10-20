@@ -40,3 +40,12 @@ The debug APK uses a development key. Release signing and minification were not 
 - The workflow passed `actionlint`. Its signing restoration was exercised with the existing private inputs: key bytes and owner-only permissions were preserved, and missing-secret input was rejected. Private test copies were removed.
 - Actions signing-secret setup returned HTTP 403 for this integration. A repository owner must configure the four documented secrets or provide authorized Secrets write access. This does not establish whether another owner has already configured them.
 - These are current-instance build results. A successful GitHub Actions run, published GitHub Release, fresh-environment restoration, and phone behavior each require separate evidence.
+
+## Signed version 0.3.2 with the original key
+
+- Built the minified APK and AAB locally with version code `6` and the original RSA-4096 production identity. APK v3 and AAB JAR signatures verified; the certificate SHA-256 matches 0.1.0.
+- All 27 tests passed, with no failures, errors, or skips. Debug/release lint each reported zero errors and 42 warnings.
+- Final APK ZIP alignment and all bundled 64-bit native load-segment alignments passed 16 KB checks. See the [public verification report](releases/v0.3.2-verification.json).
+- The new Robolectric tests initially could not create `/home/agent/.robolectric-download-lock` in this managed workspace. A Gradle init script outside Git now assigns writable Java/Maven cache paths and preserves the configured proxy/CA trust for test JVMs; the complete release checks then passed. App/test sources and checks were not weakened.
+- Six signing-input checks passed: the original key survives CRLF, wrapped whitespace, and accidental double encoding; ZIP data, a wrong password, and a wrong alias are rejected before Gradle. The workflow also passed `actionlint`.
+- The remote workflow passed debug checks, but the current Actions secret decoded to an invalid keystore (3,263 bytes, first byte `0x0e`). Restoring the four original signing values is needed for CI. This integration returned HTTP 403 for Actions-secret setup. Local signing is verified independently of GitHub publication.

@@ -8,6 +8,13 @@ All notable StashDrop changes are recorded here. Versions follow Semantic Versio
 
 - Retains the original StashDrop production signing identity for compatible updates. The certificate fingerprint is in the release's `release-verification.json` and `StashDrop-release-certificate.pem`.
 - App content is the same as 0.3.1.
+- Release signing input checks run before Gradle and require the original production certificate. Whitespace and accidental extra Base64 encoding are handled; invalid keystores, passwords, and aliases fail early.
+
+### Verified
+
+- Signed APK and AAB built with the original RSA-4096 key; both signatures and certificate continuity verified.
+- All 27 tests passed; debug and release lint each completed with zero errors and 42 warnings.
+- APK ZIP alignment and bundled 64-bit native load-segment alignments passed 16 KB checks.
 
 ## [0.3.1] - 2026-10-19
 
