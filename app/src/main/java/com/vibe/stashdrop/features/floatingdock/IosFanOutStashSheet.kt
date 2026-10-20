@@ -20,6 +20,7 @@ import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.platform.LocalView
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import com.vibe.stashdrop.core.physics.*
 import com.vibe.stashdrop.features.dragdrop.IosCardStackDragShadow
 import com.vibe.stashdrop.features.stashshelf.*
@@ -42,17 +43,15 @@ fun IosFanOutStashSheet(items: List<StashItemEntity>, repository: StashRepositor
     var dragVelocity by remember { mutableStateOf(androidx.compose.ui.geometry.Offset.Zero) }
     val tracker=remember { androidx.compose.ui.input.pointer.util.VelocityTracker() }
     val inspection = androidx.compose.ui.platform.LocalInspectionMode.current
-    val reveal=remember { Animatable(if (inspection) 0f else 300f) }
+    val reveal=remember { Animatable(if (inspection) 0f else 28f) }
     LaunchedEffect(Unit) { if (!inspection) reveal.animateTo(0f,IosSpringSpecs.liquid()) }
     Box(Modifier.fillMaxSize().then(if(compact) Modifier else Modifier.background(Color.Black.copy(alpha=.24f)).clickable(onClick=onDismiss)),contentAlignment=Alignment.BottomCenter) {
         Surface(Modifier.fillMaxWidth().fillMaxHeight(if(compact) 1f else .60f).graphicsLayer { translationY=reveal.value }.clickable(interactionSource=null,indication=null) {},
             shape=RoundedCornerShape(24.dp),color=MaterialTheme.colorScheme.surface) {
-            Column(Modifier.padding(horizontal=20.dp,vertical=12.dp)) {
-                Box(Modifier.align(Alignment.CenterHorizontally).width(38.dp).height(4.dp).background(Color.White.copy(alpha=.2f),RoundedCornerShape(3.dp)))
-                Row(Modifier.fillMaxWidth().padding(vertical=16.dp),horizontalArrangement=Arrangement.SpaceBetween,verticalAlignment=Alignment.CenterVertically) {
+            Column(Modifier.padding(horizontal=12.dp,vertical=8.dp)) {
+                Row(Modifier.fillMaxWidth().padding(vertical=2.dp),horizontalArrangement=Arrangement.SpaceBetween,verticalAlignment=Alignment.CenterVertically) {
                     Column(Modifier.weight(1f)) {
-                        Text("StashDrop",style=MaterialTheme.typography.headlineSmall,maxLines=1)
-                        Text("${items.size} items · hold a card to drag",style=MaterialTheme.typography.labelMedium,color=MaterialTheme.colorScheme.primary,maxLines=1,overflow=TextOverflow.Ellipsis)
+                        Text("Hold a card to drag",fontSize=10.sp,style=MaterialTheme.typography.labelSmall,color=MaterialTheme.colorScheme.primary,maxLines=1,overflow=TextOverflow.Ellipsis)
                     }
                     FilledTonalIconButton(onClick=onSearch) { Icon(Icons.Outlined.Search,"Circle to Search") }
                     IconButton(onClick=onDismiss) { Icon(Icons.Outlined.Close,"Close shelf") }
@@ -68,6 +67,7 @@ fun IosFanOutStashSheet(items: List<StashItemEntity>, repository: StashRepositor
                         val chosen=item.id in selected
                         val angle by animateFloatAsState(if(chosen) listOf(-4f,2f,5f)[index%3] else 0f,IosSpringSpecs.follow(),label="card tilt")
                         val scale by animateFloatAsState(if(chosen) .96f else 1f,IosSpringSpecs.landing(),label="stack scale")
+                        SwipeDeleteItem(onDeleteRequest={deleting=item}) {
                         Card(modifier=Modifier.fillMaxWidth().graphicsLayer { rotationZ=angle; scaleX=scale; scaleY=scale; cameraDistance=12*density; shadowElevation=if(chosen) 14f else 2f
                             rotationX=MagneticTrajectoryEngine.tilt(-dragVelocity.y)
                             rotationY=MagneticTrajectoryEngine.tilt(dragVelocity.x)
@@ -83,15 +83,21 @@ fun IosFanOutStashSheet(items: List<StashItemEntity>, repository: StashRepositor
                             }) },
                             onClick={ haptics.select(); selected=if(chosen) selected-item.id else selected+item.id },
                             colors=CardDefaults.cardColors(containerColor=if(chosen) MaterialTheme.colorScheme.primaryContainer else MaterialTheme.colorScheme.surfaceVariant)) {
-                            Row(Modifier.fillMaxWidth().padding(14.dp),verticalAlignment=Alignment.CenterVertically) {
-                                ShelfMediaThumbnail(item,repository.file(item),Modifier.padding(end=10.dp).size(64.dp))
-                                Column(Modifier.weight(1f)) {
-                                    Text(item.text?.replace('\n',' ') ?: item.category().label,maxLines=1,overflow=TextOverflow.Ellipsis,style=MaterialTheme.typography.bodyMedium)
-                                    Text(item.collection,style=MaterialTheme.typography.labelSmall,color=MaterialTheme.colorScheme.primary,maxLines=1)
+                            if(item.mimeType.startsWith("image/") || item.mimeType.startsWith("video/")) {
+                                Box(Modifier.fillMaxWidth().padding(6.dp)) {
+                                    ShelfMediaThumbnail(item,repository.file(item),Modifier.fillMaxWidth().height(104.dp))
+                                    if(chosen) Icon(Icons.Outlined.CheckCircle,"Selected",Modifier.align(Alignment.TopEnd).padding(6.dp),tint=MaterialTheme.colorScheme.primary)
                                 }
-                                IconButton(onClick={onShare(listOf(item),true)}) { Icon(Icons.AutoMirrored.Outlined.Send,"Send to WhatsApp") }
-                                IconButton(onClick={deleting=item}) { Icon(Icons.Outlined.DeleteOutline,"Delete item") }
+                            } else Row(Modifier.fillMaxWidth().padding(8.dp),verticalAlignment=Alignment.CenterVertically) {
+                                ShelfMediaThumbnail(item,repository.file(item),Modifier.padding(end=10.dp).size(68.dp))
+                                Column(Modifier.weight(1f)) {
+                                    item.text?.let { Text(it.replace('\n',' '),maxLines=2,overflow=TextOverflow.Ellipsis,style=MaterialTheme.typography.bodyMedium) }
+                                    if(item.text==null && !item.mimeType.startsWith("image/") && !item.mimeType.startsWith("video/"))
+                                        Text(item.category().label,style=MaterialTheme.typography.bodySmall)
+                                }
+                                if(chosen) Icon(Icons.Outlined.CheckCircle,"Selected",tint=MaterialTheme.colorScheme.primary)
                             }
+                        }
                         }
                     }
                 }

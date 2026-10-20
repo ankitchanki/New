@@ -1,7 +1,7 @@
 {
   "repository": "ankitchanki/StashDrop",
   "name": "StashDrop",
-  "description": "Native Android edge shelf with two side handles, compact floating panels, local media previews, content filters, Google-only search and optional Shizuku.",
+  "description": "Native Android edge shelf with one movable handle, compact floating panel, local media previews, content filters, compatible drag targets, Google-only search and optional Shizuku.",
   "topics": [
     "android-app",
     "android-application",

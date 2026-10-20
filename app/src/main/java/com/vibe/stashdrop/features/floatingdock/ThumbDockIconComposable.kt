@@ -38,11 +38,8 @@ fun ThumbDockIconComposable(count: Int, absorbing: Boolean, onTap: ()->Unit, onH
                     onDragEnd()
                 },onDragCancel=onDragCancel) { change,amount -> change.consume(); onDrag(amount) }
             },contentAlignment=Alignment.Center) {
-            Box(Modifier.width(if(absorbing) 14.dp else 8.dp).height(60.dp)
-                .background(Brush.verticalGradient(listOf(Ice,Mint)),RoundedCornerShape(6.dp))
-                .border(1.dp,Color.White.copy(alpha=.35f),RoundedCornerShape(6.dp)))
-            if(count>0) Text(if(count>99) "99+" else count.toString(),Modifier.align(Alignment.TopCenter).padding(top=2.dp),
-                color=Ice,fontSize=10.sp,fontWeight=FontWeight.Bold)
+            Box(Modifier.width(if(absorbing) 8.dp else 4.dp).height(44.dp)
+                .background(Ice.copy(alpha=if(absorbing) .9f else .4f),RoundedCornerShape(4.dp)))
         }
         return
     }

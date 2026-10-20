@@ -1,10 +1,10 @@
 # StashDrop feature guide
 
-This guide describes **released version 0.6.0**. See the [README](../README.md) for the signed APK, [platform support](PLATFORM_SUPPORT.md) for Android restrictions, and the [roadmap](ROADMAP.md) for proposed improvements.
+This guide describes **released version 0.7.0**. See the [README](../README.md) for the signed APK, [platform support](PLATFORM_SUPPORT.md) for Android restrictions, and the [roadmap](ROADMAP.md) for proposed improvements.
 
 ## What StashDrop does
 
-StashDrop keeps useful material in a local shelf and brings that shelf close to your thumb through two edge handles and a compact panel. Save a link while browsing, request Google screen search, organize a few notes, then share selected items to another app. Every search entry point requests Google; there is no built-in search screen.
+StashDrop keeps useful material in a local shelf and brings that shelf close to your thumb through one movable edge handle and a compact panel. Save a link while browsing, request Google screen search, organize a few notes, then share selected items to another app. Every search entry point requests Google; there is no built-in search screen.
 
 ## Home, Shelf, and Settings
 
@@ -19,7 +19,7 @@ The [visual gallery](UI_GALLERY.md) shows the implemented components with sample
 
 ## Edge handles and floating shelf
 
-Allow **Edge shelf** under Settings → Setup, then tap **Show edge shelf** on Home. Both screen edges show a slim vertical handle. Tap a handle or pull it inward to open a rounded rectangular panel on that side. Hold a handle for Google search. Drag vertically to move the handles; dragging onto the bottom X hides the shelf. Home or the notification can also stop it.
+Allow **Edge shelf** under Settings → Setup, then tap **Show edge shelf** on Home. One subtle handle appears on the right by default. Drag it across to the left or back to the right, or reposition vertically; edge and height are remembered after restart. Tap or pull inward for a rounded rectangular panel capped at 296 × 420 dp (and 78% screen width / 58% height). Drag onto the bottom X to hide it. There is no mirrored second handle.
 
 The panel is limited to part of the screen. Tap Close, press Back, or touch outside it to dismiss. Outside touches pass to the other app. Decorative search/dismiss windows are hidden while idle, and their combined opacity is capped while visible to avoid Android blocking underlying app touches. These host-checked policies still need POCO/OEM device testing.
 
@@ -47,11 +47,11 @@ Share a photo, document, or other readable attachment to StashDrop. Android's si
 
 ### Collections and deletion
 
-Tap an item's collection label to move it into a named collection; a blank name becomes **Inbox**. Collection names are limited to 80 characters. Use collection chips to filter the shelf. Select cards to show the bottom selection bar. Share/WhatsApp sends the selection; **More selection actions** offers Move to collection and Delete. Confirming deletion removes the selected database entries and cached attachments, when present; canceling keeps them. Changing a collection filter clears selection. There is currently no undo, trash, in-app backup/restore, or cloud sync. Share important items out before uninstalling or replacing an incompatible build.
+Use **Move to collection** to organize an item; a blank name becomes **Inbox**, meaning saved but not assigned to a named collection. Inbox is metadata, not a second copy. Default Inbox/Images labels are hidden on cards. Collection names are limited to 80 characters. Use collection chips to filter the shelf. Select cards to show the bottom selection bar. Share/WhatsApp sends the selection; **More selection actions** offers Move to collection and Delete. Confirming deletion removes the selected database entries and cached attachments, when present; canceling keeps them. Changing a collection filter clears selection. There is currently no undo, trash, in-app backup/restore, or cloud sync. Share important items out before uninstalling or replacing an incompatible build.
 
 ## Google Circle to Search
 
-Every search button, handle hold, notification action, enabled bottom marker gesture and StashDrop assistant entry requests Google’s contextual search session. The built-in capture/lasso/OCR/barcode workflow and its toggle were removed in 0.5.0. Existing saved items stay in the shelf.
+Every search button, handle hold, notification action, bottom strip gesture and StashDrop assistant entry requests Google’s contextual search session. The built-in capture/lasso/OCR/barcode workflow and its toggle were removed in 0.5.0. Existing saved items stay in the shelf.
 
 1. Install/update the Google app and select Google as digital assistant in Android’s default-app settings. Enable **Use screen and app data** in that assistant settings screen.
 2. Enable Circle to Search in your phone’s navigation settings if available.
@@ -75,15 +75,12 @@ These are explicit user actions. Normal app startup does not silently replace th
 
 ## Gestures, motion, and haptics
 
-Bottom gesture strips are overlay touch regions above system navigation, separate from Android's own assistant gesture. They run with the floating service, support portrait and landscape, and hide when locked or while the keyboard is visible, and can conflict with other navigation or app controls on some devices. Disable them in Settings if they interfere.
+The bottom gesture strip is a transparent overlay touch region above system navigation, separate from Android's own assistant gesture. It runs with the floating service, supports portrait and landscape, and hides when locked or while the keyboard is visible, and can conflict with other navigation or app controls on some devices. Disable it in Settings if they interfere.
 
 | Setting | Fresh-install default | Behavior |
 | --- | --- | --- |
-| Gesture strips | On | Enables the bottom overlay touch regions while the service runs |
-| Swipe up | On | Pull up about 64 dp, or flick upward, to search |
-| Corner swipe | Off | Start on a raised arrow marker and pull up/inward |
-| Press and hold | Off | Hold the center marker for Android’s long-press timeout |
-| Double tap | Off | Two nearby quick taps on the center marker within Android’s double-tap timeout |
+| Gesture strip | On | Transparent central touch region above navigation; pull up about 64 dp or flick upward to request Google |
+| System corner swipe | Managed by Android | Opens assistant settings; native corner support depends on navigation mode and OEM |
 | Auto-stash copied text | Off | Saves permitted copied text while the monitor is running |
 | Haptic feedback | On | Feedback for pulls, selection, dragging, and confirmation |
 | Springiness | 1.0 | Adjusts motion intensity within 0.5–1.5 |
@@ -120,3 +117,11 @@ Shelf content lives in Room and private files. Android app backup is disabled. T
 | An update will not install | Use the official APK signed with the original certificate; different signing identities cannot update in place |
 
 For proposed fixes and future screen changes, see the [roadmap](ROADMAP.md). For repeatable hardware checks, use [device validation](DEVICE_VALIDATION.md).
+
+## Compact panel, deletion and suggested apps
+
+The floating panel omits branding and repetitive media/collection labels. A small hold-to-drag hint remains above the working content filters. Swipe a card horizontally to reveal a red delete background and trash icon, then confirm permanent deletion or cancel. Main Shelf cards offer the same swipe behavior. Existing selection actions still work. There is no automatic deletion on a partial swipe.
+
+Holding and dragging cards reveals up to four compatible installed-app icons in a small target strip near the shelf. Hover enlarges an icon; drop opens that app's share composer. Apps must advertise support for the selected payload's actual SEND/SEND_MULTIPLE action and MIME. The strip ranks past choices made through this feature, then WhatsApp/Telegram when compatible. It does not read Android's Recents list, request usage history, choose a chat or automatically upload. The receiver controls final sending and drop compatibility. Native platform drag remains available outside these targets; cancellation preserves shelf items.
+
+Interaction settings open at the top immediately instead of inheriting the previous Settings scroll position. Home shows the app logo beside StashDrop and a floating pill navigation bar. The redundant Home setup shortcut and promotional subtitle are removed. A 220 ms pre-search animation delay has been removed; actual launch latency depends on Google and the device. No measured 10 ms guarantee is made. Android status-bar icons and mandatory navigation remain system-controlled.

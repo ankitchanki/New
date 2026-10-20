@@ -13,7 +13,7 @@ import com.vibe.stashdrop.core.haptics.TactileHapticEngine
 import com.vibe.stashdrop.features.stashshelf.GestureSettings
 import kotlin.math.*
 
-/** Visible opt-in markers above Android navigation; these do not intercept system navigation gestures. */
+/** Transparent opt-in strip above Android navigation; these do not intercept system navigation gestures. */
 class BottomBarGestureOverlay(private val context: Context, private val windows: WindowManager,
     private val onProgress: (Float, Float)->Unit, private val onTrigger: ()->Unit) {
     private val views = mutableListOf<View>()
@@ -82,18 +82,10 @@ internal class GestureStrip(context: Context, private val settings: GestureSetti
     init { contentDescription = if (center) "Google search gesture strip" else "Google search corner swipe" }
     override fun onDraw(canvas: Canvas) {
         super.onDraw(canvas)
-        val w = min(width*.5f, 36*density)
-        if(center) canvas.drawRoundRect((width-w)/2, height/2f-2*density, (width+w)/2, height/2f+2*density, 2*density, 2*density, paint)
-        else {
-            val direction=if(gravity==Gravity.LEFT) 1f else -1f
-            val x0=width/2f-direction*8*density; val x1=width/2f+direction*8*density
-            val y0=height/2f+7*density; val y1=height/2f-7*density
-            paint.strokeWidth=3*density; paint.strokeCap=Paint.Cap.ROUND
-            canvas.drawLine(x0,y0,x1,y1,paint)
-            canvas.drawLine(x1,y1,x1-direction*9*density,y1,paint)
-            canvas.drawLine(x1,y1,x1,y1+9*density,paint)
-        }
+        // Keep other apps unobstructed: no persistent arrows, bars or labels.
+        if (active) canvas.drawRoundRect(width*.3f,height/2f-density,width*.7f,height/2f+density,2*density,2*density,paint)
     }
+
     private fun trigger() {
         if (fired || !active) return
         fired = true; lastTap = null; handler.removeCallbacks(hold)
@@ -117,7 +109,7 @@ internal class GestureStrip(context: Context, private val settings: GestureSetti
         }
     }
     private fun cancel() {
-        active = false; lastTap = null; secondTap = false
+        active = false; invalidate(); lastTap = null; secondTap = false
         handler.removeCallbacks(hold); velocity?.recycle(); velocity = null
         onProgress(0f, downX)
     }
@@ -125,7 +117,7 @@ internal class GestureStrip(context: Context, private val settings: GestureSetti
         when(event.actionMasked) {
             MotionEvent.ACTION_DOWN -> {
                 downX = event.rawX; downY = event.rawY
-                active = true; fired = false; moved = false; haptics.reset()
+                active = true; invalidate(); fired = false; moved = false; haptics.reset()
                 secondTap = lastTap?.let { event.eventTime-it in 1..ViewConfiguration.getDoubleTapTimeout().toLong() &&
                     hypot(downX-tapX, downY-tapY) <= config.scaledDoubleTapSlop } == true
                 lastTap = null
@@ -143,7 +135,7 @@ internal class GestureStrip(context: Context, private val settings: GestureSetti
                     if (secondTap) trigger() else { lastTap = event.eventTime; tapX = downX; tapY = downY }
                 }
                 if (!fired) onProgress(0f, event.rawX)
-                active = false; secondTap = false
+                active = false; invalidate(); secondTap = false
                 velocity?.recycle(); velocity = null; performClick()
             }
             MotionEvent.ACTION_CANCEL, MotionEvent.ACTION_POINTER_DOWN -> cancel()

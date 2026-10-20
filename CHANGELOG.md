@@ -2,6 +2,23 @@
 
 All notable StashDrop changes are recorded here. Versions follow Semantic Versioning.
 
+## [0.7.0] - 2026-10-21
+
+### Changed
+
+- One subtle edge handle replaces the mirrored pair. Drag between edges/vertically; remember its position across restarts.
+- Compact rectangular shelf (at most 296 × 420 dp), small hold hint, no shelf branding or duplicate Inbox/Images card labels. Content filters and real media previews remain.
+- Transparent central search strip replaces persistent marker drawings. Remove redundant swipe/hold/double-tap/corner-overlay settings; native corner assistant gestures link to phone settings and depend on OEM support.
+- Home shows logo beside StashDrop, retains Everything within reach, removes promotional subtitle and duplicate setup shortcut, and uses floating pill navigation.
+- Open interaction settings at the top instead of inheriting Settings scroll. Remove 220 ms artificial pre-search animation delay. No device latency guarantee.
+
+### Added
+
+- Horizontal card swipe reveals red trash affordance and requests deletion confirmation on both shelf surfaces; cancel preserves saved data.
+- Up to four compatible installed apps appear near a dragged selection. Icons enlarge on hover; dropping opens the selected share composer. Rank prior choices without reading system Recents or usage history.
+- Regression coverage for simplified gestures, swipe deletion, single bounded panel and share-target routing; refreshed production renders and Windows test instructions.
+- Version code 10; original signing certificate, package, Room schema and saved data preserved.
+
 ## [0.6.0] - 2026-10-20
 
 ### Fixed

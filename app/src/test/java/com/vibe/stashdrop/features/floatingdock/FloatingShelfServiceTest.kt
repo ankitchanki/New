@@ -104,7 +104,7 @@ class FloatingShelfServiceTest {
         assertTrue("dropping on the X should hide the bubble", org.robolectric.Shadows.shadowOf(controller.get()).isStoppedBySelf)
         controller.destroy(); idle()
     }
-    @Test @Config(sdk=[34,35]) fun idleDecorationsDoNotObscureOtherAppsAndBothEdgesOpenBoundedPanels() {
+    @Test @Config(sdk=[34,35]) fun idleDecorationsDoNotObscureOtherAppsAndSingleHandleOpensCompactPanel() {
         ShadowSettings.setCanDrawOverlays(true)
         val controller=startService()
         fun decorations()=views().filter { (it.layoutParams as WindowManager.LayoutParams).flags and WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE != 0 }
@@ -112,7 +112,7 @@ class FloatingShelfServiceTest {
         val combined=1f-decorations().fold(1f) { transparent,view -> transparent*(1f-(view.layoutParams as WindowManager.LayoutParams).alpha) }
         assertTrue("Even active decoration overlap must remain below input-blocking opacity",combined<=.8f)
         val handles=views().filter { val p=it.layoutParams as WindowManager.LayoutParams; p.width>0 && p.height>p.width && p.gravity==(android.view.Gravity.TOP or android.view.Gravity.LEFT) }
-        org.junit.Assert.assertEquals("Both screen edges have a handle",2,handles.size)
+        org.junit.Assert.assertEquals("Only one screen edge has a handle",1,handles.size)
         for(handle in handles) {
             val before=views().size
             val down=SystemClock.uptimeMillis()
@@ -122,7 +122,7 @@ class FloatingShelfServiceTest {
             val panel=views().last()
             val p=panel.layoutParams as WindowManager.LayoutParams
             assertTrue("Panel has bounded width",p.width in 1 until context.resources.displayMetrics.widthPixels)
-            assertTrue("Panel has bounded height",p.height in 1 until context.resources.displayMetrics.heightPixels)
+            assertTrue("Panel has compact height",p.height <= (420*context.resources.displayMetrics.density).toInt())
             assertTrue(p.flags and WindowManager.LayoutParams.FLAG_NOT_TOUCH_MODAL != 0)
             touch(panel,MotionEvent.ACTION_OUTSIDE,0f,0f,SystemClock.uptimeMillis());idle()
             org.junit.Assert.assertEquals("Outside touch dismisses panel",before,views().size)

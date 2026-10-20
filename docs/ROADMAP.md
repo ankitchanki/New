@@ -1,12 +1,12 @@
 # Improvements and future UI
 
-These are **proposed directions**, not features shipped in 0.6.0. There are no committed delivery dates or promised version numbers. Current behavior is described in the [feature guide](FEATURE_GUIDE.md); implemented visuals are in the [gallery](UI_GALLERY.md).
+These are **proposed directions**, not features shipped in 0.7.0. There are no committed delivery dates or promised version numbers. Current behavior is described in the [feature guide](FEATURE_GUIDE.md); implemented visuals are in the [gallery](UI_GALLERY.md).
 
 The goal is a shelf that is easy to reach, predictable when permissions or services change, and safe for useful personal material. Reliability and accessibility should guide visual changes.
 
 ## Current foundation
 
-The app already has Home / Shelf / Settings, two edge handles with a rectangular panel, a stacked floating shelf, collections, sharing, optional copied-text saving, local media previews, content type filters, Google search routing, local crash reports, and spring/shader motion. The native UI includes main-Shelf batch actions, confirmed deletion, clipboard opt-in confirmation, and a separate interaction settings page. The signed build preserves the original production certificate. Host tests and renders are available; broad real-device qualification is still outstanding.
+The app already has Home / Shelf / Settings, one movable edge handle with a compact rectangular panel, swipe confirmation and compatible drag targets, collections, sharing, optional copied-text saving, local media previews, content type filters, Google search routing, local crash reports, and spring/shader motion. The native UI includes main-Shelf batch actions, confirmed deletion, clipboard opt-in confirmation, and a separate interaction settings page. The signed build preserves the original production certificate. Host tests and renders are available; broad real-device qualification is still outstanding.
 
 ## Priorities
 
@@ -33,7 +33,7 @@ A future readiness card could explain why an action is blocked, link to its syst
 
 ### Shelf: easier scanning and safer actions
 
-Add a local search field, collection/type filters, image thumbnails, readable link domains, and attachment names/sizes where available. Use a sticky selection toolbar near the bottom with a visible count and Share / Move / Delete. Add an undo affordance or a documented trash retention policy to the existing confirmed batch-deletion flow.
+Extend existing collection/type filters and media thumbnails with local text search, readable link domains, and attachment names/sizes where available. Use a sticky selection toolbar near the bottom with a visible count and Share / Move / Delete. Add an undo affordance or a documented trash retention policy to the existing confirmed batch-deletion flow.
 
 Empty states should explain how to share into StashDrop and offer Add note. Loading, import failure, and unavailable-file states should retain the user's context. Search/filter/selection state should survive navigation and rotation where appropriate. A local export/import design must specify private-file handling, encryption choices, and recovery before implementation.
 

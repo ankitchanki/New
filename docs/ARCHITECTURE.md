@@ -36,7 +36,7 @@ The fixed request carries Google’s contextual entry point and assist/screensho
 
 ## Gesture recognition
 
-The overlay service owns 88 × 40 dp touch regions above platform-fitted navigation insets. Markers sit 32 dp above stable navigation insets; side regions are inset 24 dp from the Back-gesture edge. Center handles swipe, hold and double-tap; side arrows require upward and inward motion. Android owns swipes beginning in its mandatory Home/Recents region. Identical settings/configuration preserve views and pending taps. Android touch slop and long-press/double-tap timing control recognition. Movement, cancellation, multi-touch and detach cancel holds; a gesture fires once. Markers remain visible when gesture navigation reports no visible navigation bar, and hide with the keyboard. The service suspends them for search, lock and keyboard visibility; portrait and landscape are supported. These are app overlay gestures, separate from OS navigation.
+The overlay service exposes one transparent 88 × 40 dp central search strip, 32 dp above stable system-navigation insets. Only upward swipe/flick is enabled by the live service; legacy gesture preference keys do not restore removed corner/hold/double-tap overlays. The drawing is visible only during active touch. Keyboard/lock/search suspend the strip. Native assistant corner gestures remain Android/OEM-managed and the UI links to assistant settings. Android owns mandatory bottom Home/Recents gestures.
 
 ## Local data flow
 
@@ -95,10 +95,12 @@ The release workflow builds debug checks and signed minified APK/AAB artifacts, 
 
 See the current versioned verification report for executed test, lint and signature checks. Host renders exercise production visual components with fixtures. Neither those checks nor a successful Binder call establishes universal OEM compatibility, usable Google search, external-app drop success, accessibility quality, or phone performance. See [verification](VERIFICATION.md), [device validation](DEVICE_VALIDATION.md), and [future work](ROADMAP.md).
 
-## Overlay input and media policies (0.6.0)
+## Overlay input and media policies (0.7.0)
 
-Two small touchable edge windows open a bounded rectangular panel. The panel uses `FLAG_NOT_TOUCH_MODAL` and outside-touch notification, so outside input can reach other apps and dismiss the panel. The handles exclude their limited side region from system Back gestures on API 29+; this does not exclude Android’s mandatory bottom navigation.
+One small touchable edge window open a bounded rectangular panel. The panel uses `FLAG_NOT_TOUCH_MODAL` and outside-touch notification, so outside input can reach other apps and dismiss the panel. The handles exclude their limited side region from system Back gestures on API 29+; this does not exclude Android’s mandatory bottom navigation.
 
 Search-wave and dismiss-target windows are non-touchable, hidden while idle, and use window alpha 0.35 when visible. Android combines overlapping untrusted opacity as `1 - product(1 - alpha)`: the two decorations combine to 0.5775, below the standard 0.8 touch-blocking threshold. The previous two 0.7 windows combined to 0.91. Checking each window separately missed that interaction.
 
 `ShelfCategory` derives a type from existing MIME/text/collection data without a Room migration. Shared type chips are used by dashboard and panel. `ShelfThumbnails` uses local IO decoding, EXIF-aware image handling, scaled video frame extraction and a 12 MiB LRU cache. Visible components hold at most a 320-pixel preview; offscreen components release their bitmap reference. Unavailable media fails to a placeholder. No remote preview request is made.
+
+The handle edge/relative vertical position is stored in private SharedPreferences. Panel bounds are at most 296 × 420 dp and 78% × 58% of the display. SwipeToDismissBox requests deletion confirmation and returns to the settled position; it never directly removes files. CompatibleDropTargets queries the exact VisualLensBridge share intent, excludes self/non-exported activities, deduplicates packages and presents at most four choices. Target drops use explicit activities and URI grants; prior successful target-strip launches rank future choices without reading system app usage. Target windows are removed after drag end, failure, sheet dismissal or service destruction.

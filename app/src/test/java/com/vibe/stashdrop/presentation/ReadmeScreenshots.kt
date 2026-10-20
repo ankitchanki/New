@@ -82,7 +82,7 @@ class ReadmeScreenshots {
             androidx.compose.runtime.CompositionLocalProvider(androidx.compose.ui.platform.LocalInspectionMode provides true) {
                 StashDropTheme {
                     Box(Modifier.fillMaxSize().background(Color(0xFF0C0E15))) {
-                        Box(Modifier.align(androidx.compose.ui.Alignment.CenterEnd).padding(12.dp).width(340.dp).height(620.dp)) {
+                        Box(Modifier.align(androidx.compose.ui.Alignment.CenterEnd).padding(12.dp).width(296.dp).height(420.dp)) {
                             IosFanOutStashSheet(samples, repository, {}, {}, {_,_->}, {}, {_,_->},compact=true)
                         }
                     }
@@ -99,7 +99,7 @@ class ReadmeScreenshots {
         paparazzi.snapshot(name="edge-handles") {
             StashDropTheme {
                 Box(Modifier.fillMaxSize().background(MaterialTheme.colorScheme.background)) {
-                    listOf(androidx.compose.ui.Alignment.CenterStart,androidx.compose.ui.Alignment.CenterEnd).forEach { edge ->
+                    listOf(androidx.compose.ui.Alignment.CenterEnd).forEach { edge ->
                         ThumbDockIconComposable(5,false,{}, {},{}, {},Modifier.align(edge),edgeHandle=true)
                     }
                 }

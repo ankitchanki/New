@@ -1,6 +1,6 @@
 # Validation performed
 
-**Current signed release build: [0.6.0](releases/v0.6.0-verification.json).** Edge panel, input and media changes passed 66 tests with no failures/errors/skips, eight production renders, zero debug/release lint errors (46 warnings each in published CI; 45 locally), original-certificate continuity, APK/AAB signatures and 16 KB ZIP/native-library alignment. [Release downloads](https://github.com/ankitchanki/StashDrop/releases/tag/v0.6.0) and [Actions](https://github.com/ankitchanki/StashDrop/actions/workflows/android.yml) provide artifacts and CI evidence. No phone/emulator was attached; POCO F5 / Android 15 remains a physical test target.
+**Current signed release build: [0.7.0](releases/v0.7.0-verification.json).** The single handle, compact shelf, swipe confirmation, sharing-target and navigation changes passed 71 tests with no failures/errors/skips, eight production renders, zero debug/release lint errors (46 warnings each locally), original-certificate continuity, APK/AAB signatures and 16 KB ZIP/native-library alignment. [Release downloads](https://github.com/ankitchanki/StashDrop/releases/tag/v0.7.0) and [Actions](https://github.com/ankitchanki/StashDrop/actions/workflows/android.yml) provide artifacts and CI evidence. No phone/emulator was attached; POCO F5 / Android 15 native corner support, external drop acceptance and latency remain physical test items.
 
 The sections below preserve historical results; earlier access/secret failures are not the current release status.
 

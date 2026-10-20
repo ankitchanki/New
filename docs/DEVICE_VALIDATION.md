@@ -46,3 +46,12 @@ A local ADB connection on the Windows laptop is not automatically reachable from
 - Test raised corner markers above the navigation region; separately confirm physical bottom swipes still invoke system navigation. Cover gesture and three-button navigation, portrait/landscape, keyboard and lock/unlock.
 - Import recognizably different images, EXIF-rotated photos, GIF/WebP stickers and supported/unsupported videos. Check inline thumbnails, missing/corrupt media placeholders, rapid scrolling and memory on a large shelf.
 - Combine collections with all type chips. Check URLs embedded in prose, OTP-like text, ordinary numerical notes, sticker heuristics and the Images/Photos/Stickers collection overrides. Changing filters must clear selection without deleting content.
+
+## 0.7.0 physical acceptance checklist (pending)
+
+- Confirm only one subtle handle exists; move it left/right and vertically, restart and check remembered position. Scroll other apps with the shelf idle and with its compact panel open.
+- Check the panel remains compact in portrait/landscape; close with Back, Close and outside touch. Verify type filters and previews; no duplicate Inbox/Images labels or panel branding.
+- Swipe a card: red trash affordance, confirmation, cancel preserves it, confirm deletes only that item/file. Test TalkBack Delete action too.
+- Check Home logo/name, tagline removal and floating pill navigation. Open interaction settings immediately; one transparent strip toggle and native assistant settings link replace the four gesture choices.
+- Start central upward swipe above navigation. Verify no persistent marker drawings, keyboard/lock hiding, Google behavior and actual launch latency. Test native corner gestures through OEM settings; do not assume Pixel support on POCO.
+- Drag a photo, mixed selection and text: only compatible installed targets appear, hover enlarges icons, drop opens the selected composer with correct content. Cancel/unsupported drop keeps items. Ensure strip vanishes after completion, lock and stop. Sending remains a user action in the receiving app.

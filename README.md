@@ -10,7 +10,7 @@
   <img alt="Target SDK 35" src="https://img.shields.io/badge/Target_SDK-35-B4C9FF?style=flat-square" />
   <img alt="Kotlin 2.1" src="https://img.shields.io/badge/Kotlin-2.1-9B72CB?style=flat-square&amp;logo=kotlin&amp;logoColor=white" />
   <img alt="Jetpack Compose" src="https://img.shields.io/badge/UI-Jetpack_Compose-4285F4?style=flat-square&amp;logo=jetpackcompose&amp;logoColor=white" />
-  <img alt="Signed release 0.6.0" src="https://img.shields.io/badge/Release-0.6.0-9DE3CF?style=flat-square" />
+  <img alt="Signed release 0.7.0" src="https://img.shields.io/badge/Release-0.7.0-9DE3CF?style=flat-square" />
 </p>
 
 <p align="center">
@@ -19,18 +19,18 @@
 
 ## What is StashDrop?
 
-Catch something useful without losing your place. Share a link into your shelf, save a note, open Google’s search interface, and send saved items back to another app. Slim handles on both screen edges open a compact floating shelf, while spring motion and aurora shaders give each interaction a fluid visual language.
+Catch something useful without losing your place. Share a link into your shelf, save a note, open Google’s search interface, and send saved items back to another app. One movable handle on your chosen screen edge open a compact floating shelf, while spring motion and aurora shaders give each interaction a fluid visual language.
 
 **Built with Kotlin, Jetpack Compose, Room, DataStore, and optional Shizuku.** All Circle to Search actions request Google’s interface. The built-in capture, lasso and OCR workflow has been removed.
 
-**[Download the signed Android APK — v0.6.0](https://github.com/ankitchanki/StashDrop/releases/download/v0.6.0/StashDrop-v0.6.0.apk)** · [Release notes and checksums](https://github.com/ankitchanki/StashDrop/releases/tag/v0.6.0)
+**[Download the signed Android APK — v0.7.0](https://github.com/ankitchanki/StashDrop/releases/download/v0.7.0/StashDrop-v0.7.0.apk)** · [Release notes and checksums](https://github.com/ankitchanki/StashDrop/releases/tag/v0.7.0)
 
-Android 9+ · No account or backend API key · Local shelf storage · Optional Shizuku integration. The published release preserves the original production signing certificate for compatible updates. Its build passed **66 tests**, signature checks, and 16 KB alignment checks. Device/OEM behavior and native Google eligibility still need the [device checklist](docs/DEVICE_VALIDATION.md).
+Android 9+ · No account or backend API key · Local shelf storage · Optional Shizuku integration. The published release preserves the original production signing certificate for compatible updates. Its build passed **71 tests**, signature checks, and 16 KB alignment checks. Device/OEM behavior and native Google eligibility still need the [device checklist](docs/DEVICE_VALIDATION.md).
 
 ### Everyday workflows
 
 - **Keep a useful link:** use another app's Share menu → StashDrop. Tracking parameters are removed from saved text links; move the item into a collection and share it again later.
-- **Search your screen with Google:** choose Google as digital assistant, enable the phone’s Circle to Search setting where available, then use the search button or a bottom marker. Google controls eligibility and may show Gemini instead.
+- **Search your screen with Google:** choose Google as digital assistant, enable the phone’s Circle to Search setting where available, then use the search button or the bottom strip. Google controls eligibility and may show Gemini instead.
 - **Send several saved items:** open the floating shelf, select cards, and use Share or WhatsApp. Global drag is available when the receiving app supports its content types.
 
 Read the [complete feature guide](docs/FEATURE_GUIDE.md), [architecture](docs/ARCHITECTURE.md), and [improvements and future UI roadmap](docs/ROADMAP.md).
@@ -61,7 +61,7 @@ These images render the **actual Compose components with sample content** using 
 
 </details>
 
-The [two edge handles](docs/assets/screenshots/edge-handles.png) and dedicated [interaction settings screen](docs/assets/screenshots/interactions.png) is also rendered from production Compose.
+The [single movable edge handle](docs/assets/screenshots/edge-handles.png) and dedicated [interaction settings screen](docs/assets/screenshots/interactions.png) are also rendered from production Compose.
 
 See [the visual guide](docs/UI_GALLERY.md) for image provenance, regeneration commands, and a map of the implementation.
 
@@ -89,19 +89,20 @@ Explore [shaders](app/src/main/java/com/vibe/stashdrop/core/shaders), [physics](
 
 | Feature | Implementation | Availability |
 | --- | --- | --- |
-| Floating thumb dock | Two slim edge handles, inward pull/tap to a bounded panel, drag-to-X dismiss, foreground notification | Overlay permission required |
+| Floating thumb dock | One persisted edge handle, inward pull/tap to a compact panel, drag-to-X dismiss, foreground notification | Overlay permission required |
 | Local stash shelf | Real media thumbnails; Images/Videos/Stickers/URLs/OTP/Text/Files filters; collections, multi-selection and sharing | Room + private app files |
 | Share into StashDrop | Android `SEND` and `SEND_MULTIPLE` receivers | Up to 30 attachments; 50 MB per attachment |
-| Google Circle to Search | Opens Google's own Circle to Search from edge handles, raised bottom markers, notification and Settings | Google voice service must be active; Google decides device eligibility |
+| Google Circle to Search | Opens Google's own Circle to Search from edge handles, a transparent bottom strip, notification and Settings | Google voice service must be active; Google decides device eligibility |
 | Digital assistant | Choose StashDrop for assistant gestures; optional Shizuku Connect keeps Google's voice service available for native search | Android 10+ assistant management; device gesture support varies |
 | Crash reports | The last crash is shown at launch with a Copy button | Stored only on the phone |
 | In-app setup | Overlay, notifications and Google assistant status with one-tap fixes | Optional Shizuku automation; manual system settings remain available |
-| Haptic feedback | Detents while dragging a handle and pulling a marker; clicks when stacking cards | Toggle in Settings |
+| Haptic feedback | Detents while dragging a handle and pulling the strip; clicks when stacking cards | Toggle in Settings |
 | Clean links | Removes `utm_*`, `fbclid`, `gclid`, `si`, `igshid`, `ref`, and related tracking keys | Preserves raw query encoding and prose punctuation |
 | Background text clipboard | Opt-in shell listener plus permitted foreground fallback | Shizuku/OEM access rules apply; off by default |
 | Multi-select & global drag | Selection stack, custom drag shadow, URI read grants | Receiver must accept the content |
+| Suggested drag targets | Up to four installed apps matching the exact share MIME/action, ranked by past target-strip choices | Drop on an icon to open its share composer; receiver controls upload |
 | WhatsApp & standard sharing | Single/multiple attachment intents with text | App and MIME compatibility dependent |
-| Gesture markers | Swipe up, corner pull, system-timed hold, double tap | Strips and swipe-up enabled by default; require the running overlay; other gestures off by default |
+| Search gesture | One transparent upward strip; native corner assistant settings | Strip on by default with the overlay; corner support belongs to Android/OEM |
 | Assistant management | Shizuku setting change with saved values for restoration | Explicit Settings actions; system/OEM support varies |
 
 For instructions, defaults, storage behavior, and troubleshooting for every feature, see the [feature guide](docs/FEATURE_GUIDE.md).
@@ -151,11 +152,11 @@ Google controls the UI after accepting a request. Installing StashDrop cannot un
 
 ## Signed releases and changelog
 
-Version `0.6.0` uses Android version code `9` and the original StashDrop production certificate. Earlier builds signed with that certificate can be updated in place. Signed APK/app-bundle packages include checksums, the public certificate, and a verification report. Version-tag builds use [GitHub Actions](.github/workflows/android.yml); the four signing secrets must be configured before publication. Private signing keys are kept separately.
+Version `0.7.0` uses Android version code `9` and the original StashDrop production certificate. Earlier builds signed with that certificate can be updated in place. Signed APK/app-bundle packages include checksums, the public certificate, and a verification report. Version-tag builds use [GitHub Actions](.github/workflows/android.yml); the four signing secrets must be configured before publication. Private signing keys are kept separately.
 
 - [Changelog](CHANGELOG.md)
-- [Version 0.6.0 notes](docs/releases/v0.6.0.md)
-- [Version 0.6.0 signed build verification](docs/releases/v0.6.0-verification.json)
+- [Version 0.7.0 notes](docs/releases/v0.7.0.md)
+- [Version 0.7.0 signed build verification](docs/releases/v0.7.0-verification.json)
 - [Version 0.3.1 notes](docs/releases/v0.3.1.md)
 - [Version 0.3.0 notes](docs/releases/v0.3.0.md)
 - [Version 0.2.0 notes](docs/releases/v0.2.0.md)
@@ -208,9 +209,9 @@ Shizuku is optional for the shelf and can send the Google contextual-session req
 
 ## Verification
 
-The published **0.6.0** build passed **66 tests** with no failures, errors, or skips. Debug and release lint each reported **zero errors and 46 warnings**. APK/AAB signatures match the original production certificate; APK ZIP and bundled 64-bit native library alignment passed 16 KB checks. The [successful release workflow](https://github.com/ankitchanki/StashDrop/actions/workflows/android.yml) and [verification report](docs/releases/v0.6.0-verification.json) record the checked scope.
+The published **0.7.0** build passed **71 tests** with no failures, errors, or skips. Debug and release lint each reported **zero errors and 46 warnings**. APK/AAB signatures match the original production certificate; APK ZIP and bundled 64-bit native library alignment passed 16 KB checks. The [successful release workflow](https://github.com/ankitchanki/StashDrop/actions/workflows/android.yml) and [verification report](docs/releases/v0.7.0-verification.json) record the checked scope.
 
-Paparazzi renders the README gallery from the production Compose components. The [two edge handles](docs/assets/screenshots/edge-handles.png) and dedicated [interaction settings screen](docs/assets/screenshots/interactions.png) is also rendered from production Compose.
+Paparazzi renders the README gallery from the production Compose components. The [single movable edge handle](docs/assets/screenshots/edge-handles.png) and dedicated [interaction settings screen](docs/assets/screenshots/interactions.png) are also rendered from production Compose.
 
 See [the visual guide](docs/UI_GALLERY.md) for regeneration. Rendering previews does not validate foreground services, Google hand-off, clipboard access, Google eligibility, WhatsApp drops, or real-device performance.
 
@@ -222,7 +223,7 @@ See [the visual guide](docs/UI_GALLERY.md) for regeneration. Rendering previews 
 
 ## Improvements and future UI
 
-Version 0.6.0 adds two edge handles, a rectangular floating panel, actual media previews, type filters, and overlay input fixes to the native Compose UI. The next priorities are broader device validation, accessible layouts, and safer recovery. Proposed UI work keeps the current Home / Shelf / Settings structure while adding clearer Google readiness status, better item previews, reachable selection actions, reduced motion, and layouts for large text and larger screens.
+Version 0.7.0 simplifies the shelf to one movable handle and a smaller rectangular panel, adds swipe-to-delete and compatible drag targets, and refreshes Home and pill navigation. The next priorities are broader device validation, accessible layouts, and safer recovery. Proposed UI work keeps the current Home / Shelf / Settings structure while adding clearer Google readiness status, better item previews, reachable selection actions, reduced motion, and layouts for large text and larger screens.
 
 Shelf search, richer filtering, undo deletion, backup/restore, and theme customization are **proposals**, with no committed release date. The [roadmap](docs/ROADMAP.md) explains the problems, suggested UI, acceptance checks, and technical limits for each direction.
 

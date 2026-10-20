@@ -105,4 +105,36 @@ class DashboardInteractionTest {
         image.delete()
     }
 
+    @Test fun gesturesExposeOneStripAndSystemCornerSettings() {
+        var opened=false
+        screen(DashboardActions(chooseAssistant={opened=true}),interactions=true)
+        compose.onNodeWithText("Gesture strip").assertExists()
+        compose.onNodeWithText("Swipe up",useUnmergedTree=true).assertDoesNotExist()
+        compose.onNodeWithText("Press and hold").assertDoesNotExist()
+        compose.onNodeWithText("Double tap").assertDoesNotExist()
+        compose.onNodeWithText("System corner swipe").performClick()
+        assertTrue(opened)
+    }
+    @Test fun swipingShowsDeleteConfirmationAndCancelPreservesItem() {
+        var deleted=emptyList<String>()
+        screen(DashboardActions(deleteMany={deleted=it.map { item->item.id }}))
+        compose.onNodeWithText("First saved note").performTouchInput { swipeLeft() }
+        compose.waitForIdle()
+        compose.onNodeWithText("Delete 1 saved item(s)?").assertExists()
+        assertTrue(deleted.isEmpty())
+        compose.onNodeWithText("Keep items").performClick()
+        compose.onNodeWithText("First saved note").assertExists()
+        compose.onNodeWithText("First saved note").performTouchInput { swipeLeft() }
+        compose.onNodeWithText("Delete permanently").performClick()
+        assertEquals(listOf("first"),deleted)
+    }
+
+    @Test fun openingInteractionsStartsAtTopInsteadOfReusingSettingsScroll() {
+        compose.setContent { StashDropTheme {
+            DashboardScreen(samples,StashSettings(),ShizukuConnectionManager.State(),false,SetupState(),"","",DashboardActions(),initialTab=2)
+        } }
+        compose.onNodeWithText("Gestures, clipboard & feel").performScrollTo().performClick()
+        compose.onNodeWithText("Gesture strip").assertIsDisplayed()
+    }
+
 }

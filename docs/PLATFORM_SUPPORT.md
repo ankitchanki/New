@@ -1,14 +1,14 @@
 # Platform support
 
-StashDrop 0.6.0 supports Android 9+ (API 28), targeting API 35. The shelf works independently of Google’s native feature availability.
+StashDrop 0.7.0 supports Android 9+ (API 28), targeting API 35. The shelf works independently of Google’s native feature availability.
 
 | Feature | Requirements and limits |
 | --- | --- |
-| Floating shelf | Overlay permission and foreground service; two edge handles and a bounded panel; OEM battery rules apply |
+| Floating shelf | Overlay permission and foreground service; one movable edge handle and a bounded panel; OEM battery rules apply |
 | Google Circle to Search | Google app and active Google voice service; Google/device/account eligibility and phone navigation settings control the UI |
 | Shizuku Google request | Running authorized Shizuku; the contextual-session request can still be rejected by an OEM |
 | App Google request | Best effort without Shizuku; can be rejected by OS/OEM restrictions |
-| Gesture markers | Floating service running, strips and relevant trigger enabled, unlocked/keyboard hidden; portrait and landscape supported |
+| Transparent search strip | Floating service running, strip enabled, unlocked/keyboard hidden; portrait and landscape supported |
 | System corner/assistant gestures | OS navigation mode, assistant selection and OEM support; distinct from StashDrop’s markers |
 | Clipboard | Opt-in; Shizuku or permitted foreground access, subject to platform restrictions |
 | Global drag | Destination must accept content and URI grants; use Share when unsupported |
@@ -28,6 +28,6 @@ No physical-device compatibility is implied by host tests. Use the [Windows ADB 
 
 ## Corner gestures and external app input
 
-Use StashDrop’s raised arrow markers for app corner swipes. A swipe that begins at the physical bottom edge remains a system Home/Recents gesture. The app reserves stable navigation insets and adds space above/inside the system edges; it does not replace mandatory Android navigation. POCO F5 / Android 15 is a pending physical test target.
+Use the central transparent strip above navigation for StashDrop search. For physical corner swipe, enable the phone's native assistant gesture if supported. No app corner arrows, hold or double-tap options remain. POCO F5 / Android 15 native corner behavior still needs physical testing. StashDrop cannot hide other apps' system-status icons or replace mandatory Android navigation.
 
 Idle decorative windows are hidden. While active, their combined opacity stays below Android’s standard untrusted-touch threshold. The floating panel consumes input inside its bounds and dismisses on outside touch. Real scrolling/touch behavior still needs OEM testing.
