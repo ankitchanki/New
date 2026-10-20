@@ -83,4 +83,26 @@ class DashboardInteractionTest {
         compose.onNodeWithText("Save note").performClick()
         assertEquals("Keep this useful idea",saved)
     }
+    @Test fun typeFiltersClearSelectionAndShowRealImagePreviews() {
+        val context=androidx.test.core.app.ApplicationProvider.getApplicationContext<android.content.Context>()
+        val image=java.io.File(context.cacheDir,"test-preview.png")
+        val bitmap=android.graphics.Bitmap.createBitmap(80,80,android.graphics.Bitmap.Config.ARGB_8888).apply { eraseColor(android.graphics.Color.BLUE) }
+        image.outputStream().use { bitmap.compress(android.graphics.Bitmap.CompressFormat.PNG,100,it) };bitmap.recycle()
+        val photo=StashItemEntity("photo",null,"photo.png","image/png")
+        val otp=StashItemEntity("otp","Your OTP is 654321",null,"text/plain")
+        compose.setContent { StashDropTheme {
+            DashboardScreen(samples+photo+otp,StashSettings(),ShizukuConnectionManager.State(),false,SetupState(),"","",DashboardActions(),
+                initialTab=1,mediaFile={if(it.id=="photo") image else null})
+        } }
+        compose.onNodeWithText("First saved note").performClick()
+        compose.onNodeWithText("Images").performClick()
+        compose.onNodeWithText("First saved note").assertDoesNotExist()
+        compose.onNodeWithText("1 selected").assertDoesNotExist()
+        compose.waitUntil(5000) { compose.onAllNodesWithContentDescription("Images preview").fetchSemanticsNodes().isNotEmpty() }
+        compose.onNodeWithText("OTP").performScrollTo().performClick()
+        compose.onNodeWithText("Your OTP is 654321").assertExists()
+        compose.onNodeWithText("Saved images").assertDoesNotExist()
+        image.delete()
+    }
+
 }

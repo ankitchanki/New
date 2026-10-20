@@ -1,32 +1,37 @@
 # StashDrop feature guide
 
-This guide describes **released version 0.5.0**. See the [README](../README.md) for the signed APK, [platform support](PLATFORM_SUPPORT.md) for Android restrictions, and the [roadmap](ROADMAP.md) for proposed improvements.
+This guide describes **released version 0.6.0**. See the [README](../README.md) for the signed APK, [platform support](PLATFORM_SUPPORT.md) for Android restrictions, and the [roadmap](ROADMAP.md) for proposed improvements.
 
 ## What StashDrop does
 
-StashDrop keeps useful material in a local shelf and brings that shelf close to your thumb through a floating bubble. Save a link while browsing, request Google screen search, organize a few notes, then share selected items to another app. Every search entry point requests Google; there is no built-in search screen.
+StashDrop keeps useful material in a local shelf and brings that shelf close to your thumb through two edge handles and a compact panel. Save a link while browsing, request Google screen search, organize a few notes, then share selected items to another app. Every search entry point requests Google; there is no built-in search screen.
 
 ## Home, Shelf, and Settings
 
 | Screen | Current purpose | Typical action |
 | --- | --- | --- |
-| Home | Bubble status, show/hide control, recent saved items | Start the floating shelf and return to another app |
-| Shelf | Saved notes, links, attachments, collection filters | Add a note, move an item, share, or delete |
+| Home | Edge shelf status, show/hide control, recent saved items | Start the floating shelf and return to another app |
+| Shelf | Saved notes, links, attachments, type and collection filters | Add a note, move an item, share, or delete |
 | Settings | Access/setup status, Google search status, and expandable assistant integration | Configure only the access you need |
 | Gestures, clipboard & feel | Dedicated interaction preferences, reached from Settings | Tune gestures, clipboard, haptics, and springiness |
 
 The [visual gallery](UI_GALLERY.md) shows the implemented components with sample content. Its images are host renders; actual device permission screens come from Android.
 
-## Floating bubble and shelf
+## Edge handles and floating shelf
 
-1. Allow **Floating bubble** in Settings → Setup, then tap **Show floating bubble** on Home.
-2. Tap the bubble to open the floating shelf. Hold the bubble to request Google Circle to Search.
-3. Drag the bubble to a comfortable position. It snaps toward the edge and partially peeks away when idle.
-4. Drag onto the bottom **X** to hide it, or hide it from Home. Show it again from Home when needed.
+Allow **Edge shelf** under Settings → Setup, then tap **Show edge shelf** on Home. Both screen edges show a slim vertical handle. Tap a handle or pull it inward to open a rounded rectangular panel on that side. Hold a handle for Google search. Drag vertically to move the handles; dragging onto the bottom X hides the shelf. Home or the notification can also stop it.
 
-The overlay runs as a foreground service with a notification and search entry point. It needs Android's display-over-other-apps access. Some manufacturers also restrict background services; review their battery/autostart settings if the bubble disappears. Hiding the bubble does not delete the shelf.
+The panel is limited to part of the screen. Tap Close, press Back, or touch outside it to dismiss. Outside touches pass to the other app. Decorative search/dismiss windows are hidden while idle, and their combined opacity is capped while visible to avoid Android blocking underlying app touches. These host-checked policies still need POCO/OEM device testing.
 
-The floating shelf uses stacked cards and selection controls. Select items for Share or WhatsApp, or begin a global drag with supported content. Android and the receiving app decide whether a cross-app drop is accepted. A visible drag shadow cannot prove that another app received an attachment.
+Select cards for Share/WhatsApp or hold to begin a supported global drag. A receiving app decides whether it accepts the data; use normal Share when needed. Overlay access, a foreground service and relevant notification access are required. If HyperOS stops the service, check the app’s battery/background restrictions. Hiding the shelf preserves saved content.
+
+## Media previews and content filters
+
+Both Shelf and the floating panel show actual local image/sticker thumbnails. Video cards request a representative-frame preview from the device codec. Broken, missing or unsupported media has an unavailable-preview icon. Thumbnails are decoded off the UI thread, sized to at most 320 pixels on the longest edge, respect image orientation, use a bounded memory cache, and release offscreen component references. Previews do not upload images or fetch external URLs. GIF/sticker previews are still images.
+
+Type chips combine with the selected collection. Changing either filter clears selection. **Images** and **Videos** follow stored MIME types. **Stickers** groups GIF/WebP candidates and images in a collection named `Stickers`; an image moved to `Images` or `Photos` is treated as an image instead. This is a practical heuristic because shared files do not provide a universal sticker type.
+
+**URLs** finds web links in saved text, including prose. **OTP** finds standalone 4–8 digit codes or text containing OTP/verification context plus a 4–8 digit code; text with a web URL stays under URLs. Other text and attachments appear under **Text** and **Files**. These filters derive from existing content and do not rewrite or delete saved items. Copied codes can remain sensitive; clipboard auto-stash stays off until explicitly enabled.
 
 ## Saving and organizing
 
@@ -46,7 +51,7 @@ Tap an item's collection label to move it into a named collection; a blank name 
 
 ## Google Circle to Search
 
-Every search button, bubble hold, notification action, enabled bottom marker gesture and StashDrop assistant entry requests Google’s contextual search session. The built-in capture/lasso/OCR/barcode workflow and its toggle were removed in 0.5.0. Existing saved items stay in the shelf.
+Every search button, handle hold, notification action, enabled bottom marker gesture and StashDrop assistant entry requests Google’s contextual search session. The built-in capture/lasso/OCR/barcode workflow and its toggle were removed in 0.5.0. Existing saved items stay in the shelf.
 
 1. Install/update the Google app and select Google as digital assistant in Android’s default-app settings. Enable **Use screen and app data** in that assistant settings screen.
 2. Enable Circle to Search in your phone’s navigation settings if available.
@@ -70,20 +75,20 @@ These are explicit user actions. Normal app startup does not silently replace th
 
 ## Gestures, motion, and haptics
 
-Bottom gesture strips are overlay touch regions above system navigation, separate from Android's own assistant gesture. They run with the floating service, hide in landscape, when locked and while the keyboard is visible, and can conflict with other navigation or app controls on some devices. Disable them in Settings if they interfere.
+Bottom gesture strips are overlay touch regions above system navigation, separate from Android's own assistant gesture. They run with the floating service, support portrait and landscape, and hide when locked or while the keyboard is visible, and can conflict with other navigation or app controls on some devices. Disable them in Settings if they interfere.
 
 | Setting | Fresh-install default | Behavior |
 | --- | --- | --- |
 | Gesture strips | On | Enables the bottom overlay touch regions while the service runs |
 | Swipe up | On | Pull up about 64 dp, or flick upward, to search |
-| Corner swipe | Off | Swipe diagonally up and inward from a visible side marker |
+| Corner swipe | Off | Start on a raised arrow marker and pull up/inward |
 | Press and hold | Off | Hold the center marker for Android’s long-press timeout |
 | Double tap | Off | Two nearby quick taps on the center marker within Android’s double-tap timeout |
 | Auto-stash copied text | Off | Saves permitted copied text while the monitor is running |
 | Haptic feedback | On | Feedback for pulls, selection, dragging, and confirmation |
 | Springiness | 1.0 | Adjusts motion intensity within 0.5–1.5 |
 
-Aurora waves and the liquid bubble use AGSL on Android 13+, with Canvas fallbacks below that version. Spring animation and velocity-projected paths drive motion; actual smoothness depends on the device. Blur/specular effects operate on the app's own content and do not provide general blur of arbitrary apps behind the overlay.
+Aurora waves use AGSL on Android 13+, with Canvas fallbacks below that version. Spring animation and velocity-projected paths drive motion; actual smoothness depends on the device. Blur/specular effects operate on the app's own content and do not provide general blur of arbitrary apps behind the overlay.
 
 ## Clipboard auto-stash
 
@@ -107,7 +112,7 @@ Shelf content lives in Room and private files. Android app backup is disabled. T
 
 | Symptom | What to try |
 | --- | --- |
-| Bubble never appears | Allow overlay access, return to Home, and show the bubble; check notification/service and OEM battery restrictions |
+| Edge handles never appear | Allow overlay access, return to Home, and show the edge shelf; check notification/service and OEM battery restrictions |
 | Gemini opens instead of circles | Enable native Circle to Search in phone settings, update Google, and check device eligibility; StashDrop cannot force Google’s UI |
 | Google route unavailable while StashDrop is assistant | Use Digital assistant → Connect with authorized Shizuku, or choose Google manually; eligibility still applies |
 | Clipboard items do not arrive | Confirm auto-stash is on, monitor status, Shizuku authorization, and OEM background limits |

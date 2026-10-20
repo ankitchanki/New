@@ -4,16 +4,17 @@ The repository gallery distinguishes app UI, sample content, shader output, and 
 
 ## UI previews
 
-The gallery reflects the native 0.5.0 UI. All UI images below are rendered from the production Jetpack Compose components using **Paparazzi 1.3.5**, with Pixel 5 dimensions. The full Settings render uses a taller virtual viewport to expose the settings in one image. No physical phone or emulator was used. The preview data includes three sample notes/links; it does not contain personal clipboard history.
+The gallery reflects the native 0.6.0 UI. All UI images below are rendered from the production Jetpack Compose components using **Paparazzi 1.3.5**, with Pixel 5 dimensions. The full Settings render uses a taller virtual viewport to expose the settings in one image. No physical phone or emulator was used. The preview data includes sample notes/links plus generated local image/sticker files; it does not contain personal clipboard history.
 
 | Preview | What it shows | Source |
 | --- | --- | --- |
-| [Home](assets/screenshots/overview.png) | Home header, recent items, bubble state and entry points | `DashboardScreen`, tab 0 |
+| [Home](assets/screenshots/overview.png) | Home header, recent items, edge shelf state and entry points | `DashboardScreen`, tab 0 |
 | [Shelf](assets/screenshots/shelf.png) | Sample notes/links, collections, share and delete actions | `DashboardScreen`, tab 1 |
 | [Settings](assets/screenshots/controls.png) | Setup access status, Google readiness, assistant and gesture controls | `DashboardScreen`, tab 2 |
 | [Full Settings](assets/screenshots/controls-full.png) | Complete setup/search screen and entry to interaction preferences | Same component, taller viewport |
 | [Interactions](assets/screenshots/interactions.png) | Gesture toggles, clipboard preference, and haptics; scroll for springiness | `DashboardScreen`, interaction page |
-| [Floating shelf](assets/screenshots/floating-shelf.png) | Production fan-out shelf sheet after its opening motion | `IosFanOutStashSheet`, inspection mode |
+| [Floating shelf](assets/screenshots/floating-shelf.png) | Compact rectangular panel with real decoded sample media | `IosFanOutStashSheet(compact=true)`, inspection mode |
+| [Edge handles](assets/screenshots/edge-handles.png) | Two production edge controls | `ThumbDockIconComposable(edgeHandle=true)` |
 | [Aurora still](assets/screenshots/aurora-wave.png) | Production shader/Canvas composable with sample pull progress | `AuroraWave` |
 
 

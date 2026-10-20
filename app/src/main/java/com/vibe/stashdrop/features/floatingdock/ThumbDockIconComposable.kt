@@ -5,6 +5,7 @@ import androidx.compose.foundation.*
 import androidx.compose.foundation.gestures.*
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.rounded.Layers
 import androidx.compose.material3.*
@@ -15,6 +16,7 @@ import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.compose.ui.semantics.*
 import com.vibe.stashdrop.core.physics.IosSpringSpecs
 import com.vibe.stashdrop.core.shaders.LiquidMetaball
 import com.vibe.stashdrop.ui.theme.*
@@ -22,7 +24,28 @@ import com.vibe.stashdrop.ui.theme.*
 /** Round floating bubble: tap opens the shelf, hold starts Circle to Search, drag moves it. */
 @Composable
 fun ThumbDockIconComposable(count: Int, absorbing: Boolean, onTap: ()->Unit, onHold: ()->Unit,
-    onDrag: (androidx.compose.ui.geometry.Offset)->Unit, onDragEnd: ()->Unit, modifier: Modifier=Modifier) {
+    onDrag: (androidx.compose.ui.geometry.Offset)->Unit, onDragEnd: ()->Unit, modifier: Modifier=Modifier, edgeHandle: Boolean=false, onDragCancel: ()->Unit=onDragEnd) {
+    if(edgeHandle) {
+        Box(modifier.width(40.dp).height(96.dp).semantics {
+            contentDescription="Open edge shelf"; role=Role.Button
+            onClick { onTap(); true }
+            onLongClick("Google Circle to Search") { onHold(); true }
+        }
+            .pointerInput(Unit) { detectTapGestures(onTap={onTap()},onLongPress={onHold()}) }
+            .pointerInput(Unit) {
+                detectDragGestures(onDragEnd={
+                    // The service handles positioning/dismiss; it opens the panel for inward horizontal pulls.
+                    onDragEnd()
+                },onDragCancel=onDragCancel) { change,amount -> change.consume(); onDrag(amount) }
+            },contentAlignment=Alignment.Center) {
+            Box(Modifier.width(if(absorbing) 14.dp else 8.dp).height(60.dp)
+                .background(Brush.verticalGradient(listOf(Ice,Mint)),RoundedCornerShape(6.dp))
+                .border(1.dp,Color.White.copy(alpha=.35f),RoundedCornerShape(6.dp)))
+            if(count>0) Text(if(count>99) "99+" else count.toString(),Modifier.align(Alignment.TopCenter).padding(top=2.dp),
+                color=Ice,fontSize=10.sp,fontWeight=FontWeight.Bold)
+        }
+        return
+    }
     val size by animateDpAsState(if(absorbing) 68.dp else 54.dp,IosSpringSpecs.liquid(),label="dock size")
     val absorption by animateFloatAsState(if(absorbing) 1f else 0f,IosSpringSpecs.liquid(),label="absorption")
     val pulse=remember { Animatable(1f) }

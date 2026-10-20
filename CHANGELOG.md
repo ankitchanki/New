@@ -2,6 +2,25 @@
 
 All notable StashDrop changes are recorded here. Versions follow Semantic Versioning.
 
+## [0.6.0] - 2026-10-20
+
+### Fixed
+
+- Hide idle decorative overlay windows and lower combined active opacity below Android’s untrusted-touch limit, addressing scrolling/touch blocking in other apps.
+- Raise corner-search markers above stable navigation insets and away from system Back edges; directional arrows distinguish them from Home/Recents gestures.
+- Bound floating panel input to the rectangular panel and dismiss on outside touch. Canceled handle drags do not open the panel.
+
+### Added
+
+- Slim handles on both screen edges with tap/inward pull to a compact panel, hold for Google search, reposition and drag-to-X.
+- Actual local media thumbnails with bounded off-thread decoding, EXIF rotation, representative-frame video previews, cache limits and unavailable-media placeholders.
+- Images, Videos, Stickers, URLs, OTP, Text and Files filters in both shelf surfaces; collections combine with type filters and filter changes clear selection.
+- Media/EXIF, category, selection, overlay-opacity and panel-input regressions; eight refreshed production renders including edge controls.
+
+### Changed
+
+- Gesture markers support landscape as well as portrait. Google-only search, saved shelf data, original signing identity and Room schema are retained. Version code 9.
+
 ## [0.5.0] - 2026-10-20
 
 ### Changed

@@ -35,12 +35,22 @@ class BottomBarGestureOverlay(private val context: Context, private val windows:
                 WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE or WindowManager.LayoutParams.FLAG_NOT_TOUCH_MODAL or
                     WindowManager.LayoutParams.FLAG_LAYOUT_IN_SCREEN, PixelFormat.TRANSLUCENT).apply {
                 this.gravity = Gravity.BOTTOM or gravity
-                // Let the platform fit navigation insets exactly once. No manual y offset as well.
-                if (android.os.Build.VERSION.SDK_INT >= 30) setFitInsetsTypes(WindowInsetsCompat.Type.systemBars())
+                // Reserve stable navigation insets even when the gesture bar is hidden.
+                y = (32*density).toInt()
+                if (android.os.Build.VERSION.SDK_INT >= 30) {
+                    setFitInsetsTypes(WindowInsetsCompat.Type.systemBars())
+                    setFitInsetsIgnoringVisibility(true)
+                }
+                // Keep side markers away from Android's Back-gesture edge too.
+                if (gravity != Gravity.CENTER_HORIZONTAL) x = (24*density).toInt()
             }
             ViewCompat.setOnApplyWindowInsetsListener(view) { _, insets ->
                 // A gesture navigation bar can report invisible while the screen is usable.
                 // Keep markers available then; hide only while a keyboard occupies the bottom.
+                if (android.os.Build.VERSION.SDK_INT < 30) {
+                    params.y = insets.getInsetsIgnoringVisibility(WindowInsetsCompat.Type.navigationBars()).bottom + (32*density).toInt()
+                    runCatching { windows.updateViewLayout(view,params) }
+                }
                 view.visibility = if (insets.isVisible(WindowInsetsCompat.Type.ime())) View.GONE else View.VISIBLE
                 insets
             }
@@ -73,7 +83,16 @@ internal class GestureStrip(context: Context, private val settings: GestureSetti
     override fun onDraw(canvas: Canvas) {
         super.onDraw(canvas)
         val w = min(width*.5f, 36*density)
-        canvas.drawRoundRect((width-w)/2, height/2f-2*density, (width+w)/2, height/2f+2*density, 2*density, 2*density, paint)
+        if(center) canvas.drawRoundRect((width-w)/2, height/2f-2*density, (width+w)/2, height/2f+2*density, 2*density, 2*density, paint)
+        else {
+            val direction=if(gravity==Gravity.LEFT) 1f else -1f
+            val x0=width/2f-direction*8*density; val x1=width/2f+direction*8*density
+            val y0=height/2f+7*density; val y1=height/2f-7*density
+            paint.strokeWidth=3*density; paint.strokeCap=Paint.Cap.ROUND
+            canvas.drawLine(x0,y0,x1,y1,paint)
+            canvas.drawLine(x1,y1,x1-direction*9*density,y1,paint)
+            canvas.drawLine(x1,y1,x1,y1+9*density,paint)
+        }
     }
     private fun trigger() {
         if (fired || !active) return

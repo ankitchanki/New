@@ -7,7 +7,7 @@ This describes the current Kotlin/Jetpack Compose Android app, package `com.vibe
 | Area | Responsibility | Implementation |
 | --- | --- | --- |
 | Dashboard | Home / Shelf / Settings, access status, user actions | [MainActivity](../app/src/main/java/com/vibe/stashdrop/MainActivity.kt), [DashboardScreen](../app/src/main/java/com/vibe/stashdrop/ui/dashboard/DashboardScreen.kt) |
-| Floating service | Foreground overlay lifecycle, bubble, shelf, gesture regions | [OneUiThumbDockService](../app/src/main/java/com/vibe/stashdrop/features/floatingdock/OneUiThumbDockService.kt), [floatingdock](../app/src/main/java/com/vibe/stashdrop/features/floatingdock) |
+| Floating service | Foreground overlay lifecycle, two edge handles, bounded panel, gesture regions | [OneUiThumbDockService](../app/src/main/java/com/vibe/stashdrop/features/floatingdock/OneUiThumbDockService.kt), [floatingdock](../app/src/main/java/com/vibe/stashdrop/features/floatingdock) |
 | Search router | Google request or setup guidance | [CircleToSearchOrchestrator](../app/src/main/java/com/vibe/stashdrop/features/circletosearch/CircleToSearchOrchestrator.kt), [GoogleCircleToSearch](../app/src/main/java/com/vibe/stashdrop/features/circletosearch/GoogleCircleToSearch.kt) |
 | Assistant entry | Turns a supported system assist invocation into the same search flow | [AssistActivity](../app/src/main/java/com/vibe/stashdrop/features/circletosearch/AssistActivity.kt) |
 | Local data | Room items/history, private attachment files, clean links | [StashRepository](../app/src/main/java/com/vibe/stashdrop/features/stashshelf/StashRepository.kt), [stashshelf](../app/src/main/java/com/vibe/stashdrop/features/stashshelf) |
@@ -36,7 +36,7 @@ The fixed request carries Google’s contextual entry point and assist/screensho
 
 ## Gesture recognition
 
-The overlay service owns 88 × 40 dp touch regions above platform-fitted navigation insets. Center handles swipe, hold and double-tap; enabled side handles require both upward and inward motion. Identical settings/configuration preserve views and pending taps. Android touch slop and long-press/double-tap timing control recognition. Movement, cancellation, multi-touch and detach cancel holds; a gesture fires once. Markers remain visible when gesture navigation reports no visible navigation bar, and hide with the keyboard. The service suspends them for search, lock and landscape. These are app overlay gestures, separate from OS navigation.
+The overlay service owns 88 × 40 dp touch regions above platform-fitted navigation insets. Markers sit 32 dp above stable navigation insets; side regions are inset 24 dp from the Back-gesture edge. Center handles swipe, hold and double-tap; side arrows require upward and inward motion. Android owns swipes beginning in its mandatory Home/Recents region. Identical settings/configuration preserve views and pending taps. Android touch slop and long-press/double-tap timing control recognition. Movement, cancellation, multi-touch and detach cancel holds; a gesture fires once. Markers remain visible when gesture navigation reports no visible navigation bar, and hide with the keyboard. The service suspends them for search, lock and keyboard visibility; portrait and landscape are supported. These are app overlay gestures, separate from OS navigation.
 
 ## Local data flow
 
@@ -68,7 +68,7 @@ No export/import archive or synchronization service is implemented. Android back
 
 Assistant role selection and Google voice-service activation are separate settings. Explicit assistant actions can save a previous role holder, select StashDrop, restore a holder, or link Google's voice service while assistant presses enter StashDrop. This arrangement depends on private/system behavior and should be tested per OS/OEM. The system assistant picker remains available without the bridge.
 
-The foreground overlay service owns its window lifecycle. Gesture strips are suppressed in landscape and on a locked screen. User actions and foreground-service access remain constrained by Android's permission and background-start rules. Local crash reporting helps reproduce failures; it does not replace recovery testing.
+The foreground overlay service owns its window lifecycle. Gesture markers hide on a locked screen and while the keyboard is shown. User actions and foreground-service access remain constrained by Android's permission and background-start rules. Local crash reporting helps reproduce failures; it does not replace recovery testing.
 
 ## Rendering and cross-app boundaries
 
@@ -94,3 +94,11 @@ The implementation has no StashDrop account server or cloud shelf sync. App-priv
 The release workflow builds debug checks and signed minified APK/AAB artifacts, verifies the pinned original certificate, signatures, checksums, tests, lint, and alignment, and publishes the five public assets. The private keystore remains outside Git and is restored from protected Actions secrets for release builds. Documentation updates do not change existing release binaries or tags.
 
 See the current versioned verification report for executed test, lint and signature checks. Host renders exercise production visual components with fixtures. Neither those checks nor a successful Binder call establishes universal OEM compatibility, usable Google search, external-app drop success, accessibility quality, or phone performance. See [verification](VERIFICATION.md), [device validation](DEVICE_VALIDATION.md), and [future work](ROADMAP.md).
+
+## Overlay input and media policies (0.6.0)
+
+Two small touchable edge windows open a bounded rectangular panel. The panel uses `FLAG_NOT_TOUCH_MODAL` and outside-touch notification, so outside input can reach other apps and dismiss the panel. The handles exclude their limited side region from system Back gestures on API 29+; this does not exclude Android’s mandatory bottom navigation.
+
+Search-wave and dismiss-target windows are non-touchable, hidden while idle, and use window alpha 0.35 when visible. Android combines overlapping untrusted opacity as `1 - product(1 - alpha)`: the two decorations combine to 0.5775, below the standard 0.8 touch-blocking threshold. The previous two 0.7 windows combined to 0.91. Checking each window separately missed that interaction.
+
+`ShelfCategory` derives a type from existing MIME/text/collection data without a Room migration. Shared type chips are used by dashboard and panel. `ShelfThumbnails` uses local IO decoding, EXIF-aware image handling, scaled video frame extraction and a 12 MiB LRU cache. Visible components hold at most a 320-pixel preview; offscreen components release their bitmap reference. Unavailable media fails to a placeholder. No remote preview request is made.

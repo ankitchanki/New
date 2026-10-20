@@ -104,4 +104,40 @@ class FloatingShelfServiceTest {
         assertTrue("dropping on the X should hide the bubble", org.robolectric.Shadows.shadowOf(controller.get()).isStoppedBySelf)
         controller.destroy(); idle()
     }
+    @Test @Config(sdk=[34,35]) fun idleDecorationsDoNotObscureOtherAppsAndBothEdgesOpenBoundedPanels() {
+        ShadowSettings.setCanDrawOverlays(true)
+        val controller=startService()
+        fun decorations()=views().filter { (it.layoutParams as WindowManager.LayoutParams).flags and WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE != 0 }
+        assertTrue("No visible decorative overlay while idle",decorations().none { it.visibility==View.VISIBLE })
+        val combined=1f-decorations().fold(1f) { transparent,view -> transparent*(1f-(view.layoutParams as WindowManager.LayoutParams).alpha) }
+        assertTrue("Even active decoration overlap must remain below input-blocking opacity",combined<=.8f)
+        val handles=views().filter { val p=it.layoutParams as WindowManager.LayoutParams; p.width>0 && p.height>p.width && p.gravity==(android.view.Gravity.TOP or android.view.Gravity.LEFT) }
+        org.junit.Assert.assertEquals("Both screen edges have a handle",2,handles.size)
+        for(handle in handles) {
+            val before=views().size
+            val down=SystemClock.uptimeMillis()
+            touch(handle,MotionEvent.ACTION_DOWN,handle.width/2f,handle.height/2f,down);idle(50)
+            touch(handle,MotionEvent.ACTION_UP,handle.width/2f,handle.height/2f,down);idle()
+            org.junit.Assert.assertEquals(before+1,views().size)
+            val panel=views().last()
+            val p=panel.layoutParams as WindowManager.LayoutParams
+            assertTrue("Panel has bounded width",p.width in 1 until context.resources.displayMetrics.widthPixels)
+            assertTrue("Panel has bounded height",p.height in 1 until context.resources.displayMetrics.heightPixels)
+            assertTrue(p.flags and WindowManager.LayoutParams.FLAG_NOT_TOUCH_MODAL != 0)
+            touch(panel,MotionEvent.ACTION_OUTSIDE,0f,0f,SystemClock.uptimeMillis());idle()
+            org.junit.Assert.assertEquals("Outside touch dismisses panel",before,views().size)
+        }
+        assertNoErrors();controller.destroy();idle()
+    }
+
+    @Test @Config(sdk=[35]) fun stoppingDuringSearchCannotRecreateGestureWindows() {
+        ShadowSettings.setCanDrawOverlays(true)
+        val controller=startService()
+        controller.withIntent(android.content.Intent().setAction(OneUiThumbDockService.SEARCH)).startCommand(0,2)
+        idle(100) // Search hand-off is waiting for its animation; cancel it now.
+        controller.destroy();idle(3000)
+        assertTrue("All overlays must stay removed after stopping",views().isEmpty())
+        assertTrue(!OneUiThumbDockService.running.value)
+    }
+
 }

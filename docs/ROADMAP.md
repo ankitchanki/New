@@ -1,12 +1,12 @@
 # Improvements and future UI
 
-These are **proposed directions**, not features shipped in 0.5.0. There are no committed delivery dates or promised version numbers. Current behavior is described in the [feature guide](FEATURE_GUIDE.md); implemented visuals are in the [gallery](UI_GALLERY.md).
+These are **proposed directions**, not features shipped in 0.6.0. There are no committed delivery dates or promised version numbers. Current behavior is described in the [feature guide](FEATURE_GUIDE.md); implemented visuals are in the [gallery](UI_GALLERY.md).
 
 The goal is a shelf that is easy to reach, predictable when permissions or services change, and safe for useful personal material. Reliability and accessibility should guide visual changes.
 
 ## Current foundation
 
-The app already has Home / Shelf / Settings, a draggable edge-peeking bubble, a stacked floating shelf, collections, sharing, optional copied-text saving, Google search routing, local crash reports, and spring/shader motion. The native UI includes main-Shelf batch actions, confirmed deletion, clipboard opt-in confirmation, and a separate interaction settings page. The signed build preserves the original production certificate. Host tests and renders are available; broad real-device qualification is still outstanding.
+The app already has Home / Shelf / Settings, two edge handles with a rectangular panel, a stacked floating shelf, collections, sharing, optional copied-text saving, local media previews, content type filters, Google search routing, local crash reports, and spring/shader motion. The native UI includes main-Shelf batch actions, confirmed deletion, clipboard opt-in confirmation, and a separate interaction settings page. The signed build preserves the original production certificate. Host tests and renders are available; broad real-device qualification is still outstanding.
 
 ## Priorities
 
@@ -15,7 +15,7 @@ The app already has Home / Shelf / Settings, a draggable edge-peeking bubble, a 
 | 1 — Reliability | Overlay and assistant behavior vary by Android/OEM | Test launch/dismiss/reconnect/reboot, permission denial, lock/unlock, rotation, and service death; surface actionable errors | Recorded device matrix with reproducible results and regression coverage for discovered bugs |
 | 1 — Setup clarity | A connected bridge or accepted Google request can look more conclusive than it is | Show separate overlay, Google-service, and clipboard readiness; identify the active route | A first-time user can start a shelf and understand Google readiness without guessing |
 | 1 — Accessibility | Dense one-line settings and visual motion can make actions hard to use | Support large text, TalkBack labels/focus, 48 dp targets, reduced motion, and higher contrast | Manual accessibility checks at large font/display sizes; readable labels and reachable actions |
-| 2 — Shelf management | Larger collections become difficult to navigate | Local text search, type filters, richer previews, selection counts, and explicit batch actions | Find and share an item from a large fixture without losing selection or collection context |
+| 2 — Shelf management | Larger collections become difficult to navigate | Local text search, richer metadata and previews, selection counts, and explicit batch actions | Find and share an item from a large fixture without losing selection or collection context |
 | 2 — Safer retention | Confirmed deletion has no recovery and no archive restore exists | Undo/trash policy, storage usage, sensitive-copy controls, explicit local export/import | Recovery and round-trip restore checks; clear handling of private files, duplicates, and canceled imports |
 | 3 — Visual refinement | Current dark styling and motion offer limited customization | Adaptive themes, subtle glass, adjustable bubble size/edge behavior, responsive layouts | Device screenshots and frame/memory/battery measurements alongside accessible fallbacks |
 

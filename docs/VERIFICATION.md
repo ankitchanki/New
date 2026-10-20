@@ -1,6 +1,6 @@
 # Validation performed
 
-**Current signed release build: [0.5.0](releases/v0.5.0-verification.json).** Google-only routing and gesture changes passed 51 tests with no failures/errors/skips, seven production renders, debug/release lint with zero errors and 39 warnings each, original-certificate continuity, APK/AAB signatures and 16 KB ZIP/native-library alignment. [Release downloads](https://github.com/ankitchanki/StashDrop/releases/tag/v0.5.0) and [Actions](https://github.com/ankitchanki/StashDrop/actions/workflows/android.yml) provide artifacts and CI evidence. No physical phone or emulator was attached; Google/OEM behavior requires device validation.
+**Current signed release build: [0.6.0](releases/v0.6.0-verification.json).** Edge panel, input and media changes passed 66 tests with no failures/errors/skips, eight production renders, zero debug/release lint errors (45 warnings each locally), original-certificate continuity, APK/AAB signatures and 16 KB ZIP/native-library alignment. [Release downloads](https://github.com/ankitchanki/StashDrop/releases/tag/v0.6.0) and [Actions](https://github.com/ankitchanki/StashDrop/actions/workflows/android.yml) provide artifacts and CI evidence. No phone/emulator was attached; POCO F5 / Android 15 remains a physical test target.
 
 The sections below preserve historical results; earlier access/secret failures are not the current release status.
 
@@ -72,3 +72,10 @@ The debug APK uses a development key. Release signing and minification were not 
 - Release manifest inspection confirms the removed capture/search activities and services, and MediaProjection foreground-service permission are absent. Bundled ML Kit models are removed. Existing shelf database/package identity are unchanged.
 - Seven updated gallery copies match their source-rendered baselines and manifest hashes. These are host renders, not phone screenshots or Google UI evidence.
 - No tablet installation, Google session outcome, OS gesture interception or real-device performance is claimed. Use the [Windows device guide](WINDOWS_DEVICE_TESTING.md) for local testing.
+
+## Signed version 0.6.0 edge panel and media
+
+- All 66 host tests passed without failures/errors/skips. New checks cover MIME/text classification, real PNG thumbnail decoding and size/cache behavior, JPEG EXIF orientation, corrupt/missing media, UI filters and selection clearing, two edge panels, outside-touch dismissal and combined decoration opacity.
+- Existing API 28/35 marker and contextual Google Binder regressions, service and dashboard interaction tests remain enabled. Eight production renders include actual generated sample image/sticker files.
+- Debug/release lint locally report zero errors and 45 warnings each. Original signing certificate, APK/AAB signatures, ZIP/native 16 KB alignment and private-key exclusion passed. See the versioned report for published CI results.
+- POCO F5 / Android 15 was reported by the user; no remote installation or physical-device scrolling, Google outcome, video codec or performance qualification is claimed.

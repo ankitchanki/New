@@ -10,7 +10,7 @@
   <img alt="Target SDK 35" src="https://img.shields.io/badge/Target_SDK-35-B4C9FF?style=flat-square" />
   <img alt="Kotlin 2.1" src="https://img.shields.io/badge/Kotlin-2.1-9B72CB?style=flat-square&amp;logo=kotlin&amp;logoColor=white" />
   <img alt="Jetpack Compose" src="https://img.shields.io/badge/UI-Jetpack_Compose-4285F4?style=flat-square&amp;logo=jetpackcompose&amp;logoColor=white" />
-  <img alt="Signed release 0.5.0" src="https://img.shields.io/badge/Release-0.5.0-9DE3CF?style=flat-square" />
+  <img alt="Signed release 0.6.0" src="https://img.shields.io/badge/Release-0.6.0-9DE3CF?style=flat-square" />
 </p>
 
 <p align="center">
@@ -19,13 +19,13 @@
 
 ## What is StashDrop?
 
-Catch something useful without losing your place. Share a link into your shelf, save a note, open Google’s search interface, and send saved items back to another app. A thumb-friendly floating dock keeps the shelf nearby, while spring motion and aurora shaders give each interaction a fluid visual language.
+Catch something useful without losing your place. Share a link into your shelf, save a note, open Google’s search interface, and send saved items back to another app. Slim handles on both screen edges open a compact floating shelf, while spring motion and aurora shaders give each interaction a fluid visual language.
 
 **Built with Kotlin, Jetpack Compose, Room, DataStore, and optional Shizuku.** All Circle to Search actions request Google’s interface. The built-in capture, lasso and OCR workflow has been removed.
 
-**[Download the signed Android APK — v0.5.0](https://github.com/ankitchanki/StashDrop/releases/download/v0.5.0/StashDrop-v0.5.0.apk)** · [Release notes and checksums](https://github.com/ankitchanki/StashDrop/releases/tag/v0.5.0)
+**[Download the signed Android APK — v0.6.0](https://github.com/ankitchanki/StashDrop/releases/download/v0.6.0/StashDrop-v0.6.0.apk)** · [Release notes and checksums](https://github.com/ankitchanki/StashDrop/releases/tag/v0.6.0)
 
-Android 9+ · No account or backend API key · Local shelf storage · Optional Shizuku integration. The published release preserves the original production signing certificate for compatible updates. Its build passed **51 tests**, signature checks, and 16 KB alignment checks. Device/OEM behavior and native Google eligibility still need the [device checklist](docs/DEVICE_VALIDATION.md).
+Android 9+ · No account or backend API key · Local shelf storage · Optional Shizuku integration. The published release preserves the original production signing certificate for compatible updates. Its build passed **66 tests**, signature checks, and 16 KB alignment checks. Device/OEM behavior and native Google eligibility still need the [device checklist](docs/DEVICE_VALIDATION.md).
 
 ### Everyday workflows
 
@@ -46,7 +46,7 @@ These images render the **actual Compose components with sample content** using 
     <th>Settings &amp; connections</th>
   </tr>
   <tr>
-    <td width="33%"><a href="docs/assets/screenshots/overview.png"><img src="docs/assets/screenshots/overview.png" alt="Implemented Home screen with recent items and floating bubble controls" width="100%" /></a></td>
+    <td width="33%"><a href="docs/assets/screenshots/overview.png"><img src="docs/assets/screenshots/overview.png" alt="Implemented Home screen with recent items and edge shelf controls" width="100%" /></a></td>
     <td width="33%"><a href="docs/assets/screenshots/shelf.png"><img src="docs/assets/screenshots/shelf.png" alt="Implemented shelf tab with sample notes, links, collections, and share actions" width="100%" /></a></td>
     <td width="33%"><a href="docs/assets/screenshots/controls.png"><img src="docs/assets/screenshots/controls.png" alt="Implemented Settings tab with access status, Shizuku, search and gesture controls" width="100%" /></a></td>
   </tr>
@@ -61,7 +61,7 @@ These images render the **actual Compose components with sample content** using 
 
 </details>
 
-The dedicated [interaction settings screen](docs/assets/screenshots/interactions.png) is also rendered from production Compose.
+The [two edge handles](docs/assets/screenshots/edge-handles.png) and dedicated [interaction settings screen](docs/assets/screenshots/interactions.png) is also rendered from production Compose.
 
 See [the visual guide](docs/UI_GALLERY.md) for image provenance, regeneration commands, and a map of the implementation.
 
@@ -89,19 +89,19 @@ Explore [shaders](app/src/main/java/com/vibe/stashdrop/core/shaders), [physics](
 
 | Feature | Implementation | Availability |
 | --- | --- | --- |
-| Floating thumb dock | Draggable bubble, magnetic edge snap, idle peek, drag-to-X dismiss, foreground notification | Overlay permission required |
-| Local stash shelf | Notes, links, files/images, collections, multi-selection, batch share/move and confirmed deletion | Room + private app files |
+| Floating thumb dock | Two slim edge handles, inward pull/tap to a bounded panel, drag-to-X dismiss, foreground notification | Overlay permission required |
+| Local stash shelf | Real media thumbnails; Images/Videos/Stickers/URLs/OTP/Text/Files filters; collections, multi-selection and sharing | Room + private app files |
 | Share into StashDrop | Android `SEND` and `SEND_MULTIPLE` receivers | Up to 30 attachments; 50 MB per attachment |
-| Google Circle to Search | Opens Google's own Circle to Search from the bubble, bottom swipe, notification and Settings | Google voice service must be active; Google decides device eligibility |
+| Google Circle to Search | Opens Google's own Circle to Search from edge handles, raised bottom markers, notification and Settings | Google voice service must be active; Google decides device eligibility |
 | Digital assistant | Choose StashDrop for assistant gestures; optional Shizuku Connect keeps Google's voice service available for native search | Android 10+ assistant management; device gesture support varies |
 | Crash reports | The last crash is shown at launch with a Copy button | Stored only on the phone |
 | In-app setup | Overlay, notifications and Google assistant status with one-tap fixes | Optional Shizuku automation; manual system settings remain available |
-| Haptic feedback | Detents while dragging the bubble and pulling a marker; clicks when stacking cards | Toggle in Settings |
+| Haptic feedback | Detents while dragging a handle and pulling a marker; clicks when stacking cards | Toggle in Settings |
 | Clean links | Removes `utm_*`, `fbclid`, `gclid`, `si`, `igshid`, `ref`, and related tracking keys | Preserves raw query encoding and prose punctuation |
 | Background text clipboard | Opt-in shell listener plus permitted foreground fallback | Shizuku/OEM access rules apply; off by default |
 | Multi-select & global drag | Selection stack, custom drag shadow, URI read grants | Receiver must accept the content |
 | WhatsApp & standard sharing | Single/multiple attachment intents with text | App and MIME compatibility dependent |
-| Gesture strips | Swipe up, corner pull, system-timed hold, double tap | Strips and swipe-up enabled by default; require the running overlay; other gestures off by default |
+| Gesture markers | Swipe up, corner pull, system-timed hold, double tap | Strips and swipe-up enabled by default; require the running overlay; other gestures off by default |
 | Assistant management | Shizuku setting change with saved values for restoration | Explicit Settings actions; system/OEM support varies |
 
 For instructions, defaults, storage behavior, and troubleshooting for every feature, see the [feature guide](docs/FEATURE_GUIDE.md).
@@ -140,22 +140,22 @@ The debug APK uses a development signing key. Signed release builds require a se
 
 Gesture, clipboard, haptic, and spring settings now live in **Settings → Gestures, clipboard & feel**. Tap Shelf cards for the selection bar; More selection actions provides Move and Delete.
 
-1. Install the signed APK above and open **Settings → Setup**. Allow the floating bubble; enable notifications where required. Shizuku is optional, and its setup shortcuts require a running, authorized Shizuku service.
-2. On **Home**, tap **Show floating bubble**. Tap the bubble to open the shelf; hold it to search. Drag to the bottom X to hide it.
-3. Choose **Google** in the system digital assistant picker and enable **Use screen and app data**. Enable **Circle to Search** in your phone’s navigation settings where offered. Use **Settings → Search & assistant → Try Google search**. Connect authorized Shizuku if the app-level session request is blocked.
-4. Open **Settings → Gestures, clipboard & feel**. Swipe-up starts enabled; enable corner swipe, hold and double-tap individually. Start on the visible markers above system navigation: center for swipe/hold/taps, sides for diagonal up-and-inward swipes. Strips hide in landscape, on lock and while the keyboard is visible.
-5. Add a note from Shelf or share text, photos and files into StashDrop. Auto-stash copied text starts off.
-6. Advanced: **Digital assistant → Use StashDrop now** with Shizuku can route system assist gestures through StashDrop while connecting Google’s voice service. Android/OEM support varies; **Restore previous** and the system picker remain available. See [assistant setup](docs/FEATURE_GUIDE.md#digital-assistant-and-shizuku).
+1. Install the signed APK and open **Settings → Setup**. Allow **Edge shelf** and notifications. On Home, tap **Show edge shelf**.
+2. Tap either side handle, or pull it inward, to open a compact rectangular panel on that side. Hold a handle for Google search. Drag vertically to reposition; drag to the X to hide the handles. Tap outside the panel or Close to dismiss it.
+3. Use type chips in the main Shelf or floating panel: **All, Images, Videos, Stickers, URLs, OTP, Text, Files**. Image/sticker previews are decoded from your local saved files; video previews use a representative frame where the device codec supports it.
+4. Choose **Google** as system digital assistant and enable **Use screen and app data**. Enable native Circle to Search in phone settings if offered. Search remains Google-only; connect authorized Shizuku if needed.
+5. Under **Settings → Gestures, clipboard & feel**, enable corner swipe, hold and double-tap individually. Begin on the visible raised markers, above system navigation. Side arrows indicate diagonal up/inward swipes. Swiping from Android’s bottom edge still belongs to Home/Recents. Gesture markers support portrait and landscape, and hide for lock/keyboard.
+6. Share notes, images, videos and files into StashDrop. Collection filters combine with type filters. Auto-stash copied text remains opt-in. See the [feature guide](docs/FEATURE_GUIDE.md) for sticker/OTP classification and Google setup.
 
 Google controls the UI after accepting a request. Installing StashDrop cannot unlock native Circle to Search on unsupported devices. Rejected requests show setup guidance; they never start an internal search screen.
 
 ## Signed releases and changelog
 
-Version `0.5.0` uses Android version code `8` and the original StashDrop production certificate. Earlier builds signed with that certificate can be updated in place. Signed APK/app-bundle packages include checksums, the public certificate, and a verification report. Version-tag builds use [GitHub Actions](.github/workflows/android.yml); the four signing secrets must be configured before publication. Private signing keys are kept separately.
+Version `0.6.0` uses Android version code `9` and the original StashDrop production certificate. Earlier builds signed with that certificate can be updated in place. Signed APK/app-bundle packages include checksums, the public certificate, and a verification report. Version-tag builds use [GitHub Actions](.github/workflows/android.yml); the four signing secrets must be configured before publication. Private signing keys are kept separately.
 
 - [Changelog](CHANGELOG.md)
-- [Version 0.5.0 notes](docs/releases/v0.5.0.md)
-- [Version 0.5.0 signed build verification](docs/releases/v0.5.0-verification.json)
+- [Version 0.6.0 notes](docs/releases/v0.6.0.md)
+- [Version 0.6.0 signed build verification](docs/releases/v0.6.0-verification.json)
 - [Version 0.3.1 notes](docs/releases/v0.3.1.md)
 - [Version 0.3.0 notes](docs/releases/v0.3.0.md)
 - [Version 0.2.0 notes](docs/releases/v0.2.0.md)
@@ -172,7 +172,7 @@ flowchart LR
     Share[Android Share or note] --> Shelf[Local stash shelf]
     Copy[Opt-in text clipboard] --> Clean[URL privacy sanitizer]
     Clean --> Shelf
-    Dock[Bubble, markers or assistant entry] --> Route{Google voice service available?}
+    Dock[Edge handle, markers or assistant entry] --> Route{Google voice service available?}
     Route -->|Accepted request| Native[Google controls search UI]
     Route -->|Missing or rejected| Help[Google setup guidance]
     Shelf --> Out[Share or supported global drag]
@@ -208,9 +208,9 @@ Shizuku is optional for the shelf and can send the Google contextual-session req
 
 ## Verification
 
-The published **0.5.0** build passed **51 tests** with no failures, errors, or skips. Debug and release lint each reported **zero errors and 39 warnings**. APK/AAB signatures match the original production certificate; APK ZIP and bundled 64-bit native library alignment passed 16 KB checks. The [successful release workflow](https://github.com/ankitchanki/StashDrop/actions/workflows/android.yml) and [verification report](docs/releases/v0.5.0-verification.json) record the checked scope.
+The published **0.6.0** build passed **66 tests** with no failures, errors, or skips. Debug and release lint each reported **zero errors and 45 warnings**. APK/AAB signatures match the original production certificate; APK ZIP and bundled 64-bit native library alignment passed 16 KB checks. The [successful release workflow](https://github.com/ankitchanki/StashDrop/actions/workflows/android.yml) and [verification report](docs/releases/v0.6.0-verification.json) record the checked scope.
 
-Paparazzi renders the README gallery from the production Compose components. The dedicated [interaction settings screen](docs/assets/screenshots/interactions.png) is also rendered from production Compose.
+Paparazzi renders the README gallery from the production Compose components. The [two edge handles](docs/assets/screenshots/edge-handles.png) and dedicated [interaction settings screen](docs/assets/screenshots/interactions.png) is also rendered from production Compose.
 
 See [the visual guide](docs/UI_GALLERY.md) for regeneration. Rendering previews does not validate foreground services, Google hand-off, clipboard access, Google eligibility, WhatsApp drops, or real-device performance.
 
@@ -222,7 +222,7 @@ See [the visual guide](docs/UI_GALLERY.md) for regeneration. Rendering previews 
 
 ## Improvements and future UI
 
-Version 0.5.0 implements the SVG direction in native Compose: refreshed Home/Shelf/Settings, a dedicated interaction page, main-Shelf batch actions, deletion confirmation, and clipboard opt-in confirmation. The next priorities are broader device validation, accessible layouts, and safer recovery. Proposed UI work keeps the current Home / Shelf / Settings structure while adding clearer Google readiness status, better item previews, reachable selection actions, reduced motion, and layouts for large text and larger screens.
+Version 0.6.0 adds two edge handles, a rectangular floating panel, actual media previews, type filters, and overlay input fixes to the native Compose UI. The next priorities are broader device validation, accessible layouts, and safer recovery. Proposed UI work keeps the current Home / Shelf / Settings structure while adding clearer Google readiness status, better item previews, reachable selection actions, reduced motion, and layouts for large text and larger screens.
 
 Shelf search, richer filtering, undo deletion, backup/restore, and theme customization are **proposals**, with no committed release date. The [roadmap](docs/ROADMAP.md) explains the problems, suggested UI, acceptance checks, and technical limits for each direction.
 
@@ -254,7 +254,7 @@ Explore a [nine-screen editable SVG overview](docs/design/stashdrop-ui-overview.
 
 ## Topics
 
-[android-app](https://github.com/topics/android-app) · [android-application](https://github.com/topics/android-application) · [productivity](https://github.com/topics/productivity) · [productivity-app](https://github.com/topics/productivity-app) · [shizuku](https://github.com/topics/shizuku) · [shizuku-android](https://github.com/topics/shizuku-android) · [shizuku-app](https://github.com/topics/shizuku-app) · [android](https://github.com/topics/android) · [kotlin](https://github.com/topics/kotlin) · [jetpack-compose](https://github.com/topics/jetpack-compose) · [material3](https://github.com/topics/material3) · [floating-window](https://github.com/topics/floating-window) · [circle-to-search](https://github.com/topics/circle-to-search) · [clipboard-manager](https://github.com/topics/clipboard-manager) · [drag-and-drop](https://github.com/topics/drag-and-drop) · [privacy](https://github.com/topics/privacy) · [agsl](https://github.com/topics/agsl) · [google-assistant](https://github.com/topics/google-assistant) · [gestures](https://github.com/topics/gestures)
+[android-app](https://github.com/topics/android-app) · [android-application](https://github.com/topics/android-application) · [productivity](https://github.com/topics/productivity) · [productivity-app](https://github.com/topics/productivity-app) · [shizuku](https://github.com/topics/shizuku) · [shizuku-android](https://github.com/topics/shizuku-android) · [shizuku-app](https://github.com/topics/shizuku-app) · [android](https://github.com/topics/android) · [kotlin](https://github.com/topics/kotlin) · [jetpack-compose](https://github.com/topics/jetpack-compose) · [material3](https://github.com/topics/material3) · [floating-window](https://github.com/topics/floating-window) · [circle-to-search](https://github.com/topics/circle-to-search) · [clipboard-manager](https://github.com/topics/clipboard-manager) · [drag-and-drop](https://github.com/topics/drag-and-drop) · [privacy](https://github.com/topics/privacy) · [agsl](https://github.com/topics/agsl) · [google-assistant](https://github.com/topics/google-assistant) · [gestures](https://github.com/topics/gestures) · [media-preview](https://github.com/topics/media-preview)
 
 The About description and 20 desired topics are maintained in [repository metadata](.github/repository-metadata.json). An owner with repository administration access can run `python scripts/apply-github-metadata.py`; the helper preserves existing topics and stops with an explanation if their union would exceed GitHub's 20-topic limit.
 

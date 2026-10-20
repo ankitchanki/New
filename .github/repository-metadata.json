@@ -1,7 +1,7 @@
 {
   "repository": "ankitchanki/StashDrop",
   "name": "StashDrop",
-  "description": "Native Android floating stash shelf with Google-only Circle to Search requests, visible gesture markers, local collections, sharing and optional Shizuku.",
+  "description": "Native Android edge shelf with two side handles, compact floating panels, local media previews, content filters, Google-only search and optional Shizuku.",
   "topics": [
     "android-app",
     "android-application",
@@ -21,6 +21,7 @@
     "privacy",
     "agsl",
     "google-assistant",
-    "gestures"
+    "gestures",
+    "media-preview"
   ]
 }

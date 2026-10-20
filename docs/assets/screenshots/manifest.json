@@ -6,37 +6,43 @@
       "file": "overview.png",
       "width": 1080,
       "height": 2340,
-      "sha256": "c033a4b6302b9e7a6c4a672db5d3d57a23eed2a2cbbbd216d2c38bb015c47e83"
+      "sha256": "bbaf7a5bf1f036ba903c85efd5950c6452f68d69a1f505719e183bd08551e328"
     },
     {
       "file": "shelf.png",
       "width": 1080,
       "height": 2340,
-      "sha256": "5217dd00eba3d0ca2797d2cccab9a56addf3aba87351682fd9bbb5bc2906298b"
+      "sha256": "efb0f93be985f599a25fde9703a8503262f43aaed2d7937e7a95827a0a678d81"
     },
     {
       "file": "controls.png",
       "width": 1080,
       "height": 2340,
-      "sha256": "18d34cebc54a6758b293c8b2ac2c9bbd40adf3c233a024f004ca33a0668daaf1"
+      "sha256": "05b9da55f2cfdc43bb8a26becd773282415151be4bc28a49a7de643ff0097d16"
     },
     {
       "file": "interactions.png",
       "width": 1080,
       "height": 2340,
-      "sha256": "8a1f4d94e93b76e5a91e1b91619f3453e7aa683083b059d87a4f53fe2e4bb363"
+      "sha256": "5ce1d242c5f4c5c4efdc05face6707b9301300ccee2547906ec7eb693a1e27b3"
     },
     {
       "file": "controls-full.png",
       "width": 1080,
       "height": 5200,
-      "sha256": "65551eb90df58d88f7299f112a45242ebc941a185017a292269649161ecb2d5e"
+      "sha256": "233da5fddff311ab2c44ec7648bf6c2721fd646d1ae522cfe34f8453a936774b"
+    },
+    {
+      "file": "edge-handles.png",
+      "width": 1080,
+      "height": 2340,
+      "sha256": "479f3b079fb0ebdaffaf31d86b28bb1b596a30a1b09f6efe411f7f2dedc38a96"
     },
     {
       "file": "floating-shelf.png",
       "width": 1080,
       "height": 2340,
-      "sha256": "0a74b918bb4d790ba7331a6fa3994af0aecf02a738963de341f413531880aa09"
+      "sha256": "4ca271faaf814d96ea48d57fa501320de432b153333c141a1730464e7e6e8def"
     },
     {
       "file": "aurora-wave.png",

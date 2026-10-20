@@ -15,6 +15,7 @@ images = {
     "controls": "controls_controls",
     "interactions": "interactions_interactions",
     "controls-full": "controlsFull_controls-full",
+    "edge-handles": "edgeHandles_edge-handles",
     "floating-shelf": "floatingShelf_floating-shelf",
     "aurora-wave": "auroraWave_aurora-wave",
 }

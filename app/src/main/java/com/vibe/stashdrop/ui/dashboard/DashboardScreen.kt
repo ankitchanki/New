@@ -37,6 +37,8 @@ import com.vibe.stashdrop.core.shizuku.ShizukuConnectionManager
 import com.vibe.stashdrop.features.floatingdock.ThumbDockIconComposable
 import com.vibe.stashdrop.features.stashshelf.*
 import com.vibe.stashdrop.ui.theme.*
+import com.vibe.stashdrop.ui.shelf.*
+import java.io.File
 import kotlinx.coroutines.launch
 
 /** What the device has granted StashDrop; each missing item can be fixed from the Settings tab. */
@@ -69,12 +71,13 @@ class DashboardActions(
 @Composable
 fun DashboardScreen(items: List<StashItemEntity>, settings: StashSettings, shizuku: ShizukuConnectionManager.State,
     running: Boolean, setup: SetupState, message: String, clipboardStatus: String, actions: DashboardActions,
-    initialTab: Int = 0, initialInteractions: Boolean = false) {
+    initialTab: Int = 0, initialInteractions: Boolean = false, mediaFile: (StashItemEntity)->File? = { null }) {
     var tab by rememberSaveable { mutableIntStateOf(initialTab.coerceIn(0,2)) }
     var interactions by rememberSaveable { mutableStateOf(initialInteractions) }
     var adding by rememberSaveable { mutableStateOf(false) }
     var text by rememberSaveable { mutableStateOf("") }
     var selectedIds by rememberSaveable { mutableStateOf(listOf<String>()) }
+    var selectedType by rememberSaveable { mutableStateOf(ShelfCategory.ALL) }
     var selectedCollection by rememberSaveable { mutableStateOf("All") }
     var collectionTargets by remember { mutableStateOf(emptyList<StashItemEntity>()) }
     var collection by rememberSaveable { mutableStateOf("") }
@@ -108,7 +111,7 @@ fun DashboardScreen(items: List<StashItemEntity>, settings: StashSettings, shizu
                 Text(when { interactions -> "INTERACTIONS"; tab==1 -> "YOUR SPACE"; tab==2 -> "MAKE IT YOURS"; else -> "STASHDROP" },
                     Modifier.weight(1f),style=MaterialTheme.typography.labelSmall,letterSpacing=2.sp,fontWeight=FontWeight.Bold)
                 if(tab==0) Surface(shape=RoundedCornerShape(20.dp),color=if(running) Mint.copy(alpha=.12f) else Ice.copy(alpha=.1f)) {
-                    Text(if(running) "Bubble on" else "Bubble off",Modifier.padding(horizontal=12.dp,vertical=8.dp),style=MaterialTheme.typography.labelSmall,color=if(running) Mint else Ice)
+                    Text(if(running) "Edge shelf on" else "Edge shelf off",Modifier.padding(horizontal=12.dp,vertical=8.dp),style=MaterialTheme.typography.labelSmall,color=if(running) Mint else Ice)
                 }
             }
             when {
@@ -117,13 +120,13 @@ fun DashboardScreen(items: List<StashItemEntity>, settings: StashSettings, shizu
                     Playground(settings.bounce,items.size)
                     Button(onClick=actions.toggleDock,Modifier.fillMaxWidth().heightIn(min=52.dp),shape=RoundedCornerShape(16.dp)) {
                         Icon(Icons.Outlined.Layers,null,Modifier.size(20.dp)); Spacer(Modifier.width(10.dp))
-                        Text(if(running) "Hide floating bubble" else if(setup.overlay) "Show floating bubble" else "Allow floating bubble")
+                        Text(if(running) "Hide edge shelf" else if(setup.overlay) "Show edge shelf" else "Allow edge shelf")
                     }
                     ActionRow("Circle to Search","Google only · eligibility varies",Icons.Outlined.CropFree,actions.search)
                     ActionRow("Setup & connections",if(setup.complete) "Review access and integrations" else "A few permissions, at your pace",Icons.Outlined.Tune) {tab=2}
                     SectionTitle("Recent","${items.size} saved") { TextButton(onClick={tab=1}) { Text("See all") } }
                     if(items.isEmpty()) EmptyCard { adding=true }
-                    else items.take(3).forEach { item -> StashRow(item,false,{tab=1;selectedCollection="All";selectedIds=listOf(item.id)},{moveSelection(listOf(item))}) }
+                    else items.take(3).forEach { item -> StashRow(item,mediaFile(item),false,{tab=1;selectedCollection="All";selectedType=ShelfCategory.ALL;selectedIds=listOf(item.id)},{moveSelection(listOf(item))}) }
                 }
                 tab==1 -> {
                     Row(Modifier.fillMaxWidth(),verticalAlignment=Alignment.CenterVertically) {
@@ -137,18 +140,19 @@ fun DashboardScreen(items: List<StashItemEntity>, settings: StashSettings, shizu
                         collections.forEach { name -> FilterChip(activeCollection==name,{selectedCollection=name;selectedIds=emptyList()},label={Text(name)},shape=RoundedCornerShape(20.dp),border=null,
                             colors=FilterChipDefaults.filterChipColors(containerColor=MaterialTheme.colorScheme.surface,selectedContainerColor=Ice.copy(alpha=.16f),labelColor=MaterialTheme.colorScheme.onSurfaceVariant,selectedLabelColor=Ice)) }
                     }
-                    val visible=items.filter { activeCollection=="All" || it.collection==activeCollection }
-                    if(visible.isEmpty()) EmptyCard { adding=true }
-                    visible.forEach { item -> StashRow(item,item.id in selectedIds,{
+                    ShelfTypeFilters(selectedType) { selectedType=it; selectedIds=emptyList() }
+                    val visible=items.filter { (activeCollection=="All" || it.collection==activeCollection) && selectedType.matches(it) }
+                    if(visible.isEmpty()) Text(if(items.isEmpty()) "Share an item or add a note to get started." else "No ${selectedType.label.lowercase()} in this collection.",Modifier.padding(vertical=20.dp),color=MaterialTheme.colorScheme.onSurfaceVariant)
+                    visible.forEach { item -> StashRow(item,mediaFile(item),item.id in selectedIds,{
                         selectedIds=if(item.id in selectedIds) selectedIds-item.id else selectedIds+item.id
                     },{moveSelection(listOf(item))}) }
                     Text("Share text, images or files to StashDrop from another app's Share menu.",style=MaterialTheme.typography.bodySmall,color=MaterialTheme.colorScheme.onSurfaceVariant)
                 }
                 interactions -> {
-                    Headline("Your way.","Show the floating bubble, then use the bottom markers. Enable each gesture below. These markers are separate from Android’s own navigation gestures.")
+                    Headline("Your way.","Show the edge shelf, then use the raised markers. Enable each gesture below. These markers are separate from Android’s own navigation gestures.")
                     Card { SettingSwitch("Gesture strips","Visible markers above the system navigation area",settings.gesturesEnabled) {actions.preference("bar",it)} }
                     Card { SettingSwitch("Swipe up","Pull up 64 dp or flick to search",settings.gestures.swipe) {actions.preference("swipe",it)} }
-                    Card { SettingSwitch("Corner swipe","Swipe diagonally up and inward on a corner marker",settings.gestures.corners) {actions.preference("corners",it)} }
+                    Card { SettingSwitch("Corner swipe","Start on the raised side marker, above system navigation",settings.gestures.corners) {actions.preference("corners",it)} }
                     Card { SettingSwitch("Press and hold","Hold the center marker until it responds",settings.gestures.hold) {actions.preference("hold",it)} }
                     Card { SettingSwitch("Double tap","Tap the center marker twice quickly",settings.gestures.doubleTap) {actions.preference("double",it)} }
                     Card { SettingSwitch("Auto-stash copied text","May retain passwords, codes or private text",settings.autoStash) {
@@ -170,7 +174,7 @@ fun DashboardScreen(items: List<StashItemEntity>, settings: StashSettings, shizu
                     if(shizuku.connected && !setup.complete) Button(onClick=actions.setupAll,Modifier.fillMaxWidth(),shape=RoundedCornerShape(16.dp)) {
                         Icon(Icons.Outlined.AutoFixHigh,null,Modifier.size(18.dp)); Spacer(Modifier.width(8.dp)); Text("Set up with Shizuku")
                     }
-                    Card { SetupRow(Icons.Outlined.BubbleChart,"Floating bubble",setup.overlay,"Allow",actions.allowOverlay) }
+                    Card { SetupRow(Icons.Outlined.BubbleChart,"Edge shelf",setup.overlay,"Allow",actions.allowOverlay) }
                     Card { SetupRow(Icons.Outlined.Notifications,"Notifications",setup.notifications,"Allow",actions.allowNotifications) }
                     Card { SetupRow(Icons.Outlined.Hub,"Shizuku",shizuku.connected,if(shizuku.granted) "Check" else "Connect",actions.connectShizuku,
                         statusText=if(shizuku.connected) "Bridge connected" else shizuku.message) }
@@ -282,16 +286,14 @@ fun DashboardScreen(items: List<StashItemEntity>, settings: StashSettings, shizu
         }
     }
 }
-@Composable private fun StashRow(item: StashItemEntity,chosen: Boolean,onSelect: ()->Unit,onCollect: ()->Unit) {
+@Composable private fun StashRow(item: StashItemEntity,file: File?,chosen: Boolean,onSelect: ()->Unit,onCollect: ()->Unit) {
     val isLink=item.text?.let {it.startsWith("https://") || it.startsWith("http://")}==true
     val title=item.text?.replace('\n',' ') ?: if(item.mimeType.startsWith("image/")) "Saved image" else "Saved file"
     Surface(onClick=onSelect,modifier=Modifier.fillMaxWidth().semantics {selected=chosen},shape=RoundedCornerShape(20.dp),
         color=if(chosen) Ice.copy(alpha=.16f) else MaterialTheme.colorScheme.surface,
         border=if(chosen) BorderStroke(1.dp,Ice) else null) {
         Row(Modifier.padding(14.dp),verticalAlignment=Alignment.CenterVertically) {
-            Box(Modifier.size(42.dp).background(MaterialTheme.colorScheme.surfaceVariant,RoundedCornerShape(13.dp)),contentAlignment=Alignment.Center) {
-                Icon(when {chosen -> Icons.Outlined.Check;isLink -> Icons.Outlined.Link;item.fileName==null -> Icons.AutoMirrored.Outlined.Notes;item.mimeType.startsWith("image/") -> Icons.Outlined.Image;else -> Icons.AutoMirrored.Outlined.InsertDriveFile},null,tint=Ice,modifier=Modifier.size(22.dp))
-            }
+            ShelfMediaThumbnail(item,file,Modifier.size(if(item.fileName!=null) 76.dp else 42.dp))
             Column(Modifier.weight(1f).padding(horizontal=12.dp)) {
                 Text(title,maxLines=2,overflow=TextOverflow.Ellipsis,style=MaterialTheme.typography.bodyMedium)
                 Text(item.collection,Modifier.clickable(role=Role.Button,onClick=onCollect).heightIn(min=32.dp).padding(vertical=8.dp),color=Ice,style=MaterialTheme.typography.labelMedium)
@@ -337,7 +339,7 @@ fun DashboardScreen(items: List<StashItemEntity>, settings: StashSettings, shizu
         },contentAlignment=Alignment.Center) {
             AuroraWave(progress.value,touch,Modifier.fillMaxSize())
             Column(horizontalAlignment=Alignment.CenterHorizontally) {
-                ThumbDockIconComposable(count,progress.value>.5f,{scope.launch {progress.animateTo(1f,IosSpringSpecs.liquid(intensity));haptics.confirm();progress.animateTo(0f,IosSpringSpecs.liquid(intensity))}}, {},{}, {})
+                ThumbDockIconComposable(count,progress.value>.5f,{scope.launch {progress.animateTo(1f,IosSpringSpecs.liquid(intensity));haptics.confirm();progress.animateTo(0f,IosSpringSpecs.liquid(intensity))}}, {},{}, {},edgeHandle=true)
                 Text("A little space. For everything.",style=MaterialTheme.typography.labelMedium,color=MaterialTheme.colorScheme.onSurfaceVariant,maxLines=1)
             }
             Box(Modifier.align(Alignment.BottomCenter).padding(bottom=12.dp).size(44.dp,4.dp).background(Color.White.copy(alpha=.28f),RoundedCornerShape(4.dp)))

@@ -105,6 +105,11 @@ class BottomBarGestureTest {
         val center=views.first { (it.layoutParams as WindowManager.LayoutParams).gravity == (Gravity.BOTTOM or Gravity.CENTER_HORIZONTAL) }
         ViewCompat.dispatchApplyWindowInsets(center,WindowInsetsCompat.Builder().setVisible(WindowInsetsCompat.Type.navigationBars(),false).build())
         assertEquals(View.VISIBLE,center.visibility)
+        val params=center.layoutParams as WindowManager.LayoutParams
+        assertTrue("Markers stay above the mandatory system gesture region",params.y>=32*d)
+        views.filter { it!==center }.forEach { side ->
+            assertTrue("Corners are inset from the system Back edge",(side.layoutParams as WindowManager.LayoutParams).x>=24*d)
+        }
         tap(center); idle(80); overlay.attach(settings)
         assertTrue(Shadow.extract<ShadowWindowManagerImpl>(windows).views.any { it === center })
         tap(center); assertEquals(1,triggers)

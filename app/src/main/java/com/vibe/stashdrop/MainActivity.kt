@@ -110,7 +110,7 @@ class MainActivity: ComponentActivity() {
             val shizuku by stashApp.shizuku.state.collectAsStateWithLifecycle()
             val running by OneUiThumbDockService.running.collectAsStateWithLifecycle()
             val clipboardStatus by OneUiThumbDockService.clipboardStatus.collectAsStateWithLifecycle()
-            DashboardScreen(items,settings,shizuku,running,setup,message,clipboardStatus,actions)
+            DashboardScreen(items,settings,shizuku,running,setup,message,clipboardStatus,actions,mediaFile=stashApp.repository::file)
         } }
     }
 }

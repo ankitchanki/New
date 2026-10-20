@@ -23,11 +23,14 @@ import androidx.compose.ui.unit.dp
 import com.vibe.stashdrop.core.physics.*
 import com.vibe.stashdrop.features.dragdrop.IosCardStackDragShadow
 import com.vibe.stashdrop.features.stashshelf.*
+import com.vibe.stashdrop.ui.shelf.*
 
 @Composable
 fun IosFanOutStashSheet(items: List<StashItemEntity>, repository: StashRepository, onDismiss: ()->Unit, onSearch: ()->Unit,
     onShare: (List<StashItemEntity>,Boolean)->Unit, onDelete: (StashItemEntity)->Unit,
-    onGlobalDrag: (View,List<StashItemEntity>)->Unit) {
+    onGlobalDrag: (View,List<StashItemEntity>)->Unit, compact: Boolean=false) {
+    var filter by remember { mutableStateOf(ShelfCategory.ALL) }
+    val visible=items.filter { filter.matches(it) }
     var selected by remember { mutableStateOf(emptySet<String>()) }
     var deleting by remember { mutableStateOf<StashItemEntity?>(null) }
     val currentItems by rememberUpdatedState(items)
@@ -41,26 +44,27 @@ fun IosFanOutStashSheet(items: List<StashItemEntity>, repository: StashRepositor
     val inspection = androidx.compose.ui.platform.LocalInspectionMode.current
     val reveal=remember { Animatable(if (inspection) 0f else 300f) }
     LaunchedEffect(Unit) { if (!inspection) reveal.animateTo(0f,IosSpringSpecs.liquid()) }
-    Box(Modifier.fillMaxSize().background(Color.Black.copy(alpha=.24f)).clickable(onClick=onDismiss),contentAlignment=Alignment.BottomCenter) {
-        Surface(Modifier.fillMaxWidth().fillMaxHeight(.60f).graphicsLayer { translationY=reveal.value }.clickable(interactionSource=null,indication=null) {},
-            shape=RoundedCornerShape(topStart=32.dp,topEnd=32.dp),color=MaterialTheme.colorScheme.surface) {
+    Box(Modifier.fillMaxSize().then(if(compact) Modifier else Modifier.background(Color.Black.copy(alpha=.24f)).clickable(onClick=onDismiss)),contentAlignment=Alignment.BottomCenter) {
+        Surface(Modifier.fillMaxWidth().fillMaxHeight(if(compact) 1f else .60f).graphicsLayer { translationY=reveal.value }.clickable(interactionSource=null,indication=null) {},
+            shape=RoundedCornerShape(24.dp),color=MaterialTheme.colorScheme.surface) {
             Column(Modifier.padding(horizontal=20.dp,vertical=12.dp)) {
                 Box(Modifier.align(Alignment.CenterHorizontally).width(38.dp).height(4.dp).background(Color.White.copy(alpha=.2f),RoundedCornerShape(3.dp)))
                 Row(Modifier.fillMaxWidth().padding(vertical=16.dp),horizontalArrangement=Arrangement.SpaceBetween,verticalAlignment=Alignment.CenterVertically) {
                     Column(Modifier.weight(1f)) {
-                        Text("Your shelf",style=MaterialTheme.typography.headlineSmall,maxLines=1)
+                        Text("StashDrop",style=MaterialTheme.typography.headlineSmall,maxLines=1)
                         Text("${items.size} items · hold a card to drag",style=MaterialTheme.typography.labelMedium,color=MaterialTheme.colorScheme.primary,maxLines=1,overflow=TextOverflow.Ellipsis)
                     }
                     FilledTonalIconButton(onClick=onSearch) { Icon(Icons.Outlined.Search,"Circle to Search") }
                     IconButton(onClick=onDismiss) { Icon(Icons.Outlined.Close,"Close shelf") }
                 }
-                if(items.isEmpty()) Column(Modifier.weight(1f).fillMaxWidth(),verticalArrangement=Arrangement.Center,horizontalAlignment=Alignment.CenterHorizontally) {
+                ShelfTypeFilters(filter) { filter=it; selected=emptySet() }
+                if(visible.isEmpty()) Column(Modifier.weight(1f).fillMaxWidth(),verticalArrangement=Arrangement.Center,horizontalAlignment=Alignment.CenterHorizontally) {
                     Icon(Icons.Outlined.Inventory2,null,tint=MaterialTheme.colorScheme.primary)
-                    Text("Keep something close",Modifier.padding(top=8.dp),style=MaterialTheme.typography.titleMedium,maxLines=1)
-                    Text("Share to StashDrop or circle something to save it",color=MaterialTheme.colorScheme.onSurfaceVariant,maxLines=1,overflow=TextOverflow.Ellipsis,style=MaterialTheme.typography.bodySmall)
+                    Text("No ${filter.label.lowercase()} here",Modifier.padding(top=8.dp),style=MaterialTheme.typography.titleMedium,maxLines=1)
+                    Text("Share to StashDrop from another app",color=MaterialTheme.colorScheme.onSurfaceVariant,maxLines=1,overflow=TextOverflow.Ellipsis,style=MaterialTheme.typography.bodySmall)
                 }
                 else LazyColumn(Modifier.weight(1f),verticalArrangement=Arrangement.spacedBy(10.dp)) {
-                    itemsIndexed(items,key={_,item->item.id}) { index,item ->
+                    itemsIndexed(visible,key={_,item->item.id}) { index,item ->
                         val chosen=item.id in selected
                         val angle by animateFloatAsState(if(chosen) listOf(-4f,2f,5f)[index%3] else 0f,IosSpringSpecs.follow(),label="card tilt")
                         val scale by animateFloatAsState(if(chosen) .96f else 1f,IosSpringSpecs.landing(),label="stack scale")
@@ -80,9 +84,9 @@ fun IosFanOutStashSheet(items: List<StashItemEntity>, repository: StashRepositor
                             onClick={ haptics.select(); selected=if(chosen) selected-item.id else selected+item.id },
                             colors=CardDefaults.cardColors(containerColor=if(chosen) MaterialTheme.colorScheme.primaryContainer else MaterialTheme.colorScheme.surfaceVariant)) {
                             Row(Modifier.fillMaxWidth().padding(14.dp),verticalAlignment=Alignment.CenterVertically) {
-                                Icon(if(item.fileName!=null) Icons.Outlined.Image else Icons.AutoMirrored.Outlined.Notes,null,Modifier.padding(end=12.dp),tint=MaterialTheme.colorScheme.primary)
+                                ShelfMediaThumbnail(item,repository.file(item),Modifier.padding(end=10.dp).size(64.dp))
                                 Column(Modifier.weight(1f)) {
-                                    Text(item.text?.replace('\n',' ') ?: "Image",maxLines=1,overflow=TextOverflow.Ellipsis,style=MaterialTheme.typography.bodyMedium)
+                                    Text(item.text?.replace('\n',' ') ?: item.category().label,maxLines=1,overflow=TextOverflow.Ellipsis,style=MaterialTheme.typography.bodyMedium)
                                     Text(item.collection,style=MaterialTheme.typography.labelSmall,color=MaterialTheme.colorScheme.primary,maxLines=1)
                                 }
                                 IconButton(onClick={onShare(listOf(item),true)}) { Icon(Icons.AutoMirrored.Outlined.Send,"Send to WhatsApp") }
@@ -100,7 +104,8 @@ fun IosFanOutStashSheet(items: List<StashItemEntity>, repository: StashRepositor
                             Surface(Modifier.width(92.dp).height(64.dp).graphicsLayer {
                                 rotationZ=listOf(-4f,2f,5f)[index%3]; translationY=-index*5*density; shadowElevation=8*density
                             },shape=RoundedCornerShape(12.dp),color=MaterialTheme.colorScheme.primaryContainer) {
-                                Text(item.text ?: "Image",Modifier.padding(10.dp),maxLines=2,overflow=TextOverflow.Ellipsis,style=MaterialTheme.typography.labelSmall)
+                                if(item.fileName!=null) ShelfMediaThumbnail(item,repository.file(item),Modifier.fillMaxSize())
+                                else Text(item.text.orEmpty(),Modifier.padding(10.dp),maxLines=2,overflow=TextOverflow.Ellipsis,style=MaterialTheme.typography.labelSmall)
                             }
                         }
                         Text("${selected.size}",Modifier.align(Alignment.TopEnd).background(MaterialTheme.colorScheme.primary,RoundedCornerShape(12.dp)).padding(6.dp),color=MaterialTheme.colorScheme.onPrimary)
