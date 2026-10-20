@@ -12,7 +12,7 @@ powershell -NoProfile -ExecutionPolicy RemoteSigned -File .\Test-StashDrop.ps1
 
 The execution policy applies to that PowerShell process only. No administrator access or permanent policy change is required. The helper uses ADB from PATH or the standard Android Studio SDK location. Unlock the phone and approve USB debugging if prompted, then rerun if it is not yet authorized.
 
-It downloads the official signed **0.5.0 APK**, checks its pinned SHA-256, installs with `adb install -r`, launches StashDrop, and records a **three-minute** test session. Approve any USB-install confirmation shown on the phone. It never uninstalls the app, clears data, clears the phone's log buffers, enables privileges, changes your assistant, opens an ADB network listener, or uploads logs.
+It downloads the official signed **0.6.0 APK**, checks its pinned SHA-256, installs with `adb install -r`, launches StashDrop, and records a **three-minute** test session. Approve any USB-install confirmation shown on the phone. It never uninstalls the app, clears data, clears the phone's log buffers, enables privileges, changes your assistant, opens an ADB network listener, or uploads logs.
 
 Examples for a custom ADB location or multiple devices:
 
@@ -26,17 +26,17 @@ powershell -NoProfile -ExecutionPolicy RemoteSigned -File .\Test-StashDrop.ps1 -
 To use an already downloaded official APK:
 
 ```powershell
-powershell -NoProfile -ExecutionPolicy RemoteSigned -File .\Test-StashDrop.ps1 -ApkPath "$env:USERPROFILE\Downloads\StashDrop-v0.5.0.apk"
+powershell -NoProfile -ExecutionPolicy RemoteSigned -File .\Test-StashDrop.ps1 -ApkPath "$env:USERPROFILE\Downloads\StashDrop-v0.6.0.apk"
 ```
 
 The helper pins the independently verified published APK hash. Custom/debug APKs are deliberately rejected. An installation signed with a different key cannot be updated in place; the helper stops rather than uninstalling it and deleting its shelf.
 
 ## What to test during recording
 
-1. Open Home, show the bubble, tap it, drag it, hold to search, and drag onto the dismiss X.
-2. Select two Shelf cards, share/move them, and cancel a deletion before trying a disposable item's confirmed deletion.
-3. Choose Google as digital assistant, then test the search button, bubble hold and notification. Record whether Google shows Circle to Search, Gemini or a rejection. No internal capture screen should appear.
-4. Enable each gesture and test center swipe/hold/double-tap and both diagonal up/inward corner swipes on the visible markers. Check rotation, keyboard and lock/unlock.
+1. Show the edge shelf. Tap or pull inward from each handle to open its rectangular panel. Close with Back/Close/outside touch, and verify scrolling/tapping another app works with handles enabled.
+2. Import distinct images, stickers and videos; inspect previews and Images/Videos/Stickers/URLs/OTP filters. Select cards, share/move them, and test deletion confirmation on a disposable item.
+3. Choose Google as digital assistant, then test the search button, handle hold and notification. Record whether Google shows Circle to Search, Gemini or a rejection. No internal capture screen should appear.
+4. Enable corner swipe and start on the raised arrow markers above system navigation. Check center swipe/hold/double-tap, rotation, keyboard and lock/unlock. Physical bottom-edge swipes remain Android Home/Recents gestures.
 5. If Shizuku is in use, verify reconnect behavior and record whether connecting the bridge changes the Google request result.
 
 See the [full device checklist](DEVICE_VALIDATION.md) for additional cases. If the app displays its own crash report, copy it manually too; release-app private files are not accessible to normal ADB.
@@ -49,11 +49,11 @@ Review/redact logs before sharing: diagnostic messages can contain private conte
 
 ## Manual ADB alternative
 
-After downloading the [official signed APK](https://github.com/ankitchanki/StashDrop/releases/download/v0.5.0/StashDrop-v0.5.0.apk):
+After downloading the [official signed APK](https://github.com/ankitchanki/StashDrop/releases/download/v0.6.0/StashDrop-v0.6.0.apk):
 
 ```powershell
 adb devices -l
-adb install -r "$env:USERPROFILE\Downloads\StashDrop-v0.5.0.apk"
+adb install -r "$env:USERPROFILE\Downloads\StashDrop-v0.6.0.apk"
 adb shell am start -n com.vibe.stashdrop/.MainActivity
 $appProcessId = [string](adb shell pidof -s com.vibe.stashdrop)
 $appProcessId = $appProcessId.Trim()

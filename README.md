@@ -208,7 +208,7 @@ Shizuku is optional for the shelf and can send the Google contextual-session req
 
 ## Verification
 
-The published **0.6.0** build passed **66 tests** with no failures, errors, or skips. Debug and release lint each reported **zero errors and 45 warnings**. APK/AAB signatures match the original production certificate; APK ZIP and bundled 64-bit native library alignment passed 16 KB checks. The [successful release workflow](https://github.com/ankitchanki/StashDrop/actions/workflows/android.yml) and [verification report](docs/releases/v0.6.0-verification.json) record the checked scope.
+The published **0.6.0** build passed **66 tests** with no failures, errors, or skips. Debug and release lint each reported **zero errors and 46 warnings**. APK/AAB signatures match the original production certificate; APK ZIP and bundled 64-bit native library alignment passed 16 KB checks. The [successful release workflow](https://github.com/ankitchanki/StashDrop/actions/workflows/android.yml) and [verification report](docs/releases/v0.6.0-verification.json) record the checked scope.
 
 Paparazzi renders the README gallery from the production Compose components. The [two edge handles](docs/assets/screenshots/edge-handles.png) and dedicated [interaction settings screen](docs/assets/screenshots/interactions.png) is also rendered from production Compose.
 
