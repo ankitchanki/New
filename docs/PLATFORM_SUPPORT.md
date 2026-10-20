@@ -1,6 +1,6 @@
 # Platform support and fallbacks
 
-StashDrop 0.3.2 supports **Android 9+ (API 28)** and targets API 35. Feature availability depends on permissions, system services, Google eligibility, OEM restrictions, and the receiving app. See the [feature guide](FEATURE_GUIDE.md) for usage and the [device checklist](DEVICE_VALIDATION.md) for hardware qualification.
+StashDrop 0.4.0 supports **Android 9+ (API 28)** and targets API 35. Feature availability depends on permissions, system services, Google eligibility, OEM restrictions, and the receiving app. See the [feature guide](FEATURE_GUIDE.md) for usage and the [device checklist](DEVICE_VALIDATION.md) for hardware qualification.
 
 ## Android version boundaries
 

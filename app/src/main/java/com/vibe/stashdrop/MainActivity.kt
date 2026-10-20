@@ -83,9 +83,11 @@ class MainActivity: ComponentActivity() {
             preference={key,value->lifecycleScope.launch { stashApp.preferences.set(key,value) }},
             bounce={value->lifecycleScope.launch { stashApp.preferences.bounce(value) }},
             addText={text->lifecycleScope.launch { runCatching { stashApp.repository.addText(text) }.onFailure { message=it.message.orEmpty() } }},
-            delete={item->lifecycleScope.launch { stashApp.repository.delete(item) }},
+            delete={item->lifecycleScope.launch { runCatching { stashApp.repository.delete(item) }.onFailure { message=it.message ?: "Could not delete item" } }},
             share={selected,whatsapp->runCatching { VisualLensBridge.share(this,stashApp.repository,selected,whatsapp) }.onFailure { message=it.message.orEmpty() }},
-            collect={item,collection->lifecycleScope.launch { stashApp.repository.move(item,collection) }},
+            collect={item,collection->lifecycleScope.launch { runCatching { stashApp.repository.move(item,collection) }.onFailure { message=it.message ?: "Could not move item" } }},
+            deleteMany={selected->lifecycleScope.launch { runCatching { selected.forEach { stashApp.repository.delete(it) } }.onFailure { message=it.message ?: "Could not delete selection" } }},
+            collectMany={selected,collection->lifecycleScope.launch { runCatching { selected.forEach { stashApp.repository.move(it,collection) } }.onFailure { message=it.message ?: "Could not move selection" } }},
             allowOverlay={ shizukuOr({ assistant.grantSetup() },overlaySettings) },
             allowNotifications={
                 if(stashApp.shizuku.service!=null) shizukuOr({ assistant.grantSetup() })

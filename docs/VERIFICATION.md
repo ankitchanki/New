@@ -1,6 +1,6 @@
 # Validation performed
 
-**Latest published release: [0.3.2](https://github.com/ankitchanki/StashDrop/releases/tag/v0.3.2).** The [release workflow](https://github.com/ankitchanki/StashDrop/actions/runs/39384349562) completed successfully after the owner updated the four signing secrets. All five published assets were downloaded and independently checked for their expected checksums/size; APK/AAB signatures and the public certificate match the original production identity. The release passed 27 tests, zero lint errors (42 warnings per variant), and signature/alignment verification. No physical device or emulator was attached for these checks.
+**Current signed release build: [0.4.0](releases/v0.4.0-verification.json).** The native UI implementation passed 32 tests with no failures/errors/skips, eight production rendering checks, debug/release lint with zero errors and 42 warnings each, original-certificate continuity, APK/AAB signatures, and 16 KB ZIP/native-library alignment. [Release downloads](https://github.com/ankitchanki/StashDrop/releases/tag/v0.4.0) and [the Actions workflow](https://github.com/ankitchanki/StashDrop/actions/workflows/android.yml) provide the published artifacts and CI evidence. See [native UI QA](NATIVE_UI_QA.md) for scope; no physical phone or emulator was attached.
 
 The sections below preserve historical results; earlier access/secret failures are not the current release status.
 
@@ -53,3 +53,13 @@ The debug APK uses a development key. Release signing and minification were not 
 - The new Robolectric tests initially could not create `/home/agent/.robolectric-download-lock` in this managed workspace. A Gradle init script outside Git now assigns writable Java/Maven cache paths and preserves the configured proxy/CA trust for test JVMs; the complete release checks then passed. App/test sources and checks were not weakened.
 - Six signing-input checks passed: the original key survives CRLF, wrapped whitespace, and accidental double encoding; ZIP data, a wrong password, and a wrong alias are rejected before Gradle. The workflow also passed `actionlint`.
 - An initial remote release attempt failed because a signing secret decoded to an invalid keystore. After the owner replaced all four secrets with the original signing values, workflow run [39384349562](https://github.com/ankitchanki/StashDrop/actions/runs/39384349562) passed both build and release jobs and published all five verified public assets. This integration still lacks Actions-secret write access; the owner-provided values resolved publication.
+
+
+## Signed version 0.4.0 native UI
+
+- Built minified APK and AAB with version code 7, original RSA-4096 certificate, and unchanged package/Room schema.
+- All 32 tests passed, none failed/errored/skipped: 12 original logic tests, 8 overlay/circle native-graphics regressions, 4 new Compose interaction tests, and 8 Paparazzi checks.
+- New native interaction coverage checks selection share/move callbacks, confirmed/canceled deletion, sensitive clipboard opt-in, and note validation/save.
+- Eight regenerated README image copies match the production baselines and gallery manifest.
+- Debug/release lint completed with zero errors and 42 warnings each. APK v3/AAB signatures and original certificate continuity passed; APK ZIP and bundled 64-bit native library alignments passed 16 KB checks.
+- [The versioned verification report](releases/v0.4.0-verification.json) contains the executed scope. Private signing credentials stayed outside Git and public assets.

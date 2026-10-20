@@ -29,6 +29,7 @@ fun IosFanOutStashSheet(items: List<StashItemEntity>, repository: StashRepositor
     onShare: (List<StashItemEntity>,Boolean)->Unit, onDelete: (StashItemEntity)->Unit,
     onGlobalDrag: (View,List<StashItemEntity>)->Unit) {
     var selected by remember { mutableStateOf(emptySet<String>()) }
+    var deleting by remember { mutableStateOf<StashItemEntity?>(null) }
     val currentItems by rememberUpdatedState(items)
     val currentSelected by rememberUpdatedState(selected)
     LaunchedEffect(items) { selected=selected.intersect(items.map { it.id }.toSet()) }
@@ -41,43 +42,24 @@ fun IosFanOutStashSheet(items: List<StashItemEntity>, repository: StashRepositor
     val reveal=remember { Animatable(if (inspection) 0f else 300f) }
     LaunchedEffect(Unit) { if (!inspection) reveal.animateTo(0f,IosSpringSpecs.liquid()) }
     Box(Modifier.fillMaxSize().background(Color.Black.copy(alpha=.24f)).clickable(onClick=onDismiss),contentAlignment=Alignment.BottomCenter) {
-        Surface(Modifier.fillMaxWidth().fillMaxHeight(.55f).graphicsLayer { translationY=reveal.value }.clickable(interactionSource=null,indication=null) {},
+        Surface(Modifier.fillMaxWidth().fillMaxHeight(.60f).graphicsLayer { translationY=reveal.value }.clickable(interactionSource=null,indication=null) {},
             shape=RoundedCornerShape(topStart=32.dp,topEnd=32.dp),color=MaterialTheme.colorScheme.surface) {
             Column(Modifier.padding(horizontal=20.dp,vertical=12.dp)) {
                 Box(Modifier.align(Alignment.CenterHorizontally).width(38.dp).height(4.dp).background(Color.White.copy(alpha=.2f),RoundedCornerShape(3.dp)))
                 Row(Modifier.fillMaxWidth().padding(vertical=16.dp),horizontalArrangement=Arrangement.SpaceBetween,verticalAlignment=Alignment.CenterVertically) {
                     Column(Modifier.weight(1f)) {
-                        Text("Your shelf",style=MaterialTheme.typography.titleLarge,maxLines=1)
+                        Text("Your shelf",style=MaterialTheme.typography.headlineSmall,maxLines=1)
                         Text("${items.size} items · hold a card to drag",style=MaterialTheme.typography.labelMedium,color=MaterialTheme.colorScheme.primary,maxLines=1,overflow=TextOverflow.Ellipsis)
                     }
                     FilledTonalIconButton(onClick=onSearch) { Icon(Icons.Outlined.Search,"Circle to Search") }
                     IconButton(onClick=onDismiss) { Icon(Icons.Outlined.Close,"Close shelf") }
                 }
-                if(selected.isNotEmpty()) Row(Modifier.fillMaxWidth(),verticalAlignment=Alignment.CenterVertically) {
-                    Box(Modifier.width(118.dp).height(88.dp).pointerInput(selected) {
-                        detectDragGesturesAfterLongPress(onDragStart={haptics.confirm(); onGlobalDrag(view,currentItems.filter {it.id in currentSelected})},onDrag={change,_->change.consume()})
-                    },contentAlignment=Alignment.Center) {
-                        val stack=items.filter {it.id in selected}.take(3)
-                        stack.reversed().forEachIndexed { index,item ->
-                            Surface(Modifier.width(92.dp).height(64.dp).graphicsLayer {
-                                rotationZ=listOf(-4f,2f,5f)[index%3]; translationY=-index*5*density; shadowElevation=8*density
-                            },shape=RoundedCornerShape(12.dp),color=MaterialTheme.colorScheme.primaryContainer) {
-                                Text(item.text ?: "Image",Modifier.padding(10.dp),maxLines=2,overflow=TextOverflow.Ellipsis,style=MaterialTheme.typography.labelSmall)
-                            }
-                        }
-                        Text("${selected.size}",Modifier.align(Alignment.TopEnd).background(MaterialTheme.colorScheme.primary,RoundedCornerShape(12.dp)).padding(6.dp),color=MaterialTheme.colorScheme.onPrimary)
-                    }
-                    Row(horizontalArrangement=Arrangement.spacedBy(8.dp)) {
-                        Button(onClick={haptics.select(); onShare(items.filter { it.id in selected },true)}) { Text("WhatsApp",maxLines=1) }
-                        OutlinedButton(onClick={haptics.select(); onShare(items.filter { it.id in selected },false)}) { Text("Share",maxLines=1) }
-                    }
-                }
-                if(items.isEmpty()) Column(Modifier.fillMaxSize(),verticalArrangement=Arrangement.Center,horizontalAlignment=Alignment.CenterHorizontally) {
+                if(items.isEmpty()) Column(Modifier.weight(1f).fillMaxWidth(),verticalArrangement=Arrangement.Center,horizontalAlignment=Alignment.CenterHorizontally) {
                     Icon(Icons.Outlined.Inventory2,null,tint=MaterialTheme.colorScheme.primary)
                     Text("Keep something close",Modifier.padding(top=8.dp),style=MaterialTheme.typography.titleMedium,maxLines=1)
                     Text("Share to StashDrop or circle something to save it",color=MaterialTheme.colorScheme.onSurfaceVariant,maxLines=1,overflow=TextOverflow.Ellipsis,style=MaterialTheme.typography.bodySmall)
                 }
-                LazyColumn(verticalArrangement=Arrangement.spacedBy(10.dp)) {
+                else LazyColumn(Modifier.weight(1f),verticalArrangement=Arrangement.spacedBy(10.dp)) {
                     itemsIndexed(items,key={_,item->item.id}) { index,item ->
                         val chosen=item.id in selected
                         val angle by animateFloatAsState(if(chosen) listOf(-4f,2f,5f)[index%3] else 0f,IosSpringSpecs.follow(),label="card tilt")
@@ -104,9 +86,41 @@ fun IosFanOutStashSheet(items: List<StashItemEntity>, repository: StashRepositor
                                     Text(item.collection,style=MaterialTheme.typography.labelSmall,color=MaterialTheme.colorScheme.primary,maxLines=1)
                                 }
                                 IconButton(onClick={onShare(listOf(item),true)}) { Icon(Icons.AutoMirrored.Outlined.Send,"Send to WhatsApp") }
-                                IconButton(onClick={onDelete(item)}) { Icon(Icons.Outlined.DeleteOutline,"Delete item") }
+                                IconButton(onClick={deleting=item}) { Icon(Icons.Outlined.DeleteOutline,"Delete item") }
                             }
                         }
+                    }
+                }
+                if(selected.isNotEmpty()) Row(Modifier.fillMaxWidth(),verticalAlignment=Alignment.CenterVertically) {
+                    Box(Modifier.width(118.dp).height(88.dp).pointerInput(selected) {
+                        detectDragGesturesAfterLongPress(onDragStart={haptics.confirm(); onGlobalDrag(view,currentItems.filter {it.id in currentSelected})},onDrag={change,_->change.consume()})
+                    },contentAlignment=Alignment.Center) {
+                        val stack=items.filter {it.id in selected}.take(3)
+                        stack.reversed().forEachIndexed { index,item ->
+                            Surface(Modifier.width(92.dp).height(64.dp).graphicsLayer {
+                                rotationZ=listOf(-4f,2f,5f)[index%3]; translationY=-index*5*density; shadowElevation=8*density
+                            },shape=RoundedCornerShape(12.dp),color=MaterialTheme.colorScheme.primaryContainer) {
+                                Text(item.text ?: "Image",Modifier.padding(10.dp),maxLines=2,overflow=TextOverflow.Ellipsis,style=MaterialTheme.typography.labelSmall)
+                            }
+                        }
+                        Text("${selected.size}",Modifier.align(Alignment.TopEnd).background(MaterialTheme.colorScheme.primary,RoundedCornerShape(12.dp)).padding(6.dp),color=MaterialTheme.colorScheme.onPrimary)
+                    }
+                    Row(Modifier.weight(1f).horizontalScroll(rememberScrollState()),horizontalArrangement=Arrangement.spacedBy(8.dp)) {
+                        Button(onClick={haptics.select(); onShare(items.filter { it.id in selected },true)}) { Text("WhatsApp",maxLines=1) }
+                        OutlinedButton(onClick={haptics.select(); onShare(items.filter { it.id in selected },false)}) { Text("Share",maxLines=1) }
+                    }
+                }
+            }
+        }
+        deleting?.let { item ->
+            Surface(Modifier.align(Alignment.Center).padding(24.dp).fillMaxWidth().clickable(interactionSource=null,indication=null) {},
+                shape=RoundedCornerShape(24.dp),color=MaterialTheme.colorScheme.surfaceVariant,shadowElevation=16.dp) {
+                Column(Modifier.padding(24.dp),verticalArrangement=Arrangement.spacedBy(16.dp)) {
+                    Text("Delete saved item?",style=MaterialTheme.typography.titleLarge)
+                    Text("This removes the item and its cached file permanently.",style=MaterialTheme.typography.bodyMedium)
+                    Row(Modifier.fillMaxWidth().horizontalScroll(rememberScrollState()),horizontalArrangement=Arrangement.End) {
+                        TextButton(onClick={deleting=null}) { Text("Keep item") }
+                        TextButton(onClick={onDelete(item);deleting=null}) { Text("Delete permanently") }
                     }
                 }
             }

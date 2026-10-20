@@ -2,7 +2,21 @@
 
 All notable StashDrop changes are recorded here. Versions follow Semantic Versioning.
 
-## [Unreleased]
+## [0.4.0] - 2026-10-20
+
+### Added
+
+- Native Compose implementation of the SVG UI direction across Home, Shelf, Settings, interaction preferences, and built-in Circle to Search.
+- Main Shelf multi-selection with a reachable selection bar for Share, WhatsApp, batch collection moves, clear selection, and confirmed deletion.
+- Explicit sensitive-text confirmation before enabling clipboard auto-stash; deletion confirmation in the floating shelf.
+- Four native UI interaction regressions and an additional production render for the interaction settings page.
+
+### Changed
+
+- Setup uses individual access cards with clearer Google voice-service eligibility text. Digital assistant details expand separately; gestures, clipboard, and feel have their own page.
+- Floating shelf selection/sharing controls sit below the scrolling card list.
+- Collection changes clear the selection; opening a recent Home item resets the filter to reveal it. Navigation, note drafts, and interaction page state use saved Compose state.
+- Version code is 7. Package, Room schema, and original production signing identity are retained for compatible updates.
 
 ### Design
 

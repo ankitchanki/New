@@ -4,14 +4,15 @@ The repository gallery distinguishes app UI, sample content, shader output, and 
 
 ## UI previews
 
-All UI images below are rendered from the production Jetpack Compose components using **Paparazzi 1.3.5**, with Pixel 5 dimensions. The full Settings render uses a taller virtual viewport to expose the settings in one image. No physical phone or emulator was used. The preview data includes three sample notes/links; it does not contain personal clipboard history.
+The gallery reflects the native 0.4.0 UI. All UI images below are rendered from the production Jetpack Compose components using **Paparazzi 1.3.5**, with Pixel 5 dimensions. The full Settings render uses a taller virtual viewport to expose the settings in one image. No physical phone or emulator was used. The preview data includes three sample notes/links; it does not contain personal clipboard history.
 
 | Preview | What it shows | Source |
 | --- | --- | --- |
 | [Home](assets/screenshots/overview.png) | Home header, recent items, bubble state and entry points | `DashboardScreen`, tab 0 |
 | [Shelf](assets/screenshots/shelf.png) | Sample notes/links, collections, share and delete actions | `DashboardScreen`, tab 1 |
 | [Settings](assets/screenshots/controls.png) | Setup access status, search mode, assistant and gesture controls | `DashboardScreen`, tab 2 |
-| [Full Settings](assets/screenshots/controls-full.png) | Gesture toggles, clipboard opt-in, spring intensity, assistant controls | Same component, taller viewport |
+| [Full Settings](assets/screenshots/controls-full.png) | Complete setup/search screen and entry to interaction preferences | Same component, taller viewport |
+| [Interactions](assets/screenshots/interactions.png) | Gesture toggles, clipboard preference, and haptics; scroll for springiness | `DashboardScreen`, interaction page |
 | [Floating shelf](assets/screenshots/floating-shelf.png) | Production fan-out shelf sheet after its opening motion | `IosFanOutStashSheet`, inspection mode |
 | [Circle selection canvas](assets/screenshots/circle-canvas.png) | Production lasso canvas over synthetic sample artwork | `AuroraCircleOverlayCanvas`, initial sample selection |
 | [Aurora still](assets/screenshots/aurora-wave.png) | Production shader/Canvas composable with sample pull progress | `AuroraWave` |
@@ -63,7 +64,7 @@ For the prepared cloud snapshot, use `PYTHONPATH=/workspace/toolchains/shader-va
 
 ## Future UI direction
 
-The [roadmap](ROADMAP.md#proposed-screen-direction) describes proposed improvements to Home readiness, shelf search/previews, floating controls, selection results, and accessible Settings. An [editable SVG screen map and interactive browser concept](design/README.md) now explore the current flows and proposed layout refinements. Android permissions, capture, recognition, and external actions are simulated in that concept. The images above represent the current Android components, and the banner is separately identified artwork.
+The [roadmap](ROADMAP.md#proposed-screen-direction) describes proposed improvements to Home readiness, shelf search/previews, floating controls, selection results, and accessible Settings. An [editable SVG screen map and interactive browser concept](design/README.md) record the design direction. Version 0.4.0 implements the corresponding native layouts and core actions; the browser prototype remains a simulation. Android permissions, capture, recognition, and external actions are simulated in that concept. The images above represent the current Android components, and the banner is separately identified artwork.
 
 ## Repository About and topics
 

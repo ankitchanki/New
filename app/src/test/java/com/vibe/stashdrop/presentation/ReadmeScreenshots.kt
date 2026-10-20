@@ -35,12 +35,12 @@ class ReadmeScreenshots {
     }
     @Test fun shelf() { paparazzi.snapshot(name = "shelf") { dashboard(1) } }
     @Test fun controls() { paparazzi.snapshot(name = "controls") { dashboard(2) } }
-    @Composable private fun dashboard(initialTab: Int = 0) {
+    @Composable private fun dashboard(initialTab: Int = 0, interactions: Boolean = false) {
         StashDropTheme {
             DashboardScreen(
                 items = samples, settings = StashSettings(), shizuku = ShizukuConnectionManager.State(),
                 running = false, setup = SetupState(overlay = true), message = "", clipboardStatus = "Auto-stash is off",
-                actions = DashboardActions(), initialTab = initialTab,
+                actions = DashboardActions(), initialTab = initialTab, initialInteractions = interactions,
             )
         }
     }
@@ -56,6 +56,7 @@ class ReadmeScreenshots {
             }
         }
     }
+    @Test fun interactions() { paparazzi.snapshot(name = "interactions") { dashboard(2, true) } }
     @Test fun controlsFull() {
         paparazzi.unsafeUpdateConfig(deviceConfig = DeviceConfig.PIXEL_5.copy(screenHeight = 5200, softButtons = false))
         paparazzi.snapshot(name = "controls-full") { dashboard(2) }

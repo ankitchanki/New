@@ -1,12 +1,12 @@
 # Improvements and future UI
 
-These are **proposed directions**, not features shipped in 0.3.2. There are no committed delivery dates or promised version numbers. Current behavior is described in the [feature guide](FEATURE_GUIDE.md); implemented visuals are in the [gallery](UI_GALLERY.md).
+These are **proposed directions**, not features shipped in 0.4.0. There are no committed delivery dates or promised version numbers. Current behavior is described in the [feature guide](FEATURE_GUIDE.md); implemented visuals are in the [gallery](UI_GALLERY.md).
 
 The goal is a shelf that is easy to reach, predictable when permissions or services change, and safe for useful personal material. Reliability and accessibility should guide visual changes.
 
 ## Current foundation
 
-The app already has Home / Shelf / Settings, a draggable edge-peeking bubble, a stacked floating shelf, collections, sharing, optional copied-text saving, Google search routing, a built-in capture/lasso/OCR flow, local crash reports, and spring/shader motion. The signed 0.3.2 build preserves the original production certificate. Host tests and renders are available; broad real-device qualification is still outstanding.
+The app already has Home / Shelf / Settings, a draggable edge-peeking bubble, a stacked floating shelf, collections, sharing, optional copied-text saving, Google search routing, a built-in capture/lasso/OCR flow, local crash reports, and spring/shader motion. The 0.4.0 native UI adds main-Shelf batch actions, confirmed deletion, clipboard opt-in confirmation, and a separate interaction settings page. The signed build preserves the original production certificate. Host tests and renders are available; broad real-device qualification is still outstanding.
 
 ## Priorities
 
@@ -16,13 +16,13 @@ The app already has Home / Shelf / Settings, a draggable edge-peeking bubble, a 
 | 1 — Setup clarity | A connected bridge or accepted Google request can look more conclusive than it is | Show separate overlay, capture, Google-service, and clipboard readiness; identify the active route | A first-time user can start a shelf and complete built-in capture without guessing |
 | 1 — Accessibility | Dense one-line settings and visual motion can make actions hard to use | Support large text, TalkBack labels/focus, 48 dp targets, reduced motion, and higher contrast | Manual accessibility checks at large font/display sizes; readable labels and reachable actions |
 | 2 — Shelf management | Larger collections become difficult to navigate | Local text search, type filters, richer previews, selection counts, and explicit batch actions | Find and share an item from a large fixture without losing selection or collection context |
-| 2 — Safer retention | Deletion is immediate and no archive restore exists | Undo/trash policy, storage usage, sensitive-copy controls, explicit local export/import | Recovery and round-trip restore checks; clear handling of private files, duplicates, and canceled imports |
+| 2 — Safer retention | Confirmed deletion has no recovery and no archive restore exists | Undo/trash policy, storage usage, sensitive-copy controls, explicit local export/import | Recovery and round-trip restore checks; clear handling of private files, duplicates, and canceled imports |
 | 2 — Capture quality | Latin OCR and manual cropping limit some content | Better crop handles, result editing, language/script options, and clearer barcode actions | Quality checks on representative images/scripts; explain download/offline behavior if models change |
 | 3 — Visual refinement | Current dark styling and motion offer limited customization | Adaptive themes, subtle glass, adjustable bubble size/edge behavior, responsive layouts | Device screenshots and frame/memory/battery measurements alongside accessible fallbacks |
 
 ## Proposed screen direction
 
-An [interactive SVG concept and nine-screen vector overview](design/README.md) demonstrate the existing flows with proposed layout refinements. The concept simulates platform services; its screen designs have not been implemented in the Android app.
+An [interactive SVG concept and nine-screen vector overview](design/README.md) demonstrate the existing flows with proposed layout refinements. The concept simulates platform services. Version 0.4.0 implements the native screen direction and core actions with actual Android integrations; further refinements below remain proposals.
 
 Keep **Home**, **Shelf**, and **Settings** as stable destinations. Place frequent actions in the lower reachable area and reserve decorative effects for moments that explain an interaction.
 
@@ -34,7 +34,7 @@ A future readiness card could explain why an action is blocked, link to its syst
 
 ### Shelf: easier scanning and safer actions
 
-Add a local search field, collection/type filters, image thumbnails, readable link domains, and attachment names/sizes where available. Use a sticky selection toolbar near the bottom with a visible count and Share / Move / Delete. Add an undo affordance or a documented trash retention policy before batch deletion.
+Add a local search field, collection/type filters, image thumbnails, readable link domains, and attachment names/sizes where available. Use a sticky selection toolbar near the bottom with a visible count and Share / Move / Delete. Add an undo affordance or a documented trash retention policy to the existing confirmed batch-deletion flow.
 
 Empty states should explain how to share into StashDrop and offer Add note. Loading, import failure, and unavailable-file states should retain the user's context. Search/filter/selection state should survive navigation and rotation where appropriate. A local export/import design must specify private-file handling, encryption choices, and recovery before implementation.
 

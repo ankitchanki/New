@@ -69,7 +69,7 @@ flowchart LR
 
 Text is sanitized and truncated to 100,000 characters. Automatic clipboard saves also hash the cleaned text and check the recent digest history before inserting. This deduplicates the last 100 automatic copies; manual saves do not share that restriction.
 
-File imports copy a readable content URI into private storage, cap each file at 50 MB, and use generated filenames with validated extensions. Import failures remove partial files. Image crops are encoded as PNG. Deleting an item deletes its metadata and cached file. Collections are item labels, with **Inbox** as the fallback. DataStore persists booleans and spring intensity independently of the Room database.
+File imports copy a readable content URI into private storage, cap each file at 50 MB, and use generated filenames with validated extensions. Import failures remove partial files. Image crops are encoded as PNG. Deleting an item deletes its metadata and cached file. Collections are item labels, with **Inbox** as the fallback. DataStore persists booleans and spring intensity independently of the Room database. The native dashboard exposes multi-item selection with batch share/move and confirmed deletion. Interaction preferences have their own page; enabling automatic copied-text saving requires explicit confirmation.
 
 No export/import archive or synchronization service is implemented. Android backup is disabled in the manifest, so users should share out content they need before uninstalling.
 
@@ -105,4 +105,4 @@ The implementation has no StashDrop account server or cloud shelf sync. App-priv
 
 The release workflow builds debug checks and signed minified APK/AAB artifacts, verifies the pinned original certificate, signatures, checksums, tests, lint, and alignment, and publishes the five public assets. The private keystore remains outside Git and is restored from protected Actions secrets for release builds. Documentation updates do not change existing release binaries or tags.
 
-Version 0.3.2 passed 27 tests, zero lint errors with 42 warnings per variant, and the documented signature/alignment checks. Host renders exercise production visual components with fixtures. Neither those checks nor a successful Binder call establishes universal OEM compatibility, usable Google search, external-app drop success, accessibility quality, or phone performance. See [verification](VERIFICATION.md), [device validation](DEVICE_VALIDATION.md), and [future work](ROADMAP.md).
+Version 0.4.0 passed 32 tests, zero lint errors with 42 warnings per variant, and the documented signature/alignment checks. Host renders exercise production visual components with fixtures. Neither those checks nor a successful Binder call establishes universal OEM compatibility, usable Google search, external-app drop success, accessibility quality, or phone performance. See [verification](VERIFICATION.md), [device validation](DEVICE_VALIDATION.md), and [future work](ROADMAP.md).

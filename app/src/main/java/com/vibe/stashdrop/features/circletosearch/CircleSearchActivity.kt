@@ -12,6 +12,7 @@ import androidx.activity.viewModels
 import androidx.compose.foundation.*
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.icons.automirrored.outlined.ArrowBack
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.*
 import androidx.compose.material3.*
@@ -24,6 +25,8 @@ import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
+import androidx.compose.ui.text.font.FontWeight
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
 import com.vibe.stashdrop.core.haptics.TactileHapticEngine
@@ -85,29 +88,32 @@ class CircleSearchActivity: ComponentActivity() {
                 saving=true
                 scope.launch { runCatching { action(model.saveCrop()) }.onFailure { model.message=it.message.orEmpty() }; saving=false }
             }
-            Box(Modifier.fillMaxSize().background(MaterialTheme.colorScheme.background)) {
+            BoxWithConstraints(Modifier.fillMaxSize().background(MaterialTheme.colorScheme.background)) {
+                val resultPanelHeight=maxHeight*.5f
                 Column(Modifier.fillMaxSize().systemBarsPadding()) {
                     Row(Modifier.fillMaxWidth().padding(horizontal=8.dp,vertical=4.dp),verticalAlignment=Alignment.CenterVertically) {
-                        IconButton(onClick={ finish() }) { Icon(Icons.Outlined.Close,"Close") }
-                        Text("Circle to Search",style=MaterialTheme.typography.titleMedium,maxLines=1)
+                        IconButton(onClick={ finish() }) { Icon(Icons.AutoMirrored.Outlined.ArrowBack,"Close Circle to Search") }
+                        Text("BUILT-IN CIRCLE",style=MaterialTheme.typography.labelSmall,letterSpacing=2.sp)
                         Spacer(Modifier.weight(1f))
                         if(model.crop!=null) TextButton(enabled=!model.busy && !saving,onClick={ haptics.tick(); model.reset() }) { Text("Again",maxLines=1) }
                     }
+                    Text("Circle something useful.",Modifier.padding(horizontal=22.dp,vertical=8.dp),style=MaterialTheme.typography.headlineMedium,fontWeight=FontWeight.Bold)
                     when {
                         source==null -> Text("Capture expired. Close and try again.",Modifier.padding(24.dp))
                         model.crop==null -> {
-                            Text("Circle anything to search it",Modifier.fillMaxWidth().padding(bottom=8.dp),
-                                style=MaterialTheme.typography.bodyMedium,color=MaterialTheme.colorScheme.onSurfaceVariant,maxLines=1,
+                            Text("Draw a loop around the detail you want to keep.",Modifier.fillMaxWidth().padding(horizontal=22.dp,vertical=8.dp),
+                                style=MaterialTheme.typography.bodyMedium,color=MaterialTheme.colorScheme.onSurfaceVariant,maxLines=2,
                                 textAlign=androidx.compose.ui.text.style.TextAlign.Center)
-                            Box(Modifier.fillMaxWidth().weight(1f),contentAlignment=Alignment.Center) {
-                                AuroraCircleOverlayCanvas(source,Modifier.aspectRatio(source.width.toFloat()/source.height).clip(RoundedCornerShape(20.dp)),model::select)
+                            Box(Modifier.fillMaxWidth().weight(1f).padding(horizontal=22.dp,vertical=12.dp),contentAlignment=Alignment.Center) {
+                                AuroraCircleOverlayCanvas(source,Modifier.aspectRatio(source.width.toFloat()/source.height).clip(RoundedCornerShape(24.dp)),model::select)
                             }
                             if(model.busy) LinearProgressIndicator(Modifier.fillMaxWidth())
                         }
                         else -> {
                             Image(model.crop!!.asImageBitmap(),"Selected area",Modifier.weight(1f).fillMaxWidth().padding(24.dp),contentScale=ContentScale.Fit)
-                            Surface(shape=RoundedCornerShape(topStart=28.dp,topEnd=28.dp),color=MaterialTheme.colorScheme.surface) {
-                                Column(Modifier.fillMaxWidth().padding(20.dp),verticalArrangement=Arrangement.spacedBy(14.dp)) {
+                            Surface(modifier=Modifier.heightIn(max=resultPanelHeight),shape=RoundedCornerShape(topStart=28.dp,topEnd=28.dp),color=MaterialTheme.colorScheme.surface) {
+                                Column(Modifier.fillMaxWidth().verticalScroll(rememberScrollState()).padding(20.dp),verticalArrangement=Arrangement.spacedBy(14.dp)) {
+                                    Text("Selection ready",style=MaterialTheme.typography.labelLarge,color=MaterialTheme.colorScheme.secondary)
                                     val extracted=model.extracted
                                     when {
                                         model.busy -> Row(verticalAlignment=Alignment.CenterVertically) {
@@ -117,6 +123,7 @@ class CircleSearchActivity: ComponentActivity() {
                                         else -> Text("No text found. Search the image with Lens.",maxLines=1,overflow=TextOverflow.Ellipsis,
                                             color=MaterialTheme.colorScheme.onSurfaceVariant,style=MaterialTheme.typography.bodyMedium)
                                     }
+                                    Text("Lens and Share also save this cutout to your shelf.",style=MaterialTheme.typography.bodySmall,color=MaterialTheme.colorScheme.onSurfaceVariant)
                                     val enabled=!model.busy && !saving
                                     Row(Modifier.horizontalScroll(rememberScrollState()),horizontalArrangement=Arrangement.spacedBy(8.dp)) {
                                         Button(enabled=enabled,onClick={

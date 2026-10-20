@@ -7,5 +7,6 @@ import androidx.compose.ui.graphics.Color
 val Ice = Color(0xFFB4C9FF)
 val Mint = Color(0xFF9DE3CF)
 private val colors = darkColorScheme(primary=Ice, secondary=Mint, background=Color(0xFF0C0E15), surface=Color(0xFF171B26),
-    surfaceVariant=Color(0xFF242A39), onBackground=Color(0xFFF1F3FA), onSurface=Color(0xFFF1F3FA))
+    surfaceVariant=Color(0xFF242A39), primaryContainer=Color(0xFF283249), onPrimaryContainer=Ice,
+    onSurfaceVariant=Color(0xFFA4AABE), secondaryContainer=Color(0xFF242A39), onSecondaryContainer=Ice, onPrimary=Color(0xFF15223E), onBackground=Color(0xFFF1F3FA), onSurface=Color(0xFFF1F3FA))
 @Composable fun StashDropTheme(content: @Composable () -> Unit) { MaterialTheme(colorScheme=colors,content=content) }

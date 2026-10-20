@@ -1,6 +1,6 @@
 # StashDrop feature guide
 
-This guide describes **released version 0.3.2**. See the [README](../README.md) for the signed APK, [platform support](PLATFORM_SUPPORT.md) for Android restrictions, and the [roadmap](ROADMAP.md) for proposed improvements.
+This guide describes **released version 0.4.0**. See the [README](../README.md) for the signed APK, [platform support](PLATFORM_SUPPORT.md) for Android restrictions, and the [roadmap](ROADMAP.md) for proposed improvements.
 
 ## What StashDrop does
 
@@ -12,7 +12,8 @@ StashDrop keeps useful material in a local shelf and brings that shelf close to 
 | --- | --- | --- |
 | Home | Bubble status, show/hide control, recent saved items | Start the floating shelf and return to another app |
 | Shelf | Saved notes, links, attachments, collection filters | Add a note, move an item, share, or delete |
-| Settings | Access/setup status, search mode, assistant integration, gestures, clipboard, haptics, springiness | Configure only the capabilities you use |
+| Settings | Access/setup status, search mode, and expandable assistant integration | Configure only the access you need |
+| Gestures, clipboard & feel | Dedicated interaction preferences, reached from Settings | Tune gestures, clipboard, haptics, and springiness |
 
 The [visual gallery](UI_GALLERY.md) shows the implemented components with sample content. Its images are host renders; actual device permission screens come from Android.
 
@@ -41,13 +42,13 @@ Share a photo, document, or other readable attachment to StashDrop. Android's si
 
 ### Collections and deletion
 
-Tap an item's collection label to move it into a named collection; a blank name becomes **Inbox**. Collection names are limited to 80 characters. Use collection chips to filter the shelf. Delete removes the database entry and its cached attachment, when present. There is currently no undo, trash, in-app backup/restore, or cloud sync. Share important items out before uninstalling or replacing an incompatible build.
+Tap an item's collection label to move it into a named collection; a blank name becomes **Inbox**. Collection names are limited to 80 characters. Use collection chips to filter the shelf. Select cards to show the bottom selection bar. Share/WhatsApp sends the selection; **More selection actions** offers Move to collection and Delete. Confirming deletion removes the selected database entries and cached attachments, when present; canceling keeps them. Changing a collection filter clears selection. There is currently no undo, trash, in-app backup/restore, or cloud sync. Share important items out before uninstalling or replacing an incompatible build.
 
 ## Two ways to Circle to Search
 
 ### Google's native route
 
-**Settings → Circle to Search → Use Google Circle to Search** starts on. Invoke it by holding the bubble, using an enabled bottom gesture, tapping the notification action, or choosing **Try it now** in Settings.
+**Settings → Search & assistant → Use Google Circle to Search** starts on. Invoke it by holding the bubble, using an enabled bottom gesture, tapping the notification action, or choosing **Try it now** in Settings.
 
 StashDrop asks Android's voice-interaction service to show Google's contextual search session. The Google app and an active Google voice service are needed. Google determines device/account eligibility and its actual UI. If Google is missing, the service is unavailable, or the request fails, StashDrop falls back to its own capture screen.
 
@@ -76,12 +77,12 @@ Lens, Share, and Stash reuse the same saved cutout within the current selection.
 
 ## Digital assistant and Shizuku
 
-On Android 10+, Settings → Digital assistant exposes the system assistant picker. Choosing StashDrop lets supported system assistant gestures enter StashDrop's search router. The OS, navigation mode, and manufacturer determine available gestures, including corner swipe or long-press home. The app does not intercept every phone's home/power controls.
+On Android 10+, Settings → Digital assistant expands the assistant controls; choose **Open assistant picker** for the system picker. Choosing StashDrop lets supported system assistant gestures enter StashDrop's search router. The OS, navigation mode, and manufacturer determine available gestures, including corner swipe or long-press home. The app does not intercept every phone's home/power controls.
 
 With a running, authorized Shizuku connection:
 
 - **Use StashDrop now** can change the assistant role and save the previous role holder for restoration.
-- When StashDrop is selected and Google's voice service is inactive, **Connect** can route assistant presses through StashDrop while restoring Google's voice service for the native search request.
+- When StashDrop is selected and Google's voice service is inactive, **Connect Google** can route assistant presses through StashDrop while restoring Google's voice service for the native search request.
 - **Restore previous** attempts to restore the saved assistant role; the system assistant picker remains available for manual changes.
 - **Set up everything with Shizuku** attempts the supported access/setup operations. Check the displayed status afterward; an OEM can reject a privileged operation.
 
@@ -107,9 +108,9 @@ Aurora waves and the liquid bubble use AGSL on Android 13+, with Canvas fallback
 
 ## Clipboard auto-stash
 
-Enable **Settings → Auto-stash copied text** only if you want copied text retained on the shelf. The monitor uses a Shizuku clipboard listener when permitted and an ordinary foreground listener as a fallback. Background clipboard access depends on Android and OEM restrictions; the app displays monitor status. It handles text, rather than arbitrary image/file clipboard entries.
+Enable **Settings → Gestures, clipboard & feel → Auto-stash copied text** only if you want copied text retained on the shelf. The monitor uses a Shizuku clipboard listener when permitted and an ordinary foreground listener as a fallback. Background clipboard access depends on Android and OEM restrictions; the app displays monitor status. It handles text, rather than arbitrary image/file clipboard entries.
 
-Text passes through link cleaning before storage. Recent automatic copies are deduplicated using a bounded history of the last 100 digests. The digest history avoids duplicate payloads in that table, but the shelf itself still contains the saved text. Passwords, codes, addresses, and other sensitive copies can therefore remain until you delete their shelf items. Turning auto-stash off stops collection; it does not erase earlier saved items.
+Enabling the preference requires confirming a sensitive-text retention prompt. Text passes through link cleaning before storage. Recent automatic copies are deduplicated using a bounded history of the last 100 digests. The digest history avoids duplicate payloads in that table, but the shelf itself still contains the saved text. Passwords, codes, addresses, and other sensitive copies can therefore remain until you delete their shelf items. Turning auto-stash off stops collection; it does not erase earlier saved items.
 
 ## Sharing, WhatsApp, and global drag
 
