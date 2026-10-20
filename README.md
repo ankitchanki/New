@@ -140,9 +140,10 @@ The debug APK uses a development signing key. Signed release builds require a se
 
 ## Signed releases and changelog
 
-Version `0.3.1` uses Android version code `5` and the existing StashDrop production certificate. Signed APK/app-bundle packages include checksums, the public certificate, and a verification report. Version-tag builds use [GitHub Actions](.github/workflows/android.yml); the four signing secrets must be configured before publication. Private signing keys are kept separately.
+Version `0.3.2` uses Android version code `6` and a new StashDrop production certificate (earlier installs need one uninstall). Signed APK/app-bundle packages include checksums, the public certificate, and a verification report. Version-tag builds use [GitHub Actions](.github/workflows/android.yml); the four signing secrets must be configured before publication. Private signing keys are kept separately.
 
 - [Changelog](CHANGELOG.md)
+- [Version 0.3.2 notes](docs/releases/v0.3.2.md)
 - [Version 0.3.1 notes](docs/releases/v0.3.1.md)
 - [Version 0.3.0 notes](docs/releases/v0.3.0.md)
 - [Version 0.2.0 notes](docs/releases/v0.2.0.md)

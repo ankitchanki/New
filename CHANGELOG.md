@@ -2,6 +2,13 @@
 
 All notable StashDrop changes are recorded here. Versions follow Semantic Versioning.
 
+## [0.3.2] - 2026-10-20
+
+### Changed
+
+- Signed with a new production key created by the owner and stored only in GitHub Actions secrets; the previous key was exposed in a chat and is retired. Earlier installs must be uninstalled once before installing this build. The certificate fingerprint is in the release's `release-verification.json` and `StashDrop-release-certificate.pem`.
+- App content is the same as 0.3.1.
+
 ## [0.3.1] - 2026-10-19
 
 ### Fixed
