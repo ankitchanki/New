@@ -13,3 +13,8 @@ local.properties
 keystore.properties
 signing.properties
 .signing/
+
+# Local, potentially private phone diagnostics
+StashDrop-device-*/
+StashDrop-device-*.zip
+stashdrop-app.log

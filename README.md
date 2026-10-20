@@ -227,6 +227,7 @@ See [the visual guide](docs/UI_GALLERY.md) for regeneration. Rendering previews 
 
 - [Native UI implementation checks](docs/NATIVE_UI_QA.md)
 - [Build verification](docs/VERIFICATION.md)
+- [Windows ADB install and logging helper](docs/WINDOWS_DEVICE_TESTING.md)
 - [Device validation checklist](docs/DEVICE_VALIDATION.md)
 - [Platform support and fallbacks](docs/PLATFORM_SUPPORT.md)
 

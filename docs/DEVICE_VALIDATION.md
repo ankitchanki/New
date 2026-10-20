@@ -1,5 +1,7 @@
 # Device validation
 
+Use the [Windows install/log helper](WINDOWS_DEVICE_TESTING.md) on the laptop actually connected to the phone.
+
 Cloud builds and JVM tests cannot prove Android overlay, privileged Binder, shader rendering, or cross-app behavior. No physical Android device or accelerated emulator is attached to the current cloud machine.
 
 Run these checks on API 28, 30, 33, and 35+ devices, with gesture and three-button navigation and at least one Samsung ROM:
