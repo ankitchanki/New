@@ -1,0 +1,55 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>StashDrop — UI interaction studio</title>
+<link rel="icon" href="data:,">
+<style>
+:root{color-scheme:dark;--bg:#0c0e15;--surface:#171b26;--line:#2b3347;--text:#f1f3fa;--muted:#a4aabe;--ice:#b4c9ff;--mint:#9de3cf}*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--text);font:14px/1.6 Arial,Helvetica,sans-serif}a{color:var(--ice)}button,a.download{font:inherit;cursor:pointer;border:1px solid var(--line);border-radius:12px;background:var(--surface);color:var(--text);padding:10px 15px;text-decoration:none}button:hover,a.download:hover{border-color:var(--ice)}button:focus-visible,a:focus-visible{outline:3px solid var(--mint);outline-offset:3px}header{display:flex;justify-content:space-between;gap:20px;align-items:center;padding:22px 5vw;border-bottom:1px solid var(--line)}.wordmark{font-size:13px;letter-spacing:4px;font-weight:bold}.tag{color:var(--mint);font-size:11px;letter-spacing:2px;text-transform:uppercase}.layout{display:grid;grid-template-columns:minmax(280px,390px) minmax(310px,440px) minmax(190px,260px);gap:4vw;max-width:1440px;margin:auto;padding:50px 4vw;align-items:start}h1{font-size:clamp(35px,3.4vw,54px);line-height:1.08;letter-spacing:-2px;margin:14px 0 22px;font-weight:600}h2{font-size:13px;letter-spacing:1px;font-weight:600;margin:28px 0 12px}.lead{color:var(--muted);font-size:16px;max-width:340px}.route{display:flex;align-items:center;gap:14px;width:100%;text-align:left;margin:9px 0;padding:12px 16px}.number{color:var(--mint);font-size:11px}.route small{display:block;color:var(--muted);font-size:11px}.download-row{display:flex;flex-wrap:wrap;gap:10px;margin-top:22px}.download-row a{font-size:12px}.device{border:1px solid #46506a;border-radius:43px;padding:9px;background:#151925;box-shadow:0 25px 90px #0008;width:100%;max-width:410px;margin:auto}.device object{display:block;width:100%;aspect-ratio:390 / 844;border-radius:33px;background:#0c0e15}.caption{text-align:center;color:var(--muted);font-size:11px;margin:15px 0}.panel{border-top:1px solid var(--line);padding-top:18px;margin:0 0 24px}.panel h2{margin:0 0 12px}.instruction{color:var(--muted);font-size:12px;margin:12px 0}.instruction b{color:var(--text);font-weight:normal}.dot{height:7px;width:7px;border-radius:50%;background:var(--mint);display:inline-block;margin-right:7px}#events{min-height:128px;max-height:220px;overflow:auto;font:11px/1.6 monospace;color:#c4ccdf;list-style:none;padding:0}#events li{border-bottom:1px solid #202736;padding:9px 0}.note{color:var(--muted);font-size:11px}footer{margin:0 5vw;padding:22px 0;border-top:1px solid var(--line);display:flex;flex-wrap:wrap;gap:20px;justify-content:space-between;color:var(--muted);font-size:11px}@media(max-width:1100px){.layout{grid-template-columns:minmax(250px,1fr) minmax(310px,410px)}aside{grid-column:1 / -1;display:grid;grid-template-columns:1fr 1fr;gap:30px}}@media(max-width:650px){header{padding:18px 22px}.layout{display:flex;flex-direction:column;padding:25px 20px;gap:30px}.intro{width:100%}h1{font-size:42px}.lead{max-width:none}.routes{display:flex;gap:6px;overflow:auto}.route{width:auto;white-space:nowrap;min-width:100px}.route small,.route .number{display:none}.device-wrap{width:100%}.device{max-width:390px}aside{display:block;width:100%}.tag{font-size:9px}footer{margin:0 22px}}
+</style>
+</head>
+<body>
+<header><div class="wordmark">STASHDROP</div><div class="tag">SVG interaction studio / 01</div></header>
+<main class="layout">
+<section class="intro">
+<span class="tag">Within reach, by design.</span>
+<h1>A little space.<br>Every interaction.</h1>
+<p class="lead">An editable vector design of your Android shelf. Tap through the flows, try a gesture, and follow what happens next.</p>
+<h2>EXPLORE THE SCREENS</h2>
+<div class="routes">
+<button class="route" data-screen="home"><span class="number">01</span><span>Home<small>Bubble, recent items &amp; search</small></span></button>
+<button class="route" data-screen="shelf"><span class="number">02</span><span>Shelf<small>Save, select, organize &amp; share</small></span></button>
+<button class="route" data-screen="settings"><span class="number">03</span><span>Settings<small>Access, integrations &amp; preferences</small></span></button>
+<button class="route" data-screen="dock"><span class="number">04</span><span>Floating shelf<small>Card stacks &amp; sample drag targets</small></span></button>
+<button class="route" id="circle-shortcut"><span class="number">05</span><span>Circle to Search<small>Consent, lasso &amp; result actions</small></span></button>
+</div>
+<div class="download-row"><a class="download" href="stashdrop-ui-overview.svg" download>Screen map .svg</a><a class="download" href="stashdrop-interactive.svg" download>Interactive .svg</a></div>
+<p class="note">UI concept grounded in the current app. Screen layout refinements are proposals. This does not change the Android application.</p>
+</section>
+<section class="device-wrap" aria-label="Interactive mobile design">
+<div class="device"><object id="prototype" data="stashdrop-interactive.svg" type="image/svg+xml" title="StashDrop interactive SVG prototype"><a href="stashdrop-interactive.svg">Open the interactive SVG</a></object></div>
+<p class="caption"><span class="dot"></span>Interactive SVG · 390 × 844 · session-only sample data</p>
+</section>
+<aside>
+<section class="panel"><h2>TRY AN INTERACTION</h2>
+<p class="instruction"><b>Start the bubble.</b> Allow simulated access, show it, then tap for the shelf or hold for search.</p>
+<p class="instruction"><b>Move or dismiss.</b> Drag the bubble to an edge, or onto the bottom X to hide it.</p>
+<p class="instruction"><b>Save and share.</b> Add a note, select a card, move it, share it, or confirm deletion.</p>
+<p class="instruction"><b>Circle a detail.</b> Approve sample capture, draw around the text, then Copy, Stash, Search, Lens, or Share.</p>
+<p class="instruction"><b>Try the gesture strip.</b> With the bubble on, swipe upward from the bottom strip; enable hold or double tap in Settings.</p>
+<p class="instruction"><b>Make a card stack.</b> Select cards in the floating shelf, then drag the stack upward into the sample app.</p>
+</section>
+<section class="panel"><h2>INTERACTION LOG</h2><ol id="events" aria-live="polite"><li>Ready. Choose a screen to begin.</li></ol><button id="reset">Reset demo</button> <button id="crash">Sample crash report</button><p class="note">Permissions, recognition, clipboard, Google, Shizuku and sharing are simulated. No real device access, network action, or clipboard write occurs. Refresh or Reset clears your demo data.</p></section>
+</aside>
+</main>
+<footer><span>Dark navy / periwinkle / mint · Built with editable SVG components</span><span><a href="README.md">Interaction reference</a> · <a href="https://github.com/ankitchanki/StashDrop/blob/main/docs/FEATURE_GUIDE.md">Android feature guide</a></span></footer>
+<script>
+const frame=document.getElementById('prototype');
+function send(action,screen){frame.contentWindow?.postMessage({type:'stashdrop-control',action,screen},'*')}
+document.querySelectorAll('[data-screen]').forEach(button=>button.addEventListener('click',()=>send('navigate',button.dataset.screen)));
+document.getElementById('circle-shortcut').addEventListener('click',()=>send('search'));
+document.getElementById('crash').addEventListener('click',()=>send('crash'));
+document.getElementById('reset').addEventListener('click',()=>{send('reset');document.getElementById('events').replaceChildren()});
+window.addEventListener('message',event=>{if(event.source!==frame.contentWindow||event.data?.type!=='stashdrop-design')return;const item=document.createElement('li');item.textContent=(event.data.action==='feedback'?'✓ ':event.data.action+': ')+(event.data.detail||event.data.screen);const log=document.getElementById('events');log.prepend(item);while(log.children.length>8)log.lastElementChild.remove()});
+</script>
+</body></html>

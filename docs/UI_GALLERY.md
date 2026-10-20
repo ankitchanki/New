@@ -63,7 +63,7 @@ For the prepared cloud snapshot, use `PYTHONPATH=/workspace/toolchains/shader-va
 
 ## Future UI direction
 
-The [roadmap](ROADMAP.md#proposed-screen-direction) describes proposed improvements to Home readiness, shelf search/previews, floating controls, selection results, and accessible Settings. Those proposals have no implementation screenshots yet. The images above represent the current components, and the banner is separately identified artwork.
+The [roadmap](ROADMAP.md#proposed-screen-direction) describes proposed improvements to Home readiness, shelf search/previews, floating controls, selection results, and accessible Settings. An [editable SVG screen map and interactive browser concept](design/README.md) now explore the current flows and proposed layout refinements. Android permissions, capture, recognition, and external actions are simulated in that concept. The images above represent the current Android components, and the banner is separately identified artwork.
 
 ## Repository About and topics
 

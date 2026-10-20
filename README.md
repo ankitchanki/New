@@ -229,6 +229,19 @@ The next priorities are broader device validation, clearer setup and recovery st
 
 Shelf search, richer filtering, undo deletion, backup/restore, extra OCR scripts, and theme customization are **proposals**, with no committed release date. The [roadmap](docs/ROADMAP.md) explains the problems, suggested UI, acceptance checks, and technical limits for each direction.
 
+### Interactive SVG UI design
+
+Explore a [nine-screen editable SVG overview](docs/design/stashdrop-ui-overview.svg) and a [browser interaction prototype](docs/design/README.md) covering navigation, notes, collections, sharing, settings, capture/lasso, and floating-dock gestures. These are UI concepts with simulated Android/external actions.
+
+**[Download the complete SVG design package](https://raw.githubusercontent.com/ankitchanki/StashDrop/main/docs/design/downloads/StashDrop-UI-Design.zip)**, extract it, and open `index.html`.
+
+<details>
+<summary>Preview the SVG screen map</summary>
+
+![StashDrop concept: nine editable SVG screens covering Home, Shelf, floating shelf, Settings, preferences, capture consent, selection, results and sharing](docs/design/stashdrop-ui-overview.svg)
+
+</details>
+
 ## Documentation
 
 | Guide | Covers |

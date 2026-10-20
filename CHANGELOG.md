@@ -4,6 +4,10 @@ All notable StashDrop changes are recorded here. Versions follow Semantic Versio
 
 ## [Unreleased]
 
+### Design
+
+- Added an editable nine-screen SVG overview, a standalone scripted SVG, and an offline browser studio for the main app flows. The design simulates Android services and external actions; release APKs are unchanged.
+
 ### Documentation
 
 - Refreshed the project description, download/first-run instructions, feature explanations, defaults, and published release evidence.

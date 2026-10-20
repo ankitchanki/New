@@ -22,6 +22,8 @@ The app already has Home / Shelf / Settings, a draggable edge-peeking bubble, a 
 
 ## Proposed screen direction
 
+An [interactive SVG concept and nine-screen vector overview](design/README.md) demonstrate the existing flows with proposed layout refinements. The concept simulates platform services; its screen designs have not been implemented in the Android app.
+
 Keep **Home**, **Shelf**, and **Settings** as stable destinations. Place frequent actions in the lower reachable area and reserve decorative effects for moments that explain an interaction.
 
 ### Home: readiness and one clear next step
