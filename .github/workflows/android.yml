@@ -110,9 +110,28 @@ jobs:
               data = base64.b64decode(text, validate=True)
           except ValueError:
               raise SystemExit("STASHDROP_KEYSTORE_BASE64 is not the base64 text of the .p12 file. Re-copy it with the command in docs/RELEASING.md.")
-          if len(data) < 500:
-              raise SystemExit(f"STASHDROP_KEYSTORE_BASE64 decodes to only {len(data)} bytes; it should be the whole .p12 key file.")
+          # A key file encoded twice (the base64 text of the base64 text) decodes to more base64 text; undo that.
+          for _ in range(2):
+              ascii_text = data.strip()
+              if data[:1] != b"\x30" and ascii_text and all(c in b"ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/=\r\n " for c in ascii_text):
+                  print("Keystore secret was encoded twice; decoding again.")
+                  data = base64.b64decode(b"".join(ascii_text.split()), validate=True)
+          if data[:2] in (b"\xff\xfe", b"\xfe\xff"):
+              raise SystemExit("STASHDROP_KEYSTORE_BASE64 is the text of a UTF-16 file (PowerShell '>' output). Copy the key text with Set-Clipboard as in docs/RELEASING.md instead.")
+          if len(data) < 500 or data[:1] != b"\x30":
+              raise SystemExit(f"STASHDROP_KEYSTORE_BASE64 does not decode to a .p12 key file ({len(data)} bytes, first byte 0x{data[:1].hex() or '00'}; a key file starts with 0x30). Re-copy the text of stashdrop-release.p12.")
           key.write_bytes(data)
+          # Check the key and both passwords now, so a mistake is named instead of failing deep inside Gradle.
+          import subprocess
+          java = Path(os.environ["JAVA_HOME"]) / "bin" / "keytool"
+          check = subprocess.run([str(java), "-list", "-keystore", str(key), "-storetype", "PKCS12", "-storepass:env", "STASHDROP_RELEASE_STORE_PASSWORD"], capture_output=True, text=True)
+          if check.returncode != 0:
+              reason = "the store password is wrong" if "password" in check.stdout.lower() + check.stderr.lower() else "the file is not a readable PKCS12 key"
+              raise SystemExit(f"Signing key check failed: {reason}. Check STASHDROP_RELEASE_STORE_PASSWORD and STASHDROP_KEYSTORE_BASE64.")
+          alias = subprocess.run([str(java), "-list", "-keystore", str(key), "-storetype", "PKCS12", "-storepass:env", "STASHDROP_RELEASE_STORE_PASSWORD", "-alias", os.environ["STASHDROP_RELEASE_KEY_ALIAS"]], capture_output=True, text=True)
+          if alias.returncode != 0:
+              raise SystemExit("Signing key check failed: the key file has no key named by STASHDROP_RELEASE_KEY_ALIAS (expected stashdrop-release).")
+          print("Signing key verified: readable PKCS12, store password and alias correct.")
           config = private / "release-signing.json"
           config.touch(mode=0o600)
           config.write_text(json.dumps({"storeFile": str(key), "keyAlias": os.environ["STASHDROP_RELEASE_KEY_ALIAS"], "storePassword": os.environ["STASHDROP_RELEASE_STORE_PASSWORD"], "keyPassword": os.environ["STASHDROP_RELEASE_KEY_PASSWORD"]}))
