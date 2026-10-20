@@ -104,7 +104,15 @@ jobs:
           private.mkdir(mode=0o700)
           key = private / "release.p12"
           key.touch(mode=0o600)
-          key.write_bytes(base64.b64decode(os.environ["KEYSTORE_BASE64"], validate=True))
+          # Copying the key text can add line breaks or spaces (e.g. PowerShell's Set-Clipboard); they are never part of it.
+          text = "".join(os.environ["KEYSTORE_BASE64"].split())
+          try:
+              data = base64.b64decode(text, validate=True)
+          except ValueError:
+              raise SystemExit("STASHDROP_KEYSTORE_BASE64 is not the base64 text of the .p12 file. Re-copy it with the command in docs/RELEASING.md.")
+          if len(data) < 500:
+              raise SystemExit(f"STASHDROP_KEYSTORE_BASE64 decodes to only {len(data)} bytes; it should be the whole .p12 key file.")
+          key.write_bytes(data)
           config = private / "release-signing.json"
           config.touch(mode=0o600)
           config.write_text(json.dumps({"storeFile": str(key), "keyAlias": os.environ["STASHDROP_RELEASE_KEY_ALIAS"], "storePassword": os.environ["STASHDROP_RELEASE_STORE_PASSWORD"], "keyPassword": os.environ["STASHDROP_RELEASE_KEY_PASSWORD"]}))
