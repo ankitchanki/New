@@ -3,13 +3,11 @@ package com.vibe.stashdrop.core.shizuku
 import android.content.ClipData
 import android.os.*
 import com.vibe.stashdrop.core.hiddenapi.HiddenApiBypassInitializer
-import java.io.ByteArrayOutputStream
 
 /** Runs under Shizuku's shell identity. No caller-supplied shell commands are accepted. */
 class ShellUserService : IPrivilegedService.Stub() {
     companion object {
         const val OWN_PACKAGE = "com.vibe.stashdrop"
-        const val ACCESSIBILITY = "$OWN_PACKAGE/$OWN_PACKAGE.core.shizuku.CaptureAccessibilityService"
         const val ASSIST_ACTIVITY = "$OWN_PACKAGE/$OWN_PACKAGE.features.circletosearch.AssistActivity"
     }
     init { HiddenApiBypassInitializer.initialize() }
@@ -47,19 +45,12 @@ class ShellUserService : IPrivilegedService.Stub() {
         command("/system/bin/settings", "--user", user, "put", "secure", "assistant", ASSIST_ACTIVITY)
         "Corner swipe and long-press home now open Google Circle to Search through StashDrop"
     }.getOrElse { "Error: ${it.message}" }
-    /** Grants StashDrop's own overlay, notification, and screenshot-accessibility access. */
+    /** Grants StashDrop's own overlay and notification access. */
     override fun grantSetup(userId: Int): String {
         val user = userId.toString()
         val done = mutableListOf<String>()
         runCatching { command("/system/bin/appops", "set", "--user", user, OWN_PACKAGE, "SYSTEM_ALERT_WINDOW", "allow"); done += "floating shelf" }
         if (Build.VERSION.SDK_INT >= 33) runCatching { command("/system/bin/pm", "grant", "--user", user, OWN_PACKAGE, "android.permission.POST_NOTIFICATIONS"); done += "notifications" }
-        runCatching {
-            val current = command("/system/bin/settings", "--user", user, "get", "secure", "enabled_accessibility_services").takeUnless { it == "null" }.orEmpty()
-            val services = current.split(':').filter { it.isNotBlank() }
-            if (ACCESSIBILITY !in services) command("/system/bin/settings", "--user", user, "put", "secure", "enabled_accessibility_services", (services + ACCESSIBILITY).joinToString(":"))
-            command("/system/bin/settings", "--user", user, "put", "secure", "accessibility_enabled", "1")
-            done += "screenshot access"
-        }
         return if (done.isEmpty()) "Error: Shizuku could not change any setting" else "Enabled " + done.joinToString(", ")
     }
     private fun clipboard(): Any {
@@ -110,19 +101,7 @@ class ShellUserService : IPrivilegedService.Stub() {
             method.invoke(service, *arguments(method.parameterTypes, listener))
         } }; remoteListener = null; callback = null
     }
-    override fun captureToPipe(): ParcelFileDescriptor {
-        val pipe = ParcelFileDescriptor.createPipe()
-        Thread {
-            var process: java.lang.Process? = null
-            try {
-                val capture = ProcessBuilder("/system/bin/screencap", "-p").start()
-                process = capture
-                ParcelFileDescriptor.AutoCloseOutputStream(pipe[1]).use { output -> capture.inputStream.use { it.copyTo(output) } }
-                capture.waitFor()
-            } catch (_: Exception) { runCatching { pipe[1].close() } }
-            finally { process?.destroy() }
-        }.start()
-        return pipe[0]
-    }
+    /** Uses shell's privileged voice-interaction entry point, never a screen-capture service. */
+    override fun requestGoogleSearch(): Boolean = com.vibe.stashdrop.features.circletosearch.GoogleCircleToSearch.requestSession(privileged = true)
     override fun destroy() { stopClipboard(); Process.killProcess(Process.myPid()) }
 }

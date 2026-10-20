@@ -35,9 +35,9 @@ The helper pins the independently verified published APK hash. Custom/debug APKs
 
 1. Open Home, show the bubble, tap it, drag it, hold to search, and drag onto the dismiss X.
 2. Select two Shelf cards, share/move them, and cancel a deletion before trying a disposable item's confirmed deletion.
-3. Turn Google mode off and test built-in capture: cancel consent once, retry, circle text, Copy, Stash, Lens, and Share.
-4. Open gesture settings, try the configured bottom swipe, rotate, and lock/unlock the phone.
-5. If Shizuku is in use, verify reconnect behavior and distinguish the Google hand-off from the built-in capture route.
+3. Choose Google as digital assistant, then test the search button, bubble hold and notification. Record whether Google shows Circle to Search, Gemini or a rejection. No internal capture screen should appear.
+4. Enable each gesture and test center swipe/hold/double-tap and both diagonal up/inward corner swipes on the visible markers. Check rotation, keyboard and lock/unlock.
+5. If Shizuku is in use, verify reconnect behavior and record whether connecting the bridge changes the Google request result.
 
 See the [full device checklist](DEVICE_VALIDATION.md) for additional cases. If the app displays its own crash report, copy it manually too; release-app private files are not accessible to normal ADB.
 

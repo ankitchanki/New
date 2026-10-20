@@ -109,8 +109,8 @@ try {
     Start-AdbLog -Name 'system-crashes' -Arguments @('logcat', '-b', 'main', '-b', 'system', '-b', 'crash', '-v', 'threadtime', '-T', '1', 'AndroidRuntime:E', 'libc:F', 'DEBUG:F', 'WindowManager:W', 'ActivityManager:I', 'ActivityTaskManager:I', 'StashDrop:V', '*:S')
     $metadata.Launch = Read-Adb -Arguments @('shell', 'am', 'start', '-n', "$Package/.MainActivity")
     if ($metadata.Launch -match '(?m)^Error:') { throw $metadata.Launch }
-    Write-Host "Recording for $Seconds seconds. On the phone: show/tap/drag/hold the bubble, open the shelf, and try built-in circle capture."
-    Write-Host 'Also try selecting/sharing cards, canceling capture, and locking/unlocking. Logs stay on this laptop.'
+    Write-Host "Recording for $Seconds seconds. On the phone: show/tap/drag/hold the bubble, open the shelf, and try Google search and each enabled bottom marker."
+    Write-Host 'Also try selecting/sharing cards, both corner swipes, hold, double-tap, and locking/unlocking. Logs stay on this laptop.'
     $deadline = (Get-Date).AddSeconds($Seconds)
     while ((Get-Date) -lt $deadline) {
         $currentPid = Read-Adb -Arguments @('shell', 'pidof', '-s', $Package) -AllowFailure

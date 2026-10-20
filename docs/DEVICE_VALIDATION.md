@@ -9,10 +9,8 @@ Run these checks on API 28, 30, 33, and 35+ devices, with gesture and three-butt
 - Fresh install: the dashboard opens without Shizuku; denied notifications and overlay permission do not crash it. Returning from overlay settings updates the button.
 - Overlay lifecycle: start/stop repeatedly, use the notification Stop action, rotate, lock/unlock, revoke overlay permission, and kill the app. No orphan window or clipboard listener should remain.
 - Dock: tap opens the shelf, hold starts Circle to Search, moving only repositions it (edge snap/peek, haptic detents). Verify touches outside the dock and gesture strips reach the underlying app on Android 12+.
-- Gestures: enable modes separately and together. Verify threshold, diagonal pulls, canceled drags, 400 ms hold, and double-tap. Check fullscreen and landscape behavior; disable strips if they interfere with an OEM's navigation.
-- Capture: test Shizuku grant/deny/death/reconnect, accessibility screenshots on 30+, MediaProjection accept/cancel, timeout, rotation, and protected content. An OS denial must never be described as a successful screenshot.
+- Gestures: enable modes separately and together. Verify threshold, diagonal pulls, canceled drags, system-timed hold, and double-tap. Check fullscreen and landscape behavior; disable strips if they interfere with an OEM's navigation.
 - Assistant: set StashDrop as default assistant, long-press home, and confirm Circle to Search opens; restore the previous assistant.
-- Circle to Search: lasso a small/large area, a Latin text block, QR, and barcode. Confirm mask/crop alignment, copying, privacy sanitation, image persistence, and share grants. Rotate during selection and OCR.
 - Shelf: add text and files via Share, restart the process, move collections, select multiple items, delete, and verify the private backing file is removed. Test oversized and revoked URI imports.
 - Sharing: single image, multiple images, plain text, and mixed selection to several apps, with and without WhatsApp installed. Cancel the chooser and reject a drag; source items must remain. Confirm no invisible full-screen window blocks the target after a drag.
 - Clipboard: off means no storage. With opt-in, test foreground and background copy, duplicate notifications, sensitive-text awareness, Shizuku restarts, and stopping the service. Confirm restrictions are visible when an OEM denies clipboard reads.
@@ -20,3 +18,11 @@ Run these checks on API 28, 30, 33, and 35+ devices, with gesture and three-butt
 - Graphics/accessibility: AGSL compilation/rendering on 33+, Canvas fallback on 28–32, unavailable haptic primitives, font scaling, TalkBack labels, narrow screens, and RTL. Profile real frame timing and memory with large screenshots and attachments before claiming 120 Hz.
 
 Release work also includes signing, privacy/store disclosures, foreground-service policy review, an accessibility declaration where distributed through Play, and device performance/stability qualification.
+
+## Google-only search and marker checks (0.5.0)
+
+- Select Google as digital assistant and enable native Circle to Search where the device offers it. Test button, bubble hold, notification and optional StashDrop assistant entry with Shizuku connected/disconnected.
+- Record whether Google shows Circle to Search, Gemini, no UI, or a rejection message. An accepted Binder request alone is not success. No StashDrop capture, lasso or consent screen should appear, including after updating from old Google-mode-off preferences.
+- Show the bubble and enable each marker gesture. Test center upward pull/flick, both diagonal up/inward corner swipes, center long-press and nearby double-tap. Each should request search once. Single tap, expired/distant taps, horizontal/outward/downward swipes, cancellation and multi-touch must not trigger search.
+- Check markers above three-button and gesture navigation, after preference changes, rotation, lock/unlock, keyboard open/close and service restart. They must not cover or replace system navigation.
+- Use [Windows ADB installation and logging](WINDOWS_DEVICE_TESTING.md). Review logs before sharing; cloud tests do not validate the connected tablet.

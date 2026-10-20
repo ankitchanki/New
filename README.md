@@ -3,14 +3,14 @@
 </p>
 
 <h1 align="center">StashDrop</h1>
-<p align="center"><strong>A little space. For everything.</strong><br/>A native Android floating shelf for notes, links, files, and visual cutouts.</p>
+<p align="center"><strong>A little space. For everything.</strong><br/>A native Android floating shelf for notes, links, files, and Google search gestures.</p>
 
 <p align="center">
   <img alt="Android 9 and newer" src="https://img.shields.io/badge/Android-9%2B-9DE3CF?style=flat-square&amp;logo=android&amp;logoColor=0C0E15" />
   <img alt="Target SDK 35" src="https://img.shields.io/badge/Target_SDK-35-B4C9FF?style=flat-square" />
   <img alt="Kotlin 2.1" src="https://img.shields.io/badge/Kotlin-2.1-9B72CB?style=flat-square&amp;logo=kotlin&amp;logoColor=white" />
   <img alt="Jetpack Compose" src="https://img.shields.io/badge/UI-Jetpack_Compose-4285F4?style=flat-square&amp;logo=jetpackcompose&amp;logoColor=white" />
-  <img alt="Signed release 0.4.0" src="https://img.shields.io/badge/Release-0.4.0-9DE3CF?style=flat-square" />
+  <img alt="Signed release 0.5.0" src="https://img.shields.io/badge/Release-0.5.0-9DE3CF?style=flat-square" />
 </p>
 
 <p align="center">
@@ -19,18 +19,18 @@
 
 ## What is StashDrop?
 
-Catch something useful without losing your place. Share a link into your shelf, save a note, circle part of the screen, extract text, and send a selection back to another app. A thumb-friendly floating dock keeps the shelf nearby, while spring motion and aurora shaders give each interaction a fluid visual language.
+Catch something useful without losing your place. Share a link into your shelf, save a note, open Google’s search interface, and send saved items back to another app. A thumb-friendly floating dock keeps the shelf nearby, while spring motion and aurora shaders give each interaction a fluid visual language.
 
-**Built with Kotlin, Jetpack Compose, Room, DataStore, ML Kit, and optional Shizuku.** The built-in OCR/barcode workflow uses bundled on-device models and needs no backend API key.
+**Built with Kotlin, Jetpack Compose, Room, DataStore, and optional Shizuku.** All Circle to Search actions request Google’s interface. The built-in capture, lasso and OCR workflow has been removed.
 
-**[Download the signed Android APK — v0.4.0](https://github.com/ankitchanki/StashDrop/releases/download/v0.4.0/StashDrop-v0.4.0.apk)** · [Release notes and checksums](https://github.com/ankitchanki/StashDrop/releases/tag/v0.4.0)
+**[Download the signed Android APK — v0.5.0](https://github.com/ankitchanki/StashDrop/releases/download/v0.5.0/StashDrop-v0.5.0.apk)** · [Release notes and checksums](https://github.com/ankitchanki/StashDrop/releases/tag/v0.5.0)
 
-Android 9+ · No account or backend API key · Local shelf storage · Optional Shizuku integration. The published release preserves the original production signing certificate for compatible updates. Its build passed **32 tests**, signature checks, and 16 KB alignment checks. Device/OEM behavior and native Google eligibility still need the [device checklist](docs/DEVICE_VALIDATION.md).
+Android 9+ · No account or backend API key · Local shelf storage · Optional Shizuku integration. The published release preserves the original production signing certificate for compatible updates. Its build passed **47 tests**, signature checks, and 16 KB alignment checks. Device/OEM behavior and native Google eligibility still need the [device checklist](docs/DEVICE_VALIDATION.md).
 
 ### Everyday workflows
 
 - **Keep a useful link:** use another app's Share menu → StashDrop. Tracking parameters are removed from saved text links; move the item into a collection and share it again later.
-- **Read text inside an image:** turn off **Use Google Circle to Search** in Settings, invoke search, allow capture, and circle the text. Copy the on-device recognition result, search it, or keep the image cutout.
+- **Search your screen with Google:** choose Google as digital assistant, enable the phone’s Circle to Search setting where available, then use the search button or a bottom marker. Google controls eligibility and may show Gemini instead.
 - **Send several saved items:** open the floating shelf, select cards, and use Share or WhatsApp. Global drag is available when the receiving app supports its content types.
 
 Read the [complete feature guide](docs/FEATURE_GUIDE.md), [architecture](docs/ARCHITECTURE.md), and [improvements and future UI roadmap](docs/ROADMAP.md).
@@ -52,13 +52,7 @@ These images render the **actual Compose components with sample content** using 
   </tr>
 </table>
 
-<table>
-  <tr><th>Floating shelf component</th><th>Circle to Search selection canvas</th></tr>
-  <tr>
-    <td width="50%" align="center"><a href="docs/assets/screenshots/floating-shelf.png"><img src="docs/assets/screenshots/floating-shelf.png" alt="Implemented floating shelf sheet showing sample stash cards" width="320" /></a></td>
-    <td width="50%" align="center"><a href="docs/assets/screenshots/circle-canvas.png"><img src="docs/assets/screenshots/circle-canvas.png" alt="Implemented iridescent lasso canvas over clearly identified sample artwork" width="320" /></a></td>
-  </tr>
-</table>
+<p align="center"><img src="docs/assets/screenshots/floating-shelf.png" alt="Native floating shelf with sample cards" width="320" /></p>
 
 <details>
 <summary><strong>See all Settings in one long-form render</strong></summary>
@@ -99,17 +93,15 @@ Explore [shaders](app/src/main/java/com/vibe/stashdrop/core/shaders), [physics](
 | Local stash shelf | Notes, links, files/images, collections, multi-selection, batch share/move and confirmed deletion | Room + private app files |
 | Share into StashDrop | Android `SEND` and `SEND_MULTIPLE` receivers | Up to 30 attachments; 50 MB per attachment |
 | Google Circle to Search | Opens Google's own Circle to Search from the bubble, bottom swipe, notification and Settings | Google voice service must be active; Google decides device eligibility |
-| StashDrop circle screen | Built-in fallback: capture, freehand lasso, Google search of circled text, Lens, copy/stash/share | Capture permission or consent required |
-| Offline text & codes | Bundled Latin-script ML Kit text recognition and barcode scanning | Built-in path; no backend key |
 | Digital assistant | Choose StashDrop for assistant gestures; optional Shizuku Connect keeps Google's voice service available for native search | Android 10+ assistant management; device gesture support varies |
 | Crash reports | The last crash is shown at launch with a Copy button | Stored only on the phone |
-| In-app setup | Overlay, notifications, screenshot access and assistant status with one-tap fixes | Optional Shizuku automation; manual system settings remain available |
-| Haptic feedback | Detents while dragging the bubble and drawing a circle; clicks when stacking cards | Toggle in Settings |
+| In-app setup | Overlay, notifications and Google assistant status with one-tap fixes | Optional Shizuku automation; manual system settings remain available |
+| Haptic feedback | Detents while dragging the bubble and pulling a marker; clicks when stacking cards | Toggle in Settings |
 | Clean links | Removes `utm_*`, `fbclid`, `gclid`, `si`, `igshid`, `ref`, and related tracking keys | Preserves raw query encoding and prose punctuation |
 | Background text clipboard | Opt-in shell listener plus permitted foreground fallback | Shizuku/OEM access rules apply; off by default |
 | Multi-select & global drag | Selection stack, custom drag shadow, URI read grants | Receiver must accept the content |
 | WhatsApp & standard sharing | Single/multiple attachment intents with text | App and MIME compatibility dependent |
-| Gesture strips | Swipe up, corner pull, 400 ms hold, double tap | Strips and swipe-up enabled by default; require the running overlay; other gestures off by default |
+| Gesture strips | Swipe up, corner pull, system-timed hold, double tap | Strips and swipe-up enabled by default; require the running overlay; other gestures off by default |
 | Assistant management | Shizuku setting change with saved values for restoration | Explicit Settings actions; system/OEM support varies |
 
 For instructions, defaults, storage behavior, and troubleshooting for every feature, see the [feature guide](docs/FEATURE_GUIDE.md).
@@ -150,18 +142,20 @@ Gesture, clipboard, haptic, and spring settings now live in **Settings → Gestu
 
 1. Install the signed APK above and open **Settings → Setup**. Allow the floating bubble; enable notifications where required. Shizuku is optional, and its setup shortcuts require a running, authorized Shizuku service.
 2. On **Home**, tap **Show floating bubble**. Tap the bubble to open the shelf; hold it to search. Drag to the bottom X to hide it.
-3. In **Settings → Search & assistant**, leave **Use Google Circle to Search** on to request Google's UI. If Gemini opens instead, turn the toggle off for StashDrop's built-in capture/lasso workflow.
-4. The built-in path tries Shizuku capture, then enabled accessibility screenshot access on Android 11+, then asks for screen-sharing consent. Circle an area and choose Search, Lens, Copy, Stash, or Share.
-5. Add a note from **Shelf**, or share text, photos, and files into StashDrop from other apps. Bottom gesture strips and swipe-up start enabled; corner swipe, strip hold, and double tap start disabled. **Auto-stash copied text starts off.**
-6. Optionally choose StashDrop under **Settings → Digital assistant** for supported system assistant gestures. With StashDrop selected, **Connect Google** through Shizuku can keep Google's voice service active. Google's eligibility rules still apply. See [assistant setup](docs/FEATURE_GUIDE.md#digital-assistant-and-shizuku).
+3. Choose **Google** in the system digital assistant picker. Enable **Circle to Search** in your phone’s navigation settings where offered. Use **Settings → Search & assistant → Try Google search**. Connect authorized Shizuku if the app-level session request is blocked.
+4. Open **Settings → Gestures, clipboard & feel**. Swipe-up starts enabled; enable corner swipe, hold and double-tap individually. Start on the visible markers above system navigation: center for swipe/hold/taps, sides for diagonal up-and-inward swipes. Strips hide in landscape, on lock and while the keyboard is visible.
+5. Add a note from Shelf or share text, photos and files into StashDrop. Auto-stash copied text starts off.
+6. Advanced: **Digital assistant → Use StashDrop now** with Shizuku can route system assist gestures through StashDrop while connecting Google’s voice service. Android/OEM support varies; **Restore previous** and the system picker remain available. See [assistant setup](docs/FEATURE_GUIDE.md#digital-assistant-and-shizuku).
+
+Google controls the UI after accepting a request. Installing StashDrop cannot unlock native Circle to Search on unsupported devices. Rejected requests show setup guidance; they never start an internal search screen.
 
 ## Signed releases and changelog
 
-Version `0.4.0` uses Android version code `7` and the original StashDrop production certificate. Earlier builds signed with that certificate can be updated in place. Signed APK/app-bundle packages include checksums, the public certificate, and a verification report. Version-tag builds use [GitHub Actions](.github/workflows/android.yml); the four signing secrets must be configured before publication. Private signing keys are kept separately.
+Version `0.5.0` uses Android version code `8` and the original StashDrop production certificate. Earlier builds signed with that certificate can be updated in place. Signed APK/app-bundle packages include checksums, the public certificate, and a verification report. Version-tag builds use [GitHub Actions](.github/workflows/android.yml); the four signing secrets must be configured before publication. Private signing keys are kept separately.
 
 - [Changelog](CHANGELOG.md)
-- [Version 0.4.0 notes](docs/releases/v0.4.0.md)
-- [Version 0.4.0 signed build verification](docs/releases/v0.4.0-verification.json)
+- [Version 0.5.0 notes](docs/releases/v0.5.0.md)
+- [Version 0.5.0 signed build verification](docs/releases/v0.5.0-verification.json)
 - [Version 0.3.1 notes](docs/releases/v0.3.1.md)
 - [Version 0.3.0 notes](docs/releases/v0.3.0.md)
 - [Version 0.2.0 notes](docs/releases/v0.2.0.md)
@@ -178,23 +172,18 @@ flowchart LR
     Share[Android Share or note] --> Shelf[Local stash shelf]
     Copy[Opt-in text clipboard] --> Clean[URL privacy sanitizer]
     Clean --> Shelf
-    Dock[Bubble, gestures or assistant entry] --> Route{Google mode enabled?}
-    Route -->|Request accepted| Native[Google UI on eligible devices]
-    Route -->|Off or request fails| Capture[Screen capture or consent]
-    Capture --> Circle[Lasso selection]
-    Circle --> ML[On-device OCR and barcodes]
-    ML --> Actions[Copy or web search]
-    Circle --> ImageActions[Stash, Lens or share cutout]
-    ImageActions --> Shelf
+    Dock[Bubble, markers or assistant entry] --> Route{Google voice service available?}
+    Route -->|Accepted request| Native[Google controls search UI]
+    Route -->|Missing or rejected| Help[Google setup guidance]
     Shelf --> Out[Share or supported global drag]
 ```
 
-[Architecture and data flow](docs/ARCHITECTURE.md) explains the services, storage, capture fallbacks, and external-app boundaries.
+[Architecture and data flow](docs/ARCHITECTURE.md) explains the services, storage, Google routing, and external-app boundaries.
 
 ```text
 app/src/main/java/com/vibe/stashdrop/
 ├── core/
-│   ├── shizuku/       Binder lifecycle, shell bridge, settings and capture
+│   ├── shizuku/       Binder lifecycle, shell bridge, settings and Google requests
 │   ├── shaders/       Aurora, metaballs and specular glass
 │   ├── physics/       Spring specs and magnetic trajectories
 │   ├── diagnostics/   Local crash reporting
@@ -203,7 +192,7 @@ app/src/main/java/com/vibe/stashdrop/
 ├── features/
 │   ├── floatingdock/  Overlay service, gestures, icon and fan-out shelf
 │   ├── dragdrop/      Global stack shadow and in-app flight feedback
-│   ├── circletosearch/ Capture routing, lasso, ML Kit and Lens sharing
+│   ├── circletosearch/ Google-only routing and Android sharing
 │   ├── stashshelf/    Room, private files, collections and URL cleaning
 │   └── clipboard/     Opt-in Shizuku text clipboard listener
 └── ui/
@@ -213,17 +202,17 @@ app/src/main/java/com/vibe/stashdrop/
 
 ## Data and permissions
 
-Stash content lives in the app's private database and files. FileProvider exposes selected attachments with temporary read grants. Clipboard text is not logged; the bounded history table stores digests rather than duplicate payloads. Auto-stash can retain sensitive copied text and is **off by default**. Delete saved items from the Shelf tab. Uninstalling removes the shelf; there is no in-app backup/restore or cloud sync. Lens and Share in the built-in circle screen save the selected cutout to the shelf before passing its URI to another app. Web search, Lens, native Google search, and sharing are explicit external actions governed by their receiving apps.
+Stash content lives in the app's private database and files. FileProvider exposes selected attachments with temporary read grants. Clipboard text is not logged; the bounded history table stores digests rather than duplicate payloads. Auto-stash can retain sensitive copied text and is **off by default**. Delete saved items from the Shelf tab. Uninstalling removes the shelf; there is no in-app backup/restore or cloud sync. Native Google search and sharing are explicit external actions governed by their receiving apps.
 
-Shizuku and accessibility are optional capabilities. The built-in path can ask for MediaProjection consent instead. StashDrop does not bypass protected/DRM content, and a successful Binder call does not prove that Google's UI appeared.
+Shizuku is optional for the shelf and provides a privileged Google session request when connected. StashDrop no longer declares screenshot accessibility or MediaProjection services. A successful Binder call does not prove that Google’s UI appeared.
 
 ## Verification
 
-The published **0.4.0** build passed **32 tests** with no failures, errors, or skips. Debug and release lint each reported **zero errors and 42 warnings**. APK/AAB signatures match the original production certificate; APK ZIP and bundled 64-bit native library alignment passed 16 KB checks. The [successful release workflow](https://github.com/ankitchanki/StashDrop/actions/workflows/android.yml) and [verification report](docs/releases/v0.4.0-verification.json) record the checked scope.
+The published **0.5.0** build passed **47 tests** with no failures, errors, or skips. Debug and release lint each reported **zero errors and 38 warnings**. APK/AAB signatures match the original production certificate; APK ZIP and bundled 64-bit native library alignment passed 16 KB checks. The [successful release workflow](https://github.com/ankitchanki/StashDrop/actions/workflows/android.yml) and [verification report](docs/releases/v0.5.0-verification.json) record the checked scope.
 
 Paparazzi renders the README gallery from the production Compose components. The dedicated [interaction settings screen](docs/assets/screenshots/interactions.png) is also rendered from production Compose.
 
-See [the visual guide](docs/UI_GALLERY.md) for regeneration. Rendering previews does not validate foreground services, capture grants, clipboard access, Google eligibility, WhatsApp drops, or real-device performance.
+See [the visual guide](docs/UI_GALLERY.md) for regeneration. Rendering previews does not validate foreground services, Google hand-off, clipboard access, Google eligibility, WhatsApp drops, or real-device performance.
 
 - [Native UI implementation checks](docs/NATIVE_UI_QA.md)
 - [Build verification](docs/VERIFICATION.md)
@@ -233,13 +222,13 @@ See [the visual guide](docs/UI_GALLERY.md) for regeneration. Rendering previews 
 
 ## Improvements and future UI
 
-Version 0.4.0 implements the SVG direction in native Compose: refreshed Home/Shelf/Settings, a dedicated interaction page, main-Shelf batch actions, deletion confirmation, and clipboard opt-in confirmation. The next priorities are broader device validation, accessible layouts, and safer recovery. Proposed UI work keeps the current Home / Shelf / Settings structure while adding clearer search-mode status, better item previews, reachable selection actions, reduced motion, and layouts for large text and larger screens.
+Version 0.5.0 implements the SVG direction in native Compose: refreshed Home/Shelf/Settings, a dedicated interaction page, main-Shelf batch actions, deletion confirmation, and clipboard opt-in confirmation. The next priorities are broader device validation, accessible layouts, and safer recovery. Proposed UI work keeps the current Home / Shelf / Settings structure while adding clearer Google readiness status, better item previews, reachable selection actions, reduced motion, and layouts for large text and larger screens.
 
-Shelf search, richer filtering, undo deletion, backup/restore, extra OCR scripts, and theme customization are **proposals**, with no committed release date. The [roadmap](docs/ROADMAP.md) explains the problems, suggested UI, acceptance checks, and technical limits for each direction.
+Shelf search, richer filtering, undo deletion, backup/restore, and theme customization are **proposals**, with no committed release date. The [roadmap](docs/ROADMAP.md) explains the problems, suggested UI, acceptance checks, and technical limits for each direction.
 
 ### Interactive SVG UI design
 
-Explore a [nine-screen editable SVG overview](docs/design/stashdrop-ui-overview.svg) and a [browser interaction prototype](docs/design/README.md) covering navigation, notes, collections, sharing, settings, capture/lasso, and floating-dock gestures. The browser files remain UI concepts with simulated Android/external actions; the 0.4.0 APK implements the corresponding native layouts and connects to the real app features.
+Explore a [nine-screen editable SVG overview](docs/design/stashdrop-ui-overview.svg) and a [browser interaction prototype](docs/design/README.md) covering navigation, notes, collections, sharing, settings, capture/lasso, and floating-dock gestures. These historical browser concepts predate Google-only search; their capture/selection screens are no longer app features. Current native screens appear in the gallery above.
 
 **[Download the complete SVG design package](https://raw.githubusercontent.com/ankitchanki/StashDrop/main/docs/design/downloads/StashDrop-UI-Design.zip)**, extract it, and open `index.html`.
 
@@ -255,7 +244,7 @@ Explore a [nine-screen editable SVG overview](docs/design/stashdrop-ui-overview.
 | Guide | Covers |
 | --- | --- |
 | [Feature guide](docs/FEATURE_GUIDE.md) | Every current feature, defaults, how to use it, and troubleshooting |
-| [Architecture](docs/ARCHITECTURE.md) | Components, capture/search routing, storage, sharing, and security boundaries |
+| [Architecture](docs/ARCHITECTURE.md) | Components, Google routing, storage, sharing, and security boundaries |
 | [Roadmap and future UI](docs/ROADMAP.md) | Prioritized improvements and proposed screen designs |
 | [Visual gallery](docs/UI_GALLERY.md) | Current UI renders, animations, provenance, and regeneration |
 | [Platform support](docs/PLATFORM_SUPPORT.md) | Android versions, permissions, OEM restrictions, and fallbacks |
@@ -265,7 +254,7 @@ Explore a [nine-screen editable SVG overview](docs/design/stashdrop-ui-overview.
 
 ## Topics
 
-[android-app](https://github.com/topics/android-app) · [android-application](https://github.com/topics/android-application) · [productivity](https://github.com/topics/productivity) · [productivity-app](https://github.com/topics/productivity-app) · [shizuku](https://github.com/topics/shizuku) · [shizuku-android](https://github.com/topics/shizuku-android) · [shizuku-app](https://github.com/topics/shizuku-app) · [android](https://github.com/topics/android) · [kotlin](https://github.com/topics/kotlin) · [jetpack-compose](https://github.com/topics/jetpack-compose) · [material3](https://github.com/topics/material3) · [floating-window](https://github.com/topics/floating-window) · [circle-to-search](https://github.com/topics/circle-to-search) · [ocr](https://github.com/topics/ocr) · [ml-kit](https://github.com/topics/ml-kit) · [clipboard-manager](https://github.com/topics/clipboard-manager) · [screen-capture](https://github.com/topics/screen-capture) · [drag-and-drop](https://github.com/topics/drag-and-drop) · [privacy](https://github.com/topics/privacy) · [agsl](https://github.com/topics/agsl)
+[android-app](https://github.com/topics/android-app) · [android-application](https://github.com/topics/android-application) · [productivity](https://github.com/topics/productivity) · [productivity-app](https://github.com/topics/productivity-app) · [shizuku](https://github.com/topics/shizuku) · [shizuku-android](https://github.com/topics/shizuku-android) · [shizuku-app](https://github.com/topics/shizuku-app) · [android](https://github.com/topics/android) · [kotlin](https://github.com/topics/kotlin) · [jetpack-compose](https://github.com/topics/jetpack-compose) · [material3](https://github.com/topics/material3) · [floating-window](https://github.com/topics/floating-window) · [circle-to-search](https://github.com/topics/circle-to-search) · [clipboard-manager](https://github.com/topics/clipboard-manager) · [drag-and-drop](https://github.com/topics/drag-and-drop) · [privacy](https://github.com/topics/privacy) · [agsl](https://github.com/topics/agsl) · [google-assistant](https://github.com/topics/google-assistant) · [gestures](https://github.com/topics/gestures)
 
 The About description and 20 desired topics are maintained in [repository metadata](.github/repository-metadata.json). An owner with repository administration access can run `python scripts/apply-github-metadata.py`; the helper preserves existing topics and stops with an explanation if their union would exceed GitHub's 20-topic limit.
 

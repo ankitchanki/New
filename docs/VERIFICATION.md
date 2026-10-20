@@ -1,6 +1,6 @@
 # Validation performed
 
-**Current signed release build: [0.4.0](releases/v0.4.0-verification.json).** The native UI implementation passed 32 tests with no failures/errors/skips, eight production rendering checks, debug/release lint with zero errors and 42 warnings each, original-certificate continuity, APK/AAB signatures, and 16 KB ZIP/native-library alignment. [Release downloads](https://github.com/ankitchanki/StashDrop/releases/tag/v0.4.0) and [the Actions workflow](https://github.com/ankitchanki/StashDrop/actions/workflows/android.yml) provide the published artifacts and CI evidence. See [native UI QA](NATIVE_UI_QA.md) for scope; no physical phone or emulator was attached.
+**Current signed release build: [0.5.0](releases/v0.5.0-verification.json).** Google-only routing and gesture changes passed 47 tests with no failures/errors/skips, seven production renders, debug/release lint with zero errors and 38 warnings each, original-certificate continuity, APK/AAB signatures and 16 KB ZIP/native-library alignment. [Release downloads](https://github.com/ankitchanki/StashDrop/releases/tag/v0.5.0) and [Actions](https://github.com/ankitchanki/StashDrop/actions/workflows/android.yml) provide artifacts and CI evidence. No physical phone or emulator was attached; Google/OEM behavior requires device validation.
 
 The sections below preserve historical results; earlier access/secret failures are not the current release status.
 
@@ -63,3 +63,12 @@ The debug APK uses a development key. Release signing and minification were not 
 - Eight regenerated README image copies match the production baselines and gallery manifest.
 - Debug/release lint completed with zero errors and 42 warnings each. APK v3/AAB signatures and original certificate continuity passed; APK ZIP and bundled 64-bit native library alignments passed 16 KB checks.
 - [The versioned verification report](releases/v0.4.0-verification.json) contains the executed scope. Private signing credentials stayed outside Git and public assets.
+
+## Signed version 0.5.0 Google-only search
+
+- All 47 tests passed, none failed/errored/skipped: 12 logic tests, 4 Google-only routing tests, 14 API 28/35 gesture cases, 6 floating-service regressions, 4 dashboard interaction tests and 7 production renders.
+- Google missing/inactive/rejected and persisted old built-in preferences never start an internal activity. Real MotionEvents cover corner directions, upward swipe, hold/taps, timeout/distance, movement/cancellation/multi-touch and view preservation across unchanged settings.
+- Debug/release lint each reported zero errors and 38 warnings. The signed APK/AAB preserve the original production certificate. ZIP/native 16 KB alignment checks passed.
+- Release manifest inspection confirms the removed capture/search activities and services, and MediaProjection foreground-service permission are absent. Bundled ML Kit models are removed. Existing shelf database/package identity are unchanged.
+- Seven updated gallery copies match their source-rendered baselines and manifest hashes. These are host renders, not phone screenshots or Google UI evidence.
+- No tablet installation, Google session outcome, OS gesture interception or real-device performance is claimed. Use the [Windows device guide](WINDOWS_DEVICE_TESTING.md) for local testing.

@@ -193,20 +193,20 @@ class OneUiThumbDockService: LifecycleService(), SavedStateRegistryOwner, ViewMo
         if(searchJob?.isActive==true) return
         haptics.confirm(); hideSheet(); idleJob?.cancel()
         searchJob=lifecycleScope.launch(ui) {
-            var google=false
             try {
                 val velocity=waveProgress.velocity
                 waveJob?.cancel()
                 waveJob=launch { waveProgress.animateTo(1f,IosSpringSpecs.follow(),initialVelocity=velocity) }
                 delay(220)
                 waveJob?.cancel(); waveProgress.snapTo(0f)
+                bar.close()
                 dock.visibility=View.INVISIBLE; wave.visibility=View.INVISIBLE
                 delay(80) // Let SurfaceFlinger remove our overlay before screenshot acquisition.
-                google=CircleToSearchOrchestrator(this@OneUiThumbDockService).launch()
+                val google=CircleToSearchOrchestrator(this@OneUiThumbDockService).launch()
                 if(google) delay(900) // Keep the bubble out of Google's screenshot.
             } catch(e: CancellationException) { throw e
             } catch(e: Exception) { report("Circle to Search",e) }
-            finally { dock.visibility=View.VISIBLE; wave.visibility=View.VISIBLE; schedulePeek() }
+            finally { dock.visibility=View.VISIBLE; wave.visibility=View.VISIBLE; configureBar(); schedulePeek() }
         }
     }
     private fun dragDock(amount: Offset) {

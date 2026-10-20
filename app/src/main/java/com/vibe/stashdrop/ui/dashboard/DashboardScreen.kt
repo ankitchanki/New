@@ -40,10 +40,10 @@ import com.vibe.stashdrop.ui.theme.*
 import kotlinx.coroutines.launch
 
 /** What the device has granted StashDrop; each missing item can be fixed from the Settings tab. */
-data class SetupState(val overlay: Boolean = false, val notifications: Boolean = true, val accessibility: Boolean = false,
+data class SetupState(val overlay: Boolean = false, val notifications: Boolean = true,
     val assistant: Boolean = false, val assistantSupported: Boolean = true, val google: GoogleState = GoogleState.READY,
     val crash: String? = null) {
-    val complete get() = overlay && notifications && accessibility
+    val complete get() = overlay && notifications
 }
 /** Whether Google's Circle to Search can be opened from StashDrop. */
 enum class GoogleState(val label: String) {
@@ -57,7 +57,7 @@ class DashboardActions(
     val preference: (String,Boolean)->Unit = {_,_->}, val bounce: (Float)->Unit = {},
     val addText: (String)->Unit = {}, val delete: (StashItemEntity)->Unit = {},
     val share: (List<StashItemEntity>,Boolean)->Unit = {_,_->}, val collect: (StashItemEntity,String)->Unit = {_,_->},
-    val allowOverlay: ()->Unit = {}, val allowNotifications: ()->Unit = {}, val enableAccessibility: ()->Unit = {},
+    val allowOverlay: ()->Unit = {}, val allowNotifications: ()->Unit = {},
     val makeAssistant: ()->Unit = {}, val restoreAssistant: ()->Unit = {}, val setupAll: ()->Unit = {},
     val chooseAssistant: ()->Unit = {}, val linkGoogle: ()->Unit = {}, val copyCrash: (String)->Unit = {}, val dismissCrash: ()->Unit = {},
     val messageShown: ()->Unit = {},
@@ -119,7 +119,7 @@ fun DashboardScreen(items: List<StashItemEntity>, settings: StashSettings, shizu
                         Icon(Icons.Outlined.Layers,null,Modifier.size(20.dp)); Spacer(Modifier.width(10.dp))
                         Text(if(running) "Hide floating bubble" else if(setup.overlay) "Show floating bubble" else "Allow floating bubble")
                     }
-                    ActionRow("Circle to Search",if(settings.googleCircle) "Google route · eligibility varies" else "Built-in · circle, copy, save",Icons.Outlined.CropFree,actions.search)
+                    ActionRow("Circle to Search","Google only · eligibility varies",Icons.Outlined.CropFree,actions.search)
                     ActionRow("Setup & connections",if(setup.complete) "Review access and integrations" else "A few permissions, at your pace",Icons.Outlined.Tune) {tab=2}
                     SectionTitle("Recent","${items.size} saved") { TextButton(onClick={tab=1}) { Text("See all") } }
                     if(items.isEmpty()) EmptyCard { adding=true }
@@ -145,12 +145,12 @@ fun DashboardScreen(items: List<StashItemEntity>, settings: StashSettings, shizu
                     Text("Share text, images or files to StashDrop from another app's Share menu.",style=MaterialTheme.typography.bodySmall,color=MaterialTheme.colorScheme.onSurfaceVariant)
                 }
                 interactions -> {
-                    Headline("Your way.","Gesture strips run with the floating bubble.")
-                    Card { SettingSwitch("Gesture strips","Touch areas above the navigation bar",settings.gesturesEnabled) {actions.preference("bar",it)} }
+                    Headline("Your way.","Show the floating bubble, then use the bottom markers. Enable each gesture below. These markers are separate from Android’s own navigation gestures.")
+                    Card { SettingSwitch("Gesture strips","Visible markers above the system navigation area",settings.gesturesEnabled) {actions.preference("bar",it)} }
                     Card { SettingSwitch("Swipe up","Pull up 64 dp or flick to search",settings.gestures.swipe) {actions.preference("swipe",it)} }
-                    Card { SettingSwitch("Corner swipe","Pull inward from either corner",settings.gestures.corners) {actions.preference("corners",it)} }
-                    Card { SettingSwitch("Press and hold","Hold the strip for 400 ms",settings.gestures.hold) {actions.preference("hold",it)} }
-                    Card { SettingSwitch("Double tap","Two taps within 300 ms",settings.gestures.doubleTap) {actions.preference("double",it)} }
+                    Card { SettingSwitch("Corner swipe","Swipe diagonally up and inward on a corner marker",settings.gestures.corners) {actions.preference("corners",it)} }
+                    Card { SettingSwitch("Press and hold","Hold the center marker until it responds",settings.gestures.hold) {actions.preference("hold",it)} }
+                    Card { SettingSwitch("Double tap","Tap the center marker twice quickly",settings.gestures.doubleTap) {actions.preference("double",it)} }
                     Card { SettingSwitch("Auto-stash copied text","May retain passwords, codes or private text",settings.autoStash) {
                         if(it) confirmClipboard=true else actions.preference("auto",false)
                     } }
@@ -174,13 +174,13 @@ fun DashboardScreen(items: List<StashItemEntity>, settings: StashSettings, shizu
                     Card { SetupRow(Icons.Outlined.Notifications,"Notifications",setup.notifications,"Allow",actions.allowNotifications) }
                     Card { SetupRow(Icons.Outlined.Hub,"Shizuku",shizuku.connected,if(shizuku.granted) "Check" else "Connect",actions.connectShizuku,
                         statusText=if(shizuku.connected) "Bridge connected" else shizuku.message) }
-                    Card { SetupRow(Icons.Outlined.Screenshot,"Screenshot access",setup.accessibility,"Turn on",actions.enableAccessibility,
-                        statusText=if(setup.accessibility) "Accessibility enabled" else if(shizuku.connected) "Shizuku or capture consent available" else "Optional · capture consent is also available") }
-                    SectionTitle("Search & assistant","Choose a route")
+                    SectionTitle("Search & assistant","Google only")
                     Card {
-                        SettingSwitch("Use Google Circle to Search",if(settings.googleCircle) setup.google.label else "Built-in capture and on-device OCR",settings.googleCircle) {actions.preference("google_cts",it)}
-                        Text("Gemini opens instead? Turn Google mode off.",Modifier.padding(horizontal=16.dp),style=MaterialTheme.typography.bodySmall,color=MaterialTheme.colorScheme.onSurfaceVariant)
-                        TextButton(onClick=actions.search,modifier=Modifier.padding(horizontal=8.dp)) { Icon(Icons.Outlined.CropFree,null,Modifier.size(18.dp)); Spacer(Modifier.width(6.dp)); Text("Try it now") }
+                        Text("Google Circle to Search",Modifier.padding(horizontal=16.dp,vertical=8.dp),style=MaterialTheme.typography.titleSmall)
+                        Text(setup.google.label,Modifier.padding(horizontal=16.dp),style=MaterialTheme.typography.bodySmall,color=MaterialTheme.colorScheme.onSurfaceVariant)
+                        Text("All search buttons and gestures request Google's interface. Google may show Gemini on unsupported devices. Enable Circle to Search in your phone's navigation settings; StashDrop cannot unlock eligibility.",Modifier.padding(16.dp),style=MaterialTheme.typography.bodySmall,color=MaterialTheme.colorScheme.onSurfaceVariant)
+                        TextButton(onClick=actions.chooseAssistant) { Text("Choose Google assistant") }
+                        TextButton(onClick=actions.search) { Text("Try Google search") }
                     }
                     if(setup.assistantSupported) {
                         ActionRow("Digital assistant",when {

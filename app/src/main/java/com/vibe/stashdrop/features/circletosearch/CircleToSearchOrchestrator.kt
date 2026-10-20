@@ -1,34 +1,19 @@
 package com.vibe.stashdrop.features.circletosearch
 
-import android.content.*
+import android.content.Context
 import android.widget.Toast
-import com.vibe.stashdrop.core.shizuku.*
-import com.vibe.stashdrop.stashApp
-import kotlinx.coroutines.flow.first
 
-/** Opens Google Circle to Search when enabled and reachable; otherwise StashDrop's built-in circle screen. */
+/** All entry points request Google. Failure never starts a StashDrop capture or search activity. */
 class CircleToSearchOrchestrator(private val context: Context) {
-    /** @return true when Google's Circle to Search was requested (the caller should not draw over it). */
+    /** True means Android accepted the request, not proof that Google displayed Circle to Search. */
     suspend fun launch(): Boolean {
-        if (context.stashApp.preferences.settings.first().googleCircle) {
-            if (GoogleCircleToSearch.launch(context)) return true
-            val reason = when (GoogleCircleToSearch.readiness(context)) {
-                GoogleCircleToSearch.Readiness.GOOGLE_MISSING -> "Google app not found"
-                GoogleCircleToSearch.Readiness.GOOGLE_NOT_ASSISTANT -> "Connect Google in StashDrop Settings"
-                GoogleCircleToSearch.Readiness.READY -> "Google did not respond"
-            }
-            Toast.makeText(context, "$reason · using StashDrop circle", Toast.LENGTH_SHORT).show()
+        if (GoogleCircleToSearch.launch(context)) return true
+        val reason = when (GoogleCircleToSearch.readiness(context)) {
+            GoogleCircleToSearch.Readiness.GOOGLE_MISSING -> "Install or enable the Google app first"
+            GoogleCircleToSearch.Readiness.GOOGLE_NOT_ASSISTANT -> "Choose Google as your digital assistant in system settings, or connect Google in StashDrop Settings"
+            GoogleCircleToSearch.Readiness.READY -> "Google search request was blocked. Connect Shizuku and enable Circle to Search in your phone's navigation settings. Device support is required."
         }
-        launchBuiltIn()
+        Toast.makeText(context, reason, Toast.LENGTH_LONG).show()
         return false
-    }
-    suspend fun launchBuiltIn() {
-        val captured = runCatching { SurfaceScreenCapturer(context).capture() }
-        if (captured.isSuccess) {
-            CapturedFrame.put(captured.getOrThrow())
-            context.startActivity(Intent(context, CircleSearchActivity::class.java).addFlags(Intent.FLAG_ACTIVITY_NEW_TASK))
-        } else {
-            context.startActivity(Intent(context, CaptureConsentActivity::class.java).addFlags(Intent.FLAG_ACTIVITY_NEW_TASK))
-        }
     }
 }

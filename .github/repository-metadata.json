@@ -1,7 +1,7 @@
 {
   "repository": "ankitchanki/StashDrop",
   "name": "StashDrop",
-  "description": "A native Android floating shelf for notes, clean links, files, and screen cutouts. Google Circle to Search or built-in on-device OCR, collections, cross-app sharing, fluid Compose UI, and optional Shizuku integration. Android 9+.",
+  "description": "Native Android floating stash shelf with Google-only Circle to Search requests, visible gesture markers, local collections, sharing and optional Shizuku.",
   "topics": [
     "android-app",
     "android-application",
@@ -16,12 +16,11 @@
     "material3",
     "floating-window",
     "circle-to-search",
-    "ocr",
-    "ml-kit",
     "clipboard-manager",
-    "screen-capture",
     "drag-and-drop",
     "privacy",
-    "agsl"
+    "agsl",
+    "google-assistant",
+    "gestures"
   ]
 }

@@ -1,8 +1,6 @@
 package com.vibe.stashdrop.features.circletosearch
 
-import android.app.Activity
 import android.content.*
-import android.net.Uri
 import com.vibe.stashdrop.features.stashshelf.*
 
 object VisualLensBridge {
@@ -29,14 +27,5 @@ object VisualLensBridge {
         }
         if (whatsapp && intent.resolveActivity(context.packageManager) != null) context.startActivity(intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK))
         else context.startActivity(Intent.createChooser(intent.setPackage(null), "Share from StashDrop").addFlags(Intent.FLAG_ACTIVITY_NEW_TASK))
-    }
-    fun lens(context: Context, uri: Uri) {
-        // Lens has no stable public image deep-link; offer its ACTION_SEND receiver when installed.
-        val intent = Intent(Intent.ACTION_SEND).setType("image/png").putExtra(Intent.EXTRA_STREAM, uri)
-            .apply { clipData = ClipData.newRawUri("Circle cutout", uri) }.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
-        intent.setPackage("com.google.ar.lens")
-        if (intent.resolveActivity(context.packageManager) == null) intent.setPackage("com.google.android.googlequicksearchbox")
-        if (intent.resolveActivity(context.packageManager) == null) intent.setPackage(null)
-        context.startActivity(Intent.createChooser(intent, "Search image with").addFlags(Intent.FLAG_ACTIVITY_NEW_TASK))
     }
 }

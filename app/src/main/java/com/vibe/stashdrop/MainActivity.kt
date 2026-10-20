@@ -6,7 +6,6 @@ import android.content.pm.PackageManager
 import android.net.Uri
 import android.os.*
 import android.provider.Settings
-import android.view.accessibility.AccessibilityManager
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
@@ -34,12 +33,9 @@ class MainActivity: ComponentActivity() {
     private var message by mutableStateOf("")
     override fun onResume() { super.onResume(); stashApp.shizuku.refresh(); refreshSetup() }
     private fun refreshSetup() {
-        val accessibility=getSystemService(AccessibilityManager::class.java)
-            .getEnabledAccessibilityServiceList(android.accessibilityservice.AccessibilityServiceInfo.FEEDBACK_ALL_MASK)
-            .any { it.resolveInfo.serviceInfo.packageName==packageName }
         setup=SetupState(overlay=Settings.canDrawOverlays(this),
             notifications=Build.VERSION.SDK_INT<33 || ContextCompat.checkSelfPermission(this,Manifest.permission.POST_NOTIFICATIONS)==PackageManager.PERMISSION_GRANTED,
-            accessibility=accessibility,assistant=assistant.isDefault(),assistantSupported=assistant.supported,
+            assistant=assistant.isDefault(),assistantSupported=assistant.supported,
             google=when(GoogleCircleToSearch.readiness(this)) {
                 GoogleCircleToSearch.Readiness.READY -> GoogleState.READY
                 GoogleCircleToSearch.Readiness.GOOGLE_NOT_ASSISTANT -> GoogleState.NOT_ASSISTANT
@@ -94,13 +90,10 @@ class MainActivity: ComponentActivity() {
                 else if(Build.VERSION.SDK_INT>=33) notificationPermission.launch(Manifest.permission.POST_NOTIFICATIONS)
                 else open(notificationSettings)
             },
-            enableAccessibility={ shizukuOr({ assistant.grantSetup() },Intent(Settings.ACTION_ACCESSIBILITY_SETTINGS)) },
             makeAssistant={ shizukuOr({ assistant.makeDefault() },*defaultApps) },
             restoreAssistant={ shizukuOr({ assistant.restore() },*defaultApps) },
             setupAll={ shizukuOr({
-                val granted=assistant.grantSetup()
-                val role=if(assistant.supported) assistant.makeDefault() else null
-                listOfNotNull(granted,role).joinToString(" · ")
+                assistant.grantSetup()
             }) },
             chooseAssistant={ open(*defaultApps) },
             linkGoogle={ shizukuOr({ assistant.linkGoogle() }) },

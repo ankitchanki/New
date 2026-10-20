@@ -1,5 +1,7 @@
 # Native SVG-design implementation: 0.4.0
 
+> Historical 0.4.0 QA record. The 0.5.0 app removes the internal capture/circle workflow; see [current verification](VERIFICATION.md) and [Google-only feature guide](FEATURE_GUIDE.md).
+
 The browser SVG concept is implemented as native Compose screens and interactions in version 0.4.0. Layouts adapt to Android system insets, scrolling, typography, and touch targets. The browser's sample permission/recognition/share results remain confined to the separate design prototype.
 
 ## What was checked

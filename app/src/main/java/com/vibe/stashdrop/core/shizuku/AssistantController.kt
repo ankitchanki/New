@@ -28,7 +28,7 @@ class AssistantController(private val context: Context, private val manager: Shi
         val previous = service.getAssistantRole(user)
         if (!previous.startsWith("Error:") && previous != context.packageName && !backup.contains("holder"))
             backup.edit().putString("holder", previous).commit()
-        service.setAssistantRole(context.packageName, user).let { if (it.startsWith("Error:")) it else "StashDrop is now your digital assistant" }
+        service.setAssistantRole(context.packageName, user).let { if (it.startsWith("Error:")) it else linkGoogle() ?: "Error: Connect Shizuku to restore Google voice service" }
     }
     suspend fun restore(): String? = withContext(Dispatchers.IO) {
         val service = manager.service ?: return@withContext null

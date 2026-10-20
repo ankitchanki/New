@@ -16,7 +16,6 @@ images = {
     "interactions": "interactions_interactions",
     "controls-full": "controlsFull_controls-full",
     "floating-shelf": "floatingShelf_floating-shelf",
-    "circle-canvas": "circleCanvas_circle-canvas",
     "aurora-wave": "auroraWave_aurora-wave",
 }
 manifest = {"renderer": "Paparazzi 1.3.5 / production Compose components", "content": "Sample data; not phone screenshots", "images": []}

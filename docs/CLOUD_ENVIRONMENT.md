@@ -19,7 +19,7 @@ These workspace paths refer to the prepared snapshot, not a universal SDK instal
 
 ## Writable Robolectric test runtime
 
-The 27-test suite includes Robolectric service/circle regressions. Its default download lock is under Java's `user.home`, which is read-only in this managed workspace. Configure the test JVM's home and Maven cache inside `/workspace` before running Gradle. This keeps the normal `HOME` environment variable unchanged and forwards the managed proxy and CA trust settings to test JVMs.
+The suite includes Robolectric Google-only routing, gesture, floating-service and dashboard regressions, plus Paparazzi renders. Its default download lock is under Java's `user.home`, which is read-only in this managed workspace. Configure the test JVM's home and Maven cache inside `/workspace` before running Gradle. This keeps the normal `HOME` environment variable unchanged and forwards the managed proxy and CA trust settings to test JVMs.
 
 The prepared instance already has this Gradle init script outside Git. To recreate it in the documented `/workspace/New` checkout after activating `cloud-env.sh` and running `configure-cloud-gradle.py`:
 

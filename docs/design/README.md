@@ -1,5 +1,7 @@
 # StashDrop SVG UI design
 
+> Historical UI concept: capture, selection and OCR screens in this package predate 0.5.0 and were removed from the Android app. Current search routes only to Google.
+
 An interactive **UI concept** grounded in StashDrop's current Home / Shelf / Settings structure and dark navy, periwinkle, and mint palette. Layout refinements are design proposals. This package does not change the Android app or its signed APK.
 
 ## Open the design

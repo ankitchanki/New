@@ -7,6 +7,8 @@ import android.os.*
 import android.provider.Settings
 import android.service.voice.VoiceInteractionService
 import android.service.voice.VoiceInteractionSession
+import com.vibe.stashdrop.stashApp
+import android.util.Log
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 
@@ -39,24 +41,43 @@ object GoogleCircleToSearch {
         val google = googleService(context) ?: return Readiness.GOOGLE_MISSING
         // When the active service cannot be read, assume Google and let the request decide.
         val active = activeService(context) ?: return Readiness.READY
-        return if (active == google.flattenToString()) Readiness.READY else Readiness.GOOGLE_NOT_ASSISTANT
+        return if (ComponentName.unflattenFromString(active) == google) Readiness.READY else Readiness.GOOGLE_NOT_ASSISTANT
     }
 
-    /** True when the system accepted the request; Google then shows Circle to Search on eligible phones. */
-    suspend fun launch(context: Context): Boolean =
-        readiness(context) == Readiness.READY && withContext(Dispatchers.IO) { showSession(context) }
+    /** True when Android accepted the request; Google controls eligibility and the displayed UI. */
+    suspend fun launch(context: Context): Boolean {
+        if (readiness(context) != Readiness.READY) return false
+        return withContext(Dispatchers.IO) {
+            // showSessionFromSession is often rejected without an existing session token.
+            // Shizuku can use the privileged active-service entry point instead.
+            val shell = runCatching { context.stashApp.shizuku.service?.requestGoogleSearch() == true }
+                .getOrDefault(false)
+            shell || requestSession(privileged = false, attributionTag = if (Build.VERSION.SDK_INT >= 30) context.attributionTag else null)
+        }
+    }
 
-    private fun showSession(context: Context): Boolean = runCatching {
+    /** Fixed Google contextual-search request, shared with the Shizuku shell process. */
+    fun requestSession(privileged: Boolean, attributionTag: String? = null): Boolean = runCatching {
         val binder = Class.forName("android.os.ServiceManager").getMethod("getService", String::class.java).invoke(null, "voiceinteraction") as IBinder
+        val api = Class.forName("com.android.internal.app.IVoiceInteractionManagerService")
         val service = Class.forName("com.android.internal.app.IVoiceInteractionManagerService\$Stub").getMethod("asInterface", IBinder::class.java).invoke(null, binder)
-        val method = Class.forName("com.android.internal.app.IVoiceInteractionManagerService").methods.first { it.name == "showSessionFromSession" }
+        if (privileged) {
+            val active = api.getMethod("getActiveServiceComponentName").invoke(service) as? ComponentName
+            if (active?.packageName != GOOGLE) return false
+        }
+        val name = if (privileged) "showSessionForActiveService" else "showSessionFromSession"
+        val method = api.methods.first { it.name == name }
         val args = Bundle().apply {
             putLong("invocation_time_ms", SystemClock.elapsedRealtime())
             putInt(ENTRY_POINT_KEY, ENTRY_POINT_LONG_PRESS_NAV_HANDLE)
         }
         val flags = VoiceInteractionSession.SHOW_WITH_ASSIST or VoiceInteractionSession.SHOW_WITH_SCREENSHOT or VoiceInteractionSession.SHOW_SOURCE_ASSIST_GESTURE
-        val result = if (method.parameterTypes.size >= 4) method.invoke(service, null, args, flags, if (Build.VERSION.SDK_INT >= 30) context.attributionTag else null)
-            else method.invoke(service, null, args, flags)
-        result as? Boolean ?: false
-    }.getOrDefault(false)
+        val arguments = method.parameterTypes.map { type -> when (type) {
+            Bundle::class.java -> args
+            Int::class.javaPrimitiveType -> flags
+            String::class.java -> attributionTag
+            else -> null // callback / session token / activity token
+        } }.toTypedArray()
+        method.invoke(service, *arguments) as? Boolean ?: false
+    }.onFailure { Log.w("StashDropGoogle", "Google session request rejected (${if (privileged) "shell" else "app"})", it) }.getOrDefault(false)
 }
