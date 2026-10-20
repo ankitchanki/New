@@ -34,7 +34,7 @@ The helper pins the independently verified published APK hash. Custom/debug APKs
 ## What to test during recording
 
 1. Show the edge shelf. Tap or pull inward from the single handle to open its rectangular panel. Close with Back/Close/outside touch, and verify scrolling/tapping another app works with the handle enabled.
-2. Import distinct images, stickers and videos; inspect previews and Images/Videos/Stickers/URLs/OTP filters. Select cards, share/move them, and test deletion confirmation on a disposable item.
+2. Import distinct images, stickers and videos; inspect previews and Images/Videos/Stickers/URLs/OTP filters. Drag a card onto a compatible app icon and verify the receiving composer. Swipe a disposable card for the red trash affordance, then test cancel/confirm deletion.
 3. Choose Google as digital assistant, then test the search button, handle hold and notification. Record whether Google shows Circle to Search, Gemini or a rejection. No internal capture screen should appear.
 4. Enable the transparent strip and start above system navigation. Test native corner gestures through assistant settings. Check central upward swipe, rotation, keyboard and lock/unlock. Physical bottom-edge swipes remain Android Home/Recents gestures.
 5. If Shizuku is in use, verify reconnect behavior and record whether connecting the bridge changes the Google request result.

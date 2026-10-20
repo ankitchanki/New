@@ -145,7 +145,7 @@ Gesture, clipboard, haptic, and spring settings now live in **Settings → Gestu
 2. Tap either side handle, or pull it inward, to open a compact rectangular panel on that side. Hold a handle for Google search. Drag vertically to reposition; drag to the X to hide the handles. Tap outside the panel or Close to dismiss it.
 3. Use type chips in the main Shelf or floating panel: **All, Images, Videos, Stickers, URLs, OTP, Text, Files**. Image/sticker previews are decoded from your local saved files; video previews use a representative frame where the device codec supports it.
 4. Choose **Google** as system digital assistant and enable **Use screen and app data**. Enable native Circle to Search in phone settings if offered. Search remains Google-only; connect authorized Shizuku if needed.
-5. Under **Settings → Gestures, clipboard & feel**, enable corner swipe, hold and double-tap individually. Begin on the visible raised markers, above system navigation. Side arrows indicate diagonal up/inward swipes. Swiping from Android’s bottom edge still belongs to Home/Recents. Gesture markers support portrait and landscape, and hide for lock/keyboard.
+5. Under **Settings → Gestures, clipboard & feel**, keep **Gesture strip** enabled for an upward swipe above bottom navigation. The strip has no permanent marker. **System corner swipe** opens phone assistant settings; native corner support depends on the OEM. Bottom Home/Recents remains Android-controlled. The strip hides for lock/keyboard and works in portrait/landscape.
 6. Share notes, images, videos and files into StashDrop. Collection filters combine with type filters. Auto-stash copied text remains opt-in. See the [feature guide](docs/FEATURE_GUIDE.md) for sticker/OTP classification and Google setup.
 
 Google controls the UI after accepting a request. Installing StashDrop cannot unlock native Circle to Search on unsupported devices. Rejected requests show setup guidance; they never start an internal search screen.
@@ -173,7 +173,7 @@ flowchart LR
     Share[Android Share or note] --> Shelf[Local stash shelf]
     Copy[Opt-in text clipboard] --> Clean[URL privacy sanitizer]
     Clean --> Shelf
-    Dock[Edge handle, markers or assistant entry] --> Route{Google voice service available?}
+    Dock[Edge handle, strip or assistant entry] --> Route{Google voice service available?}
     Route -->|Accepted request| Native[Google controls search UI]
     Route -->|Missing or rejected| Help[Google setup guidance]
     Shelf --> Out[Share or supported global drag]
@@ -209,7 +209,7 @@ Shizuku is optional for the shelf and can send the Google contextual-session req
 
 ## Verification
 
-The published **0.7.0** build passed **71 tests** with no failures, errors, or skips. Debug and release lint each reported **zero errors and 46 warnings**. APK/AAB signatures match the original production certificate; APK ZIP and bundled 64-bit native library alignment passed 16 KB checks. The [successful release workflow](https://github.com/ankitchanki/StashDrop/actions/workflows/android.yml) and [verification report](docs/releases/v0.7.0-verification.json) record the checked scope.
+The published **0.7.0** build passed **71 tests** with no failures, errors, or skips. Debug and release lint each reported **zero errors and 47 warnings**. APK/AAB signatures match the original production certificate; APK ZIP and bundled 64-bit native library alignment passed 16 KB checks. The [successful release workflow](https://github.com/ankitchanki/StashDrop/actions/workflows/android.yml) and [verification report](docs/releases/v0.7.0-verification.json) record the checked scope.
 
 Paparazzi renders the README gallery from the production Compose components. The [single movable edge handle](docs/assets/screenshots/edge-handles.png) and dedicated [interaction settings screen](docs/assets/screenshots/interactions.png) are also rendered from production Compose.
 

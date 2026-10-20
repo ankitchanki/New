@@ -9,7 +9,7 @@ StashDrop 0.7.0 supports Android 9+ (API 28), targeting API 35. The shelf works 
 | Shizuku Google request | Running authorized Shizuku; the contextual-session request can still be rejected by an OEM |
 | App Google request | Best effort without Shizuku; can be rejected by OS/OEM restrictions |
 | Transparent search strip | Floating service running, strip enabled, unlocked/keyboard hidden; portrait and landscape supported |
-| System corner/assistant gestures | OS navigation mode, assistant selection and OEM support; distinct from StashDrop’s markers |
+| System corner/assistant gestures | OS navigation mode, assistant selection and OEM support; distinct from StashDrop’s transparent strip |
 | Clipboard | Opt-in; Shizuku or permitted foreground access, subject to platform restrictions |
 | Global drag | Destination must accept content and URI grants; use Share when unsupported |
 | Shaders | AGSL on API 33+, Canvas fallbacks below; no guaranteed frame rate |
@@ -22,7 +22,7 @@ Choose Google in the system assistant picker and enable native Circle to Search 
 
 ## Permissions and privacy
 
-Overlay access enables edge handles/markers, notifications expose foreground-service controls, vibration supplies haptics, and optional Shizuku supports explicit setup, Google requests and clipboard monitoring. StashDrop no longer declares screenshot accessibility or media-projection services. No account or backend API key is needed for the local shelf. Google and sharing receivers apply their own policies.
+Overlay access enables the edge handle and transparent strip, notifications expose foreground-service controls, vibration supplies haptics, and optional Shizuku supports explicit setup, Google requests and clipboard monitoring. StashDrop no longer declares screenshot accessibility or media-projection services. No account or backend API key is needed for the local shelf. Google and sharing receivers apply their own policies.
 
 No physical-device compatibility is implied by host tests. Use the [Windows ADB helper](WINDOWS_DEVICE_TESTING.md) and [device checklist](DEVICE_VALIDATION.md) to validate an actual phone/tablet. The cloud cannot access a laptop’s local ADB connection merely because laptop and tablet share Wi-Fi.
 

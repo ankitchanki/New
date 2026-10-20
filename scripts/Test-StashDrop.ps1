@@ -10,8 +10,8 @@ param(
 )
 $ErrorActionPreference = 'Stop'
 $Package = 'com.vibe.stashdrop'
-$Version = '0.6.0'
-$ExpectedHash = '4b08f4efa742bfcbb0c1297142325e56cd108f61cd25aefd574a1da8cbe9a74e'
+$Version = '0.7.0'
+$ExpectedHash = '955bcf2649b7b3cffe2396b614877c433e965ca91422d4c8009bbb69bd796646'
 $DownloadUrl = "https://github.com/ankitchanki/StashDrop/releases/download/v$Version/StashDrop-v$Version.apk"
 
 if (-not $AdbPath) {
@@ -70,7 +70,7 @@ if (-not $ApkPath) {
 }
 $ApkPath = (Resolve-Path -LiteralPath $ApkPath).Path
 if ((Get-FileHash -LiteralPath $ApkPath -Algorithm SHA256).Hash.ToLowerInvariant() -ne $ExpectedHash) {
-    throw 'APK checksum mismatch. This helper only installs the independently verified official 0.6.0 release.'
+    throw 'APK checksum mismatch. This helper only installs the independently verified official 0.7.0 release.'
 }
 
 if (-not $OutputDirectory) { $OutputDirectory = Join-Path (Get-Location).Path ('StashDrop-device-' + (Get-Date -Format 'yyyyMMdd-HHmmss')) }
@@ -109,8 +109,8 @@ try {
     Start-AdbLog -Name 'system-crashes' -Arguments @('logcat', '-b', 'main', '-b', 'system', '-b', 'crash', '-v', 'threadtime', '-T', '1', 'AndroidRuntime:E', 'libc:F', 'DEBUG:F', 'WindowManager:W', 'ActivityManager:I', 'ActivityTaskManager:I', 'StashDrop:V', '*:S')
     $metadata.Launch = Read-Adb -Arguments @('shell', 'am', 'start', '-n', "$Package/.MainActivity")
     if ($metadata.Launch -match '(?m)^Error:') { throw $metadata.Launch }
-    Write-Host "Recording for $Seconds seconds. On the phone: tap both edge handles, open/close the panel, scroll another app, and try the raised corner markers."
-    Write-Host 'Also test image previews, content filters, sharing, hold, double-tap, and locking/unlocking. Logs stay on this laptop.'
+    Write-Host "Recording for $Seconds seconds. On the phone: move the single handle between edges, open/close the panel, scroll another app, and try the transparent search strip."
+    Write-Host 'Also test previews, filters, swipe-delete confirmation, and dragging a card onto a compatible app icon. Logs stay on this laptop.'
     $deadline = (Get-Date).AddSeconds($Seconds)
     while ((Get-Date) -lt $deadline) {
         $currentPid = Read-Adb -Arguments @('shell', 'pidof', '-s', $Package) -AllowFailure

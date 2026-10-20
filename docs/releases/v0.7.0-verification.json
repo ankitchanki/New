@@ -32,11 +32,11 @@
   "lint": {
     "debug": {
       "errors": 0,
-      "warnings": 46
+      "warnings": 47
     },
     "release": {
       "errors": 0,
-      "warnings": 46
+      "warnings": 47
     }
   },
   "deviceRuntimeValidated": false,
