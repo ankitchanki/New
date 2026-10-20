@@ -2,6 +2,15 @@
 
 All notable StashDrop changes are recorded here. Versions follow Semantic Versioning.
 
+## [Unreleased]
+
+### Documentation
+
+- Refreshed the project description, download/first-run instructions, feature explanations, defaults, and published release evidence.
+- Added complete feature, architecture/data-flow, and prioritized improvement/future UI guides. Proposed capabilities are explicitly identified.
+- Updated the visual guide, platform boundaries, contribution guidance, and 0.3.2 release explanation. Existing release binaries, version tags, and signing identity are unchanged.
+- Repository metadata helper checks the 20-topic limit before writing and verifies applied metadata while preserving existing topics.
+
 ## [0.3.2] - 2026-10-20
 
 ### Changed

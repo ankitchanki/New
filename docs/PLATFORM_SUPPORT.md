@@ -1,30 +1,52 @@
-# Platform support
+# Platform support and fallbacks
 
-StashDrop targets Android 9+ with different capabilities depending on OS permissions, hardware, and receiving apps.
+StashDrop 0.3.2 supports **Android 9+ (API 28)** and targets API 35. Feature availability depends on permissions, system services, Google eligibility, OEM restrictions, and the receiving app. See the [feature guide](FEATURE_GUIDE.md) for usage and the [device checklist](DEVICE_VALIDATION.md) for hardware qualification.
 
+## Android version boundaries
 
-- Google Circle to Search is requested through the system voice-interaction service with the contextual-search entry point (what a long-press of the navigation handle sends). It works when Google is the digital assistant and Google has enabled Circle to Search for the device; otherwise Google may open its assistant. StashDrop's own circle screen is the fallback and is used when StashDrop itself is picked as the digital assistant (Android 10+).
-- Switching the default assistant is an explicit Controls action through Shizuku, with previous values saved for restoration. No assistant setting is changed during app startup. No private API can guarantee universal “zero-settings” Google support.
-- A normal app cannot capture `FLAG_SECURE`, DRM, or other protected content. Capture is asynchronous, not zero latency. No `SurfaceControl` signature-permission bypass is claimed.
-- Android 9–10 require Shizuku capture or MediaProjection consent. Accessibility screenshots require API 30+, user enablement, and a permitted target window.
-- Background clipboard availability varies by Android release and OEM. The shell user service attempts the platform listener under shell identity; failed access does not silently claim success. The regular app listener only works where Android permits foreground clipboard access. File/image clipboard monitoring is not implemented; use Share-to-StashDrop for URI grants.
-- Global drag/drop acceptance belongs to the receiver. Mixed text/file shares may be ignored by WhatsApp. An overlay cannot request Activity drag permissions for incoming foreign file URIs; text drops work, and files should be shared to StashDrop. The app retains shelf items after outbound drags.
-- Android does not expose other apps' global drag locations or drop-target bounds to the source app. The framework stack shadow follows the drag; the app does not fabricate a landing in WhatsApp. The Bezier/ripple flight is used for in-app stash feedback.
-- Gesture strips are best-effort overlays, not system navigation replacements. Landscape hides them; immersive visibility follows delivered navigation insets. OEMs may omit these insets. No DRM/game classification is claimed.
-- AGSL is used on API 33+; older versions use Canvas gradients/paths. RenderEffect softens the dock's own shader on API 31+; overlays cannot sample arbitrary apps' pixels for true backdrop glass. The app requests 120 Hz where available; display hardware, power mode, and frame cost determine actual refresh rate. Performance is not benchmarked here.
+| Capability | Boundary and fallback |
+| --- | --- |
+| Local notes, clean links, collections, normal sharing | Available across supported versions; readable attachment URIs and compatible receivers are required |
+| Floating bubble and gesture strips | Overlay access and a running foreground service; OEM background/battery policies can affect persistence |
+| Shizuku integration | Optional running/authorized Shizuku with connected user service; supported shell operations still vary by system |
+| Accessibility screenshot | Android 11+ (API 30), with the screenshot service explicitly enabled |
+| Built-in capture on Android 9–10 | Shizuku capture where permitted, otherwise MediaProjection consent |
+| MediaProjection | Android-controlled screen-sharing consent and capture service; cancel/denial prevents capture |
+| Assistant role management | Android 10+ (API 29); assistant gesture availability depends on OEM and navigation mode |
+| AGSL runtime shaders | Android 13+ (API 33); Canvas fallbacks on older supported versions |
+| RenderEffect blur | Android 12+ (API 31), applied to app-rendered content |
+| Notification permission | Android 13+ runtime permission; foreground-service behavior also follows the platform's rules |
 
+## Native Google search versus built-in selection
 
-## Permission map
+The native route requests a contextual session through Android's voice-interaction service. It needs Google's app and active voice service; Google decides whether Circle to Search is available. A successful request may open Gemini/the assistant instead. Turn off **Use Google Circle to Search** to force StashDrop's built-in capture, lasso, OCR/barcode, and result actions.
 
-| Access | Used for | Required? |
+The usual native setup is Google as the digital assistant. Alternatively, on supported systems, an explicit Shizuku **Connect** action can keep Google's voice service active while assistant presses enter StashDrop. Selecting StashDrop manually without that connection can lead to the built-in route. This is best-effort system integration and requires device validation.
+
+Assistant role changes occur through explicit Settings actions, with a saved previous role holder for restoration when available. App startup does not automatically replace the assistant. System home/power controls are not universally interceptable.
+
+## Permissions and data access
+
+| Access | Used for | Alternative or limit |
 | --- | --- | --- |
-| Display over other apps | Floating dock and opt-in gesture strips | For the floating shelf |
-| Notifications | Foreground shelf/capture status and Stop action | Requested on Android 13+ |
-| Shizuku authorization | Shell capture, best-effort native Google search, assistant settings, background text clipboard | Optional |
-| Accessibility screenshot capability | One-shot screenshot on API 30+ | Optional alternative to Shizuku |
-| MediaProjection consent | One-shot screen capture when other routes are unavailable | Per capture fallback |
-| URI read grants | Importing/sharing selected attachments | Granted through Share / FileProvider |
+| Display over other apps | Bubble, floating shelf, gesture touch regions | The dashboard shelf and normal share receiver remain usable without the overlay |
+| Notifications | Foreground-service visibility and actions | Permission handling follows the Android version; check system notification settings |
+| Shizuku runtime permission | Shell capture, clipboard listener, supported setup and assistant operations | Manual settings, foreground clipboard access where permitted, and consent-based capture |
+| Accessibility screenshot service | Capture on API 30+ | Shizuku or MediaProjection; requires explicit enablement |
+| MediaProjection consent | Capture when direct routes cannot provide a frame | Canceling leaves capture unavailable; no protected-content bypass |
+| Incoming content URI grant | Copy a shared file into private storage | Sender must provide readable content; 50 MB per attachment and 30 per shared batch |
+| Outgoing temporary URI grants | Share or drag selected attachments | Receiver must accept the MIME types and URI permissions |
 
-There is no required backend account or API key for the bundled Latin-script OCR and barcode workflow.
+No app account or backend API key is needed. Latin-script OCR and barcode processing use bundled on-device ML Kit models. Browser search, Google/Lens, and sharing are external actions whose receiving apps may use the network.
 
-See [the device validation checklist](DEVICE_VALIDATION.md) for checks still required on real devices.
+## Boundaries that permissions cannot remove
+
+- **Protected screens:** no bypass for `FLAG_SECURE`, DRM surfaces, or system capture denial. Capture is asynchronous, with no zero-latency guarantee.
+- **Clipboard:** true background access depends on shell/OEM policy. Text monitoring is opt-in and off by default. File/image clipboard history is not implemented; use Android Share for attachments.
+- **External drag:** the receiver owns MIME acceptance and drop handling. An overlay cannot obtain an Activity's drag permissions for arbitrary foreign file drops; text drops and normal sharing have different capabilities.
+- **Cross-app landing:** the app cannot inspect another app's internal drop bounds or guarantee a WhatsApp landing animation. Its flight overlay is local feedback.
+- **Gesture regions:** strips hide in landscape and while locked; immersive-mode/inset behavior is best effort. They can interfere with other controls, so the Settings toggle remains important.
+- **Glass and performance:** blur affects the app's own rendered content; general blur of arbitrary apps is unavailable. High-refresh requests and host shader renders are not performance benchmarks.
+- **Data recovery:** there is no in-app archive restore, cloud sync, or deletion undo. Android app backup is disabled. Share out important items before uninstalling.
+
+The signed release passed build/test/signature/alignment checks. Broad phone compatibility and performance still need documented results; see [verification](VERIFICATION.md) and the [future work](ROADMAP.md).

@@ -1,5 +1,9 @@
 # Validation performed
 
+**Latest published release: [0.3.2](https://github.com/ankitchanki/StashDrop/releases/tag/v0.3.2).** The [release workflow](https://github.com/ankitchanki/StashDrop/actions/runs/39384349562) completed successfully after the owner updated the four signing secrets. All five published assets were downloaded and independently checked for their expected checksums/size; APK/AAB signatures and the public certificate match the original production identity. The release passed 27 tests, zero lint errors (42 warnings per variant), and signature/alignment verification. No physical device or emulator was attached for these checks.
+
+The sections below preserve historical results; earlier access/secret failures are not the current release status.
+
 - Gradle wrapper 8.11.1 (SHA-256 pinned), JDK 21.0.12.1, Android SDK 35.
 - `./gradlew :app:assembleDebug :app:testDebugUnitTest :app:lintDebug`: successful.
 - 12 JVM tests executed: 12 passed, 0 failed, 0 skipped.
@@ -14,7 +18,7 @@ The debug APK uses a development key. Release signing and minification were not 
 - Added seven high-resolution Paparazzi component renders using production Compose code and sample content.
 - `./gradlew :app:assembleDebug :app:testDebugUnitTest :app:lintDebug :app:verifyPaparazziDebug`: successful.
 - 19 tests executed: 12 logic tests and 7 visual rendering/baseline checks; all passed, none skipped.
-- Latest lint result: 0 errors, 29 warnings.
+- Lint at that presentation update: 0 errors, 29 warnings.
 - Seven published gallery copies match their recorded image hashes and dimensions. Both source-rendered shader animations contain 48 frames.
 - 47 local documentation references resolved when preparing the presentation update.
 - GitHub About/topic metadata remains pending. The initial attempt was blocked by network policy; a later API attempt returned HTTP 403 for the current integration. The proposed description and 20 topics are saved in `.github/repository-metadata.json`. This is independent of pushing the README and assets with Git.
@@ -48,4 +52,4 @@ The debug APK uses a development key. Release signing and minification were not 
 - Final APK ZIP alignment and all bundled 64-bit native load-segment alignments passed 16 KB checks. See the [public verification report](releases/v0.3.2-verification.json).
 - The new Robolectric tests initially could not create `/home/agent/.robolectric-download-lock` in this managed workspace. A Gradle init script outside Git now assigns writable Java/Maven cache paths and preserves the configured proxy/CA trust for test JVMs; the complete release checks then passed. App/test sources and checks were not weakened.
 - Six signing-input checks passed: the original key survives CRLF, wrapped whitespace, and accidental double encoding; ZIP data, a wrong password, and a wrong alias are rejected before Gradle. The workflow also passed `actionlint`.
-- The remote workflow passed debug checks, but the current Actions secret decoded to an invalid keystore (3,263 bytes, first byte `0x0e`). Restoring the four original signing values is needed for CI. This integration returned HTTP 403 for Actions-secret setup. Local signing is verified independently of GitHub publication.
+- An initial remote release attempt failed because a signing secret decoded to an invalid keystore. After the owner replaced all four secrets with the original signing values, workflow run [39384349562](https://github.com/ankitchanki/StashDrop/actions/runs/39384349562) passed both build and release jobs and published all five verified public assets. This integration still lacks Actions-secret write access; the owner-provided values resolved publication.

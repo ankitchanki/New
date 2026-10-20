@@ -4,14 +4,14 @@ The repository gallery distinguishes app UI, sample content, shader output, and 
 
 ## UI previews
 
-All UI images below are rendered from the production Jetpack Compose components using **Paparazzi 1.3.5**, with Pixel 5 dimensions. The full Controls render uses a taller virtual viewport to expose the settings in one image. No physical phone or emulator was used. The preview data includes three sample notes/links; it does not contain personal clipboard history.
+All UI images below are rendered from the production Jetpack Compose components using **Paparazzi 1.3.5**, with Pixel 5 dimensions. The full Settings render uses a taller virtual viewport to expose the settings in one image. No physical phone or emulator was used. The preview data includes three sample notes/links; it does not contain personal clipboard history.
 
 | Preview | What it shows | Source |
 | --- | --- | --- |
-| [Overview](assets/screenshots/overview.png) | Dashboard hero, motion playground, floating-shelf and search entry points | `DashboardScreen`, tab 0 |
+| [Home](assets/screenshots/overview.png) | Home header, recent items, bubble state and entry points | `DashboardScreen`, tab 0 |
 | [Shelf](assets/screenshots/shelf.png) | Sample notes/links, collections, share and delete actions | `DashboardScreen`, tab 1 |
-| [Controls](assets/screenshots/controls.png) | Connections, optional access, gesture controls | `DashboardScreen`, tab 2 |
-| [Full Controls](assets/screenshots/controls-full.png) | Gesture toggles, clipboard opt-in, spring intensity, assistant controls | Same component, taller viewport |
+| [Settings](assets/screenshots/controls.png) | Setup access status, search mode, assistant and gesture controls | `DashboardScreen`, tab 2 |
+| [Full Settings](assets/screenshots/controls-full.png) | Gesture toggles, clipboard opt-in, spring intensity, assistant controls | Same component, taller viewport |
 | [Floating shelf](assets/screenshots/floating-shelf.png) | Production fan-out shelf sheet after its opening motion | `IosFanOutStashSheet`, inspection mode |
 | [Circle selection canvas](assets/screenshots/circle-canvas.png) | Production lasso canvas over synthetic sample artwork | `AuroraCircleOverlayCanvas`, initial sample selection |
 | [Aurora still](assets/screenshots/aurora-wave.png) | Production shader/Canvas composable with sample pull progress | `AuroraWave` |
@@ -61,8 +61,12 @@ For the prepared cloud snapshot, use `PYTHONPATH=/workspace/toolchains/shader-va
 
 [The StashDrop header](assets/stashdrop-banner.png) is AI-generated promotional artwork commissioned for this README. It is not a screenshot. Its dark navy, periwinkle, mint, stacked trays, and aurora reference the implemented theme and launcher mark. The original generated image was copied without repainting or compositing UI into it.
 
+## Future UI direction
+
+The [roadmap](ROADMAP.md#proposed-screen-direction) describes proposed improvements to Home readiness, shelf search/previews, floating controls, selection results, and accessible Settings. Those proposals have no implementation screenshots yet. The images above represent the current components, and the banner is separately identified artwork.
+
 ## Repository About and topics
 
-[Repository metadata](../.github/repository-metadata.json) is the source for the proposed About description and 20 topic tags. Run `python scripts/apply-github-metadata.py` with existing GitHub CLI authentication and permission to administer `ankitchanki/StashDrop` to apply the description and add topics while preserving existing topics.
+[Repository metadata](../.github/repository-metadata.json) contains the desired About description and 20 topic tags. Run `python scripts/apply-github-metadata.py` with GitHub CLI authentication and repository administration access to apply metadata. The helper preserves existing topics and checks GitHub's 20-topic maximum before writing. If the combined list is too large, review the desired/existing tags in GitHub settings before retrying.
 
-During preparation, the environment proxy denied `api.github.com`. The required domain addition was saved to the environment draft; saving the draft alone does not apply network access. Repository file publication and GitHub About/topic metadata are separate operations.
+Git pushes and release updates have separate permissions from editing repository About/topics. An integration can publish this README while GitHub rejects metadata edits with HTTP 403; the reviewed metadata file remains available for an owner to apply.
