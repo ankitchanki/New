@@ -12,7 +12,7 @@ powershell -NoProfile -ExecutionPolicy RemoteSigned -File .\Test-StashDrop.ps1
 
 The execution policy applies to that PowerShell process only. No administrator access or permanent policy change is required. The helper uses ADB from PATH or the standard Android Studio SDK location. Unlock the phone and approve USB debugging if prompted, then rerun if it is not yet authorized.
 
-It downloads the official signed **0.4.0 APK**, checks its pinned SHA-256, installs with `adb install -r`, launches StashDrop, and records a **three-minute** test session. Approve any USB-install confirmation shown on the phone. It never uninstalls the app, clears data, clears the phone's log buffers, enables privileges, changes your assistant, opens an ADB network listener, or uploads logs.
+It downloads the official signed **0.5.0 APK**, checks its pinned SHA-256, installs with `adb install -r`, launches StashDrop, and records a **three-minute** test session. Approve any USB-install confirmation shown on the phone. It never uninstalls the app, clears data, clears the phone's log buffers, enables privileges, changes your assistant, opens an ADB network listener, or uploads logs.
 
 Examples for a custom ADB location or multiple devices:
 
@@ -26,7 +26,7 @@ powershell -NoProfile -ExecutionPolicy RemoteSigned -File .\Test-StashDrop.ps1 -
 To use an already downloaded official APK:
 
 ```powershell
-powershell -NoProfile -ExecutionPolicy RemoteSigned -File .\Test-StashDrop.ps1 -ApkPath "$env:USERPROFILE\Downloads\StashDrop-v0.4.0.apk"
+powershell -NoProfile -ExecutionPolicy RemoteSigned -File .\Test-StashDrop.ps1 -ApkPath "$env:USERPROFILE\Downloads\StashDrop-v0.5.0.apk"
 ```
 
 The helper pins the independently verified published APK hash. Custom/debug APKs are deliberately rejected. An installation signed with a different key cannot be updated in place; the helper stops rather than uninstalling it and deleting its shelf.
@@ -49,11 +49,11 @@ Review/redact logs before sharing: diagnostic messages can contain private conte
 
 ## Manual ADB alternative
 
-After downloading the [official signed APK](https://github.com/ankitchanki/StashDrop/releases/download/v0.4.0/StashDrop-v0.4.0.apk):
+After downloading the [official signed APK](https://github.com/ankitchanki/StashDrop/releases/download/v0.5.0/StashDrop-v0.5.0.apk):
 
 ```powershell
 adb devices -l
-adb install -r "$env:USERPROFILE\Downloads\StashDrop-v0.4.0.apk"
+adb install -r "$env:USERPROFILE\Downloads\StashDrop-v0.5.0.apk"
 adb shell am start -n com.vibe.stashdrop/.MainActivity
 $appProcessId = [string](adb shell pidof -s com.vibe.stashdrop)
 $appProcessId = $appProcessId.Trim()

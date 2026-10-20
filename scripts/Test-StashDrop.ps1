@@ -10,8 +10,8 @@ param(
 )
 $ErrorActionPreference = 'Stop'
 $Package = 'com.vibe.stashdrop'
-$Version = '0.4.0'
-$ExpectedHash = '1a74e610c61daa2d999ac189e06ba2061919b229bf84d26185c93db1b9799974'
+$Version = '0.5.0'
+$ExpectedHash = 'c8a6a5b10bbc09e8bd4a23d904c447ba0d90104b1a4c3da7d17613a70f423c83'
 $DownloadUrl = "https://github.com/ankitchanki/StashDrop/releases/download/v$Version/StashDrop-v$Version.apk"
 
 if (-not $AdbPath) {
@@ -70,7 +70,7 @@ if (-not $ApkPath) {
 }
 $ApkPath = (Resolve-Path -LiteralPath $ApkPath).Path
 if ((Get-FileHash -LiteralPath $ApkPath -Algorithm SHA256).Hash.ToLowerInvariant() -ne $ExpectedHash) {
-    throw 'APK checksum mismatch. This helper only installs the independently verified official 0.4.0 release.'
+    throw 'APK checksum mismatch. This helper only installs the independently verified official 0.5.0 release.'
 }
 
 if (-not $OutputDirectory) { $OutputDirectory = Join-Path (Get-Location).Path ('StashDrop-device-' + (Get-Date -Format 'yyyyMMdd-HHmmss')) }

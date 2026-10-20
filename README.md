@@ -142,7 +142,7 @@ Gesture, clipboard, haptic, and spring settings now live in **Settings → Gestu
 
 1. Install the signed APK above and open **Settings → Setup**. Allow the floating bubble; enable notifications where required. Shizuku is optional, and its setup shortcuts require a running, authorized Shizuku service.
 2. On **Home**, tap **Show floating bubble**. Tap the bubble to open the shelf; hold it to search. Drag to the bottom X to hide it.
-3. Choose **Google** in the system digital assistant picker. Enable **Circle to Search** in your phone’s navigation settings where offered. Use **Settings → Search & assistant → Try Google search**. Connect authorized Shizuku if the app-level session request is blocked.
+3. Choose **Google** in the system digital assistant picker and enable **Use screen and app data**. Enable **Circle to Search** in your phone’s navigation settings where offered. Use **Settings → Search & assistant → Try Google search**. Connect authorized Shizuku if the app-level session request is blocked.
 4. Open **Settings → Gestures, clipboard & feel**. Swipe-up starts enabled; enable corner swipe, hold and double-tap individually. Start on the visible markers above system navigation: center for swipe/hold/taps, sides for diagonal up-and-inward swipes. Strips hide in landscape, on lock and while the keyboard is visible.
 5. Add a note from Shelf or share text, photos and files into StashDrop. Auto-stash copied text starts off.
 6. Advanced: **Digital assistant → Use StashDrop now** with Shizuku can route system assist gestures through StashDrop while connecting Google’s voice service. Android/OEM support varies; **Restore previous** and the system picker remain available. See [assistant setup](docs/FEATURE_GUIDE.md#digital-assistant-and-shizuku).
@@ -208,7 +208,7 @@ Shizuku is optional for the shelf and can send the Google contextual-session req
 
 ## Verification
 
-The published **0.5.0** build passed **51 tests** with no failures, errors, or skips. Debug and release lint each reported **zero errors and 38 warnings**. APK/AAB signatures match the original production certificate; APK ZIP and bundled 64-bit native library alignment passed 16 KB checks. The [successful release workflow](https://github.com/ankitchanki/StashDrop/actions/workflows/android.yml) and [verification report](docs/releases/v0.5.0-verification.json) record the checked scope.
+The published **0.5.0** build passed **51 tests** with no failures, errors, or skips. Debug and release lint each reported **zero errors and 39 warnings**. APK/AAB signatures match the original production certificate; APK ZIP and bundled 64-bit native library alignment passed 16 KB checks. The [successful release workflow](https://github.com/ankitchanki/StashDrop/actions/workflows/android.yml) and [verification report](docs/releases/v0.5.0-verification.json) record the checked scope.
 
 Paparazzi renders the README gallery from the production Compose components. The dedicated [interaction settings screen](docs/assets/screenshots/interactions.png) is also rendered from production Compose.
 

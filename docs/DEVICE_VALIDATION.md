@@ -26,3 +26,15 @@ Release work also includes signing, privacy/store disclosures, foreground-servic
 - Show the bubble and enable each marker gesture. Test center upward pull/flick, both diagonal up/inward corner swipes, center long-press and nearby double-tap. Each should request search once. Single tap, expired/distant taps, horizontal/outward/downward swipes, cancellation and multi-touch must not trigger search.
 - Check markers above three-button and gesture navigation, after preference changes, rotation, lock/unlock, keyboard open/close and service restart. They must not cover or replace system navigation.
 - Use [Windows ADB installation and logging](WINDOWS_DEVICE_TESTING.md). Review logs before sharing; cloud tests do not validate the connected tablet.
+
+## Current user device: POCO F5 / Android 15
+
+The user reported this model/OS; physical installation and gesture/Google outcomes have **not** been verified by the cloud. Android 15 alone does not establish Circle to Search eligibility.
+
+1. Update the Google app. In Android Settings → Apps → Default apps → Digital assistant app, choose Google and enable **Use screen and app data**. Menu names can vary by ROM. See [Google’s setup guide](https://support.google.com/websearch/answer/14508957?hl=en).
+2. Search phone Settings for **Circle to Search** and enable it if offered. Record if the setting is absent; do not infer native support from Android version alone.
+3. Allow StashDrop’s overlay access and show the bubble. If the service stops on HyperOS, check the app’s background/battery restrictions and available background pop-up permission.
+4. In portrait with the keyboard closed, enable the desired marker gestures individually. Use center for swipe/hold/double-tap and the sides for diagonal up/inward corner swipes. Test with and without authorized Shizuku.
+5. Use the Windows helper to install the official compatible update and capture logs. Record whether each request shows Google Circle to Search, Gemini, rejection guidance or no UI. None should open an internal StashDrop capture screen.
+
+A local ADB connection on the Windows laptop is not automatically reachable from the cloud. Device logs must be captured there and reviewed before sharing.
