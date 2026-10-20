@@ -6,7 +6,7 @@ The goal is a shelf that is easy to reach, predictable when permissions or servi
 
 ## Current foundation
 
-The app already has Home / Shelf / Settings, a draggable edge-peeking bubble, a stacked floating shelf, collections, sharing, optional copied-text saving, Google search routing, local crash reports, and spring/shader motion. The 0.5.0 native UI adds main-Shelf batch actions, confirmed deletion, clipboard opt-in confirmation, and a separate interaction settings page. The signed build preserves the original production certificate. Host tests and renders are available; broad real-device qualification is still outstanding.
+The app already has Home / Shelf / Settings, a draggable edge-peeking bubble, a stacked floating shelf, collections, sharing, optional copied-text saving, Google search routing, local crash reports, and spring/shader motion. The native UI includes main-Shelf batch actions, confirmed deletion, clipboard opt-in confirmation, and a separate interaction settings page. The signed build preserves the original production certificate. Host tests and renders are available; broad real-device qualification is still outstanding.
 
 ## Priorities
 

@@ -6,8 +6,8 @@ StashDrop 0.5.0 supports Android 9+ (API 28), targeting API 35. The shelf works 
 | --- | --- |
 | Floating shelf | Overlay permission and foreground service; OEM battery rules apply |
 | Google Circle to Search | Google app and active Google voice service; Google/device/account eligibility and phone navigation settings control the UI |
-| Privileged Google request | Running authorized Shizuku; shell voice-interaction access can still be rejected by an OEM |
-| App Google request | Best effort without Shizuku; often rejected without a valid session token |
+| Shizuku Google request | Running authorized Shizuku; the contextual-session request can still be rejected by an OEM |
+| App Google request | Best effort without Shizuku; can be rejected by OS/OEM restrictions |
 | Gesture markers | Floating service running, strips and relevant trigger enabled, portrait/unlocked/keyboard hidden |
 | System corner/assistant gestures | OS navigation mode, assistant selection and OEM support; distinct from StashDrop’s markers |
 | Clipboard | Opt-in; Shizuku or permitted foreground access, subject to platform restrictions |

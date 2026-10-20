@@ -101,7 +101,7 @@ class ShellUserService : IPrivilegedService.Stub() {
             method.invoke(service, *arguments(method.parameterTypes, listener))
         } }; remoteListener = null; callback = null
     }
-    /** Uses shell's privileged voice-interaction entry point, never a screen-capture service. */
-    override fun requestGoogleSearch(): Boolean = com.vibe.stashdrop.features.circletosearch.GoogleCircleToSearch.requestSession(privileged = true)
+    /** Sends the same Google contextual-session request under Shizuku's identity. */
+    override fun requestGoogleSearch(): Boolean = com.vibe.stashdrop.features.circletosearch.GoogleCircleToSearch.requestSession(fromShell = true)
     override fun destroy() { stopClipboard(); Process.killProcess(Process.myPid()) }
 }

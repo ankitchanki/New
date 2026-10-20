@@ -7,7 +7,7 @@ All notable StashDrop changes are recorded here. Versions follow Semantic Versio
 ### Changed
 
 - All Circle to Search entry points request Google only. Removed the internal screenshot/lasso/OCR/barcode UI, fallback, capture services/permission setup and ML Kit models; existing shelf data is retained.
-- Added a privileged active-Google voice-session request through connected Shizuku, with actionable setup guidance on rejection. Google controls Circle to Search eligibility and may display Gemini instead.
+- Added a Google contextual-session request under shell identity through connected Shizuku, with actionable setup guidance on rejection. Google controls Circle to Search eligibility and may display Gemini instead.
 - Visible center/corner gesture markers replace invisible touch strips; unchanged settings preserve pending taps. Added platform-timed hold/double-tap recognition, tap distance checks, diagonal up/inward corner validation, one-trigger semantics and cancellation/multi-touch cleanup.
 - Gesture navigation reporting an invisible navigation bar no longer hides markers. Markers hide for keyboard, lock, landscape and search hand-off.
 - Basic Shizuku setup changes overlay/notification access only. Explicit advanced StashDrop assistant selection also attempts to reconnect Google's voice service.

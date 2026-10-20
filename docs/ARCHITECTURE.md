@@ -32,7 +32,7 @@ flowchart TD
     App -->|No| Help
 ```
 
-The fixed request carries Google’s contextual entry point and assist/screenshot flags. Shizuku uses `showSessionForActiveService` only after checking that the active component belongs to Google. The app route uses `showSessionFromSession`, which can be rejected without a valid session token. Reflection is best effort across OS versions. Acceptance does not prove Circle to Search appeared; Google may display Gemini instead. There is no capture, OCR or built-in activity fallback.
+The fixed request carries Google’s contextual entry point and assist/screenshot flags. Both app and Shizuku identities use `showSessionFromSession` after checking the active voice-service component belongs to Google. Android 15 handles contextual-search requests specially through this API; `showSessionForActiveService` has a separate permission and bypasses that handling. A null session token is allowed by [AOSP Android 15](https://android.googlesource.com/platform/frameworks/base/+/refs/tags/android-15.0.0_r1/services/voiceinteraction/java/com/android/server/voiceinteraction/VoiceInteractionManagerService.java); private API/OEM restrictions can still reject requests. Reflection is best effort across OS versions. Acceptance does not prove Circle to Search appeared; Google may display Gemini instead. There is no capture, OCR or built-in activity fallback.
 
 ## Gesture recognition
 

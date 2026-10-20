@@ -48,25 +48,22 @@ object GoogleCircleToSearch {
     suspend fun launch(context: Context): Boolean {
         if (readiness(context) != Readiness.READY) return false
         return withContext(Dispatchers.IO) {
-            // showSessionFromSession is often rejected without an existing session token.
-            // Shizuku can use the privileged active-service entry point instead.
+            // Use the contextual session route under either identity. On Android 15 this
+            // also allows the system's contextual-search helper to handle Google's entry point.
             val shell = runCatching { context.stashApp.shizuku.service?.requestGoogleSearch() == true }
                 .getOrDefault(false)
-            shell || requestSession(privileged = false, attributionTag = if (Build.VERSION.SDK_INT >= 30) context.attributionTag else null)
+            shell || requestSession(fromShell = false, attributionTag = if (Build.VERSION.SDK_INT >= 30) context.attributionTag else null)
         }
     }
 
     /** Fixed Google contextual-search request, shared with the Shizuku shell process. */
-    fun requestSession(privileged: Boolean, attributionTag: String? = null): Boolean = runCatching {
-        val binder = Class.forName("android.os.ServiceManager").getMethod("getService", String::class.java).invoke(null, "voiceinteraction") as IBinder
+    internal fun requestSession(fromShell: Boolean, attributionTag: String? = null, voiceBinder: IBinder? = null): Boolean = runCatching {
+        val binder = voiceBinder ?: Class.forName("android.os.ServiceManager").getMethod("getService", String::class.java).invoke(null, "voiceinteraction") as IBinder
         val api = Class.forName("com.android.internal.app.IVoiceInteractionManagerService")
         val service = Class.forName("com.android.internal.app.IVoiceInteractionManagerService\$Stub").getMethod("asInterface", IBinder::class.java).invoke(null, binder)
-        if (privileged) {
-            val active = api.getMethod("getActiveServiceComponentName").invoke(service) as? ComponentName
-            if (active?.packageName != GOOGLE) return false
-        }
-        val name = if (privileged) "showSessionForActiveService" else "showSessionFromSession"
-        val method = api.methods.first { it.name == name }
+        val active = api.getMethod("getActiveServiceComponentName").invoke(service) as? ComponentName
+        if (active?.packageName != GOOGLE) return false
+        val method = api.methods.first { it.name == "showSessionFromSession" }
         val args = Bundle().apply {
             putLong("invocation_time_ms", SystemClock.elapsedRealtime())
             putInt(ENTRY_POINT_KEY, ENTRY_POINT_LONG_PRESS_NAV_HANDLE)
@@ -79,5 +76,5 @@ object GoogleCircleToSearch {
             else -> null // callback / session token / activity token
         } }.toTypedArray()
         method.invoke(service, *arguments) as? Boolean ?: false
-    }.onFailure { Log.w("StashDropGoogle", "Google session request rejected (${if (privileged) "shell" else "app"})", it) }.getOrDefault(false)
+    }.onFailure { Log.w("StashDropGoogle", "Google session request rejected (${if (fromShell) "shell" else "app"})", it) }.getOrDefault(false)
 }

@@ -10,7 +10,7 @@ The gallery reflects the native 0.5.0 UI. All UI images below are rendered from 
 | --- | --- | --- |
 | [Home](assets/screenshots/overview.png) | Home header, recent items, bubble state and entry points | `DashboardScreen`, tab 0 |
 | [Shelf](assets/screenshots/shelf.png) | Sample notes/links, collections, share and delete actions | `DashboardScreen`, tab 1 |
-| [Settings](assets/screenshots/controls.png) | Setup access status, search mode, assistant and gesture controls | `DashboardScreen`, tab 2 |
+| [Settings](assets/screenshots/controls.png) | Setup access status, Google readiness, assistant and gesture controls | `DashboardScreen`, tab 2 |
 | [Full Settings](assets/screenshots/controls-full.png) | Complete setup/search screen and entry to interaction preferences | Same component, taller viewport |
 | [Interactions](assets/screenshots/interactions.png) | Gesture toggles, clipboard preference, and haptics; scroll for springiness | `DashboardScreen`, interaction page |
 | [Floating shelf](assets/screenshots/floating-shelf.png) | Production fan-out shelf sheet after its opening motion | `IosFanOutStashSheet`, inspection mode |

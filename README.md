@@ -25,7 +25,7 @@ Catch something useful without losing your place. Share a link into your shelf, 
 
 **[Download the signed Android APK — v0.5.0](https://github.com/ankitchanki/StashDrop/releases/download/v0.5.0/StashDrop-v0.5.0.apk)** · [Release notes and checksums](https://github.com/ankitchanki/StashDrop/releases/tag/v0.5.0)
 
-Android 9+ · No account or backend API key · Local shelf storage · Optional Shizuku integration. The published release preserves the original production signing certificate for compatible updates. Its build passed **47 tests**, signature checks, and 16 KB alignment checks. Device/OEM behavior and native Google eligibility still need the [device checklist](docs/DEVICE_VALIDATION.md).
+Android 9+ · No account or backend API key · Local shelf storage · Optional Shizuku integration. The published release preserves the original production signing certificate for compatible updates. Its build passed **51 tests**, signature checks, and 16 KB alignment checks. Device/OEM behavior and native Google eligibility still need the [device checklist](docs/DEVICE_VALIDATION.md).
 
 ### Everyday workflows
 
@@ -204,11 +204,11 @@ app/src/main/java/com/vibe/stashdrop/
 
 Stash content lives in the app's private database and files. FileProvider exposes selected attachments with temporary read grants. Clipboard text is not logged; the bounded history table stores digests rather than duplicate payloads. Auto-stash can retain sensitive copied text and is **off by default**. Delete saved items from the Shelf tab. Uninstalling removes the shelf; there is no in-app backup/restore or cloud sync. Native Google search and sharing are explicit external actions governed by their receiving apps.
 
-Shizuku is optional for the shelf and provides a privileged Google session request when connected. StashDrop no longer declares screenshot accessibility or MediaProjection services. A successful Binder call does not prove that Google’s UI appeared.
+Shizuku is optional for the shelf and can send the Google contextual-session request under shell identity when connected. StashDrop no longer declares screenshot accessibility or MediaProjection services. A successful Binder call does not prove that Google’s UI appeared.
 
 ## Verification
 
-The published **0.5.0** build passed **47 tests** with no failures, errors, or skips. Debug and release lint each reported **zero errors and 38 warnings**. APK/AAB signatures match the original production certificate; APK ZIP and bundled 64-bit native library alignment passed 16 KB checks. The [successful release workflow](https://github.com/ankitchanki/StashDrop/actions/workflows/android.yml) and [verification report](docs/releases/v0.5.0-verification.json) record the checked scope.
+The published **0.5.0** build passed **51 tests** with no failures, errors, or skips. Debug and release lint each reported **zero errors and 38 warnings**. APK/AAB signatures match the original production certificate; APK ZIP and bundled 64-bit native library alignment passed 16 KB checks. The [successful release workflow](https://github.com/ankitchanki/StashDrop/actions/workflows/android.yml) and [verification report](docs/releases/v0.5.0-verification.json) record the checked scope.
 
 Paparazzi renders the README gallery from the production Compose components. The dedicated [interaction settings screen](docs/assets/screenshots/interactions.png) is also rendered from production Compose.
 

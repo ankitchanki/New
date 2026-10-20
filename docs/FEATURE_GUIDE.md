@@ -51,7 +51,7 @@ Every search button, bubble hold, notification action, enabled bottom marker ges
 1. Install/enable the Google app and select Google as digital assistant in Android’s default-app settings.
 2. Enable Circle to Search in your phone’s navigation settings if available.
 3. Try the Home search action or **Settings → Search & assistant → Try Google search**.
-4. If Android rejects the session request, connect running, authorized Shizuku and retry. Its shell bridge uses the privileged active voice-service entry point. Without Shizuku, the app tries a best-effort session request that some systems reject.
+4. If Android rejects the session request, connect running, authorized Shizuku and retry. Its shell bridge sends the contextual-session request under shell identity. Without Shizuku, the app tries the same best-effort request under app identity; OS/OEM restrictions can reject either.
 
 Android accepting the request means only that it was dispatched. Google controls device/account eligibility and the actual UI, and can show Gemini/assistant instead of Circle to Search. StashDrop cannot detect or override that choice. A missing Google app, inactive Google voice service or rejected request shows setup guidance; no internal search screen opens. No screenshot permission is requested by StashDrop.
 

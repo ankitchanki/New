@@ -64,4 +64,47 @@ class GoogleOnlySearchTest {
         assertNull(shadowOf(context as android.app.Application).nextStartedActivity)
     }
 
+    /** A local Binder endpoint verifies the actual reflected API and payload on both OS versions. */
+    private fun voiceBinder(active: android.content.ComponentName, calls: MutableList<Pair<android.os.Bundle,Int>>): android.os.IBinder {
+        val api=Class.forName("com.android.internal.app.IVoiceInteractionManagerService")
+        lateinit var binder: android.os.Binder
+        val service=java.lang.reflect.Proxy.newProxyInstance(api.classLoader,arrayOf(api)) { _,method,args ->
+            when(method.name) {
+                "getActiveServiceComponentName" -> active
+                "showSessionFromSession" -> {
+                    assertNull(args!![0]) // AOSP permits a null session token for this invocation.
+                    calls += (args[1] as android.os.Bundle) to (args[2] as Int)
+                    true
+                }
+                "showSessionForActiveService" -> error("Must preserve contextual-search handling")
+                "asBinder" -> binder
+                else -> null
+            }
+        } as android.os.IInterface
+        binder=android.os.Binder().apply { attachInterface(service,api.name) }
+        return binder
+    }
+    @Test @Config(sdk=[28,35]) fun bothIdentitiesUseTheContextualSessionApiAndGoogleEntryPoint() {
+        val calls=mutableListOf<Pair<android.os.Bundle,Int>>()
+        val binder=voiceBinder(android.content.ComponentName(GoogleCircleToSearch.GOOGLE,"GoogleService"),calls)
+        val accepted=GoogleCircleToSearch.requestSession(fromShell=false,voiceBinder=binder)
+        assertTrue(org.robolectric.shadows.ShadowLog.getLogsForTag("StashDropGoogle").joinToString { "${it.msg}: ${it.throwable?.stackTraceToString()}" },accepted)
+        assertTrue(GoogleCircleToSearch.requestSession(fromShell=true,voiceBinder=binder))
+        assertEquals(2,calls.size)
+        calls.forEach { (args,flags) ->
+            assertEquals(1,args.getInt("omni.entry_point"))
+            assertTrue(args.containsKey("invocation_time_ms"))
+            assertEquals(android.service.voice.VoiceInteractionSession.SHOW_WITH_ASSIST or
+                android.service.voice.VoiceInteractionSession.SHOW_WITH_SCREENSHOT or
+                android.service.voice.VoiceInteractionSession.SHOW_SOURCE_ASSIST_GESTURE,flags)
+        }
+    }
+    @Test @Config(sdk=[28,35]) fun changedActiveServiceCannotLaunchAnotherAssistant() {
+        val calls=mutableListOf<Pair<android.os.Bundle,Int>>()
+        val binder=voiceBinder(android.content.ComponentName("another.assistant","AnotherService"),calls)
+        assertFalse(GoogleCircleToSearch.requestSession(fromShell=false,voiceBinder=binder))
+        assertFalse(GoogleCircleToSearch.requestSession(fromShell=true,voiceBinder=binder))
+        assertTrue(calls.isEmpty())
+    }
+
 }
