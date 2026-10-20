@@ -94,7 +94,7 @@ jobs:
       - name: Restore signing keystore
         run: |
           python - <<'PY'
-          import base64, json, os
+          import base64, hashlib, json, os, subprocess
           from pathlib import Path
           required = ["KEYSTORE_BASE64", "STASHDROP_RELEASE_KEY_ALIAS", "STASHDROP_RELEASE_STORE_PASSWORD", "STASHDROP_RELEASE_KEY_PASSWORD"]
           missing = [name for name in required if not os.environ.get(name)]
@@ -113,6 +113,18 @@ jobs:
           if len(data) < 500:
               raise SystemExit(f"STASHDROP_KEYSTORE_BASE64 decodes to only {len(data)} bytes; it should be the whole .p12 key file.")
           key.write_bytes(data)
+          # Fail before the Gradle build if the secret encodes another file or identity.
+          certificate = subprocess.run(
+              ["keytool", "-exportcert", "-storetype", "PKCS12", "-keystore", str(key),
+               "-alias", os.environ["STASHDROP_RELEASE_KEY_ALIAS"],
+               "-storepass:env", "STASHDROP_RELEASE_STORE_PASSWORD"],
+              capture_output=True,
+          )
+          if certificate.returncode:
+              raise SystemExit("::error::Signing secrets could not open the original PKCS12 keystore. Set STASHDROP_KEYSTORE_BASE64 to the base64 of the .p12 file inside the private backup, and use its matching original alias and store password.")
+          original = json.loads(Path("docs/releases/v0.1.0-verification.json").read_text())
+          if hashlib.sha256(certificate.stdout).hexdigest() != original["certificateSha256"]:
+              raise SystemExit("::error::Signing certificate differs from the original StashDrop production key. Restore the original signing secrets to preserve compatible updates.")
           config = private / "release-signing.json"
           config.touch(mode=0o600)
           config.write_text(json.dumps({"storeFile": str(key), "keyAlias": os.environ["STASHDROP_RELEASE_KEY_ALIAS"], "storePassword": os.environ["STASHDROP_RELEASE_STORE_PASSWORD"], "keyPassword": os.environ["STASHDROP_RELEASE_KEY_PASSWORD"]}))

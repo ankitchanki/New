@@ -24,6 +24,8 @@ Signed releases run when a `v*` tag is pushed, or manually from the Actions tab.
 - `STASHDROP_KEYSTORE_BASE64`: the keystore file, base64-encoded (`base64 -w0 release.p12`).
 - `STASHDROP_RELEASE_KEY_ALIAS`, `STASHDROP_RELEASE_STORE_PASSWORD`, `STASHDROP_RELEASE_KEY_PASSWORD`.
 
+`STASHDROP_KEYSTORE_BASE64` must encode the raw `.p12` file inside the private backup. Decode/copy that file's Base64 text, retaining the original alias and passwords. Encoding the backup ZIP, the JSON credentials, or a second layer of Base64 does not produce a valid keystore. Whitespace in the secret is ignored, but its decoded bytes must form a PKCS12 keystore with the original production certificate. CI checks the file, alias, store password, and certificate before the Gradle build.
+
 The production key already exists and signed the prepared 0.1.0 build. **Restore that key and its credentials from the private owner backup for 0.1.1 and later updates. Do not generate a replacement.** Keep an offline backup. The workflow rejects a certificate that differs from the original public verification report.
 
 Only for a completely new application that has never had a signing identity, create a key with `keytool -genkeypair -keystore release.p12 -storetype PKCS12 -alias stashdrop -keyalg RSA -keysize 4096 -validity 10000 -dname "CN=StashDrop"`.
