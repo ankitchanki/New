@@ -2,6 +2,26 @@
 
 All notable StashDrop changes are recorded here. Versions follow Semantic Versioning.
 
+## [0.8.0] - 2026-10-26
+
+### Changed
+
+- New light design inspired by vivo OriginOS: soft grey ground, large white rounded cards, near-black ink, and the bundled Outfit typeface (SIL Open Font License) for titles.
+- Home leads with a Circle to Search card, an edge shelf toggle tile, a shelf count tile, the clipboard switch, and recent items. Pill navigation shows the active tab's label.
+- Shelf adds instant search, ink collection and type chips, and a two-column grid for photos and videos with full-width note and link cards. A selected card tilts slightly and shows an accent border; selection actions move into a dark floating bar.
+- Settings opens with a setup ring (edge shelf, notifications, Google readiness) and a one-tap fix. Permissions, Circle to Search and digital assistant settings sit in grouped cards with coloured icons.
+- The edge handle is now an accent pill with the shelf icon. The floating bubble is white with an accent core and an ink count badge. The edge panel, swipe-delete background, and chat-head dismiss target use the same light style.
+
+### Added
+
+- Accent colour choice (Blue, Sky, Violet, Orange) under Settings → Gestures, clipboard & feel. Each choice keeps white text at 4.5:1 contrast or better. The overlay shelf follows the chosen accent too.
+
+### Fixed
+
+- Media previews already decoded no longer flash a placeholder before their first layout.
+- Scrolled content can no longer sit hidden behind the bottom navigation and selection bar.
+- Version code 11; package, Room schema, saved data and the release signing certificate are unchanged.
+
 ## [0.7.0] - 2026-10-21
 
 ### Changed

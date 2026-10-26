@@ -10,7 +10,7 @@
   <img alt="Target SDK 35" src="https://img.shields.io/badge/Target_SDK-35-B4C9FF?style=flat-square" />
   <img alt="Kotlin 2.1" src="https://img.shields.io/badge/Kotlin-2.1-9B72CB?style=flat-square&amp;logo=kotlin&amp;logoColor=white" />
   <img alt="Jetpack Compose" src="https://img.shields.io/badge/UI-Jetpack_Compose-4285F4?style=flat-square&amp;logo=jetpackcompose&amp;logoColor=white" />
-  <img alt="Signed release 0.7.0" src="https://img.shields.io/badge/Release-0.7.0-9DE3CF?style=flat-square" />
+  <img alt="Signed release 0.8.0" src="https://img.shields.io/badge/Release-0.8.0-9DE3CF?style=flat-square" />
 </p>
 
 <p align="center">
@@ -19,13 +19,13 @@
 
 ## What is StashDrop?
 
-Catch something useful without losing your place. Share a link into your shelf, save a note, open Google’s search interface, and send saved items back to another app. One movable handle on your chosen screen edge open a compact floating shelf, while spring motion and aurora shaders give each interaction a fluid visual language.
+Catch something useful without losing your place. Share a link into your shelf, save a note, open Google’s search interface, and send saved items back to another app. One movable handle on your chosen screen edge opens a compact floating shelf. The light, OriginOS-inspired design uses large rounded cards, Outfit titles and an accent colour you pick.
 
 **Built with Kotlin, Jetpack Compose, Room, DataStore, and optional Shizuku.** All Circle to Search actions request Google’s interface. The built-in capture, lasso and OCR workflow has been removed.
 
-**[Download the signed Android APK — v0.7.0](https://github.com/ankitchanki/StashDrop/releases/download/v0.7.0/StashDrop-v0.7.0.apk)** · [Release notes and checksums](https://github.com/ankitchanki/StashDrop/releases/tag/v0.7.0)
+**[Download the signed Android APK — v0.8.0](https://github.com/ankitchanki/StashDrop/releases/download/v0.8.0/StashDrop-v0.8.0.apk)** · [Release notes and checksums](https://github.com/ankitchanki/StashDrop/releases/tag/v0.8.0)
 
-Android 9+ · No account or backend API key · Local shelf storage · Optional Shizuku integration. The published release preserves the original production signing certificate for compatible updates. Its build passed **71 tests**, signature checks, and 16 KB alignment checks. Device/OEM behavior and native Google eligibility still need the [device checklist](docs/DEVICE_VALIDATION.md).
+Android 9+ · No account or backend API key · Local shelf storage · Optional Shizuku integration. The published release preserves the original production signing certificate for compatible updates. Its build passed **73 tests**, signature checks, and 16 KB alignment checks. Device/OEM behavior and native Google eligibility still need the [device checklist](docs/DEVICE_VALIDATION.md).
 
 ### Everyday workflows
 
@@ -152,9 +152,10 @@ Google controls the UI after accepting a request. Installing StashDrop cannot un
 
 ## Signed releases and changelog
 
-Version `0.7.0` uses Android version code `9` and the original StashDrop production certificate. Earlier builds signed with that certificate can be updated in place. Signed APK/app-bundle packages include checksums, the public certificate, and a verification report. Version-tag builds use [GitHub Actions](.github/workflows/android.yml); the four signing secrets must be configured before publication. Private signing keys are kept separately.
+Version `0.8.0` uses Android version code `11` and the original StashDrop production certificate. Earlier builds signed with that certificate can be updated in place. Signed APK/app-bundle packages include checksums, the public certificate, and a verification report. Version-tag builds use [GitHub Actions](.github/workflows/android.yml); the four signing secrets must be configured before publication. Private signing keys are kept separately.
 
 - [Changelog](CHANGELOG.md)
+- [Version 0.8.0 notes](docs/releases/v0.8.0.md)
 - [Version 0.7.0 notes](docs/releases/v0.7.0.md)
 - [Version 0.7.0 signed build verification](docs/releases/v0.7.0-verification.json)
 - [Version 0.3.1 notes](docs/releases/v0.3.1.md)
@@ -197,7 +198,7 @@ app/src/main/java/com/vibe/stashdrop/
 │   ├── stashshelf/    Room, private files, collections and URL cleaning
 │   └── clipboard/     Opt-in Shizuku text clipboard listener
 └── ui/
-    ├── theme/         Dark surface, periwinkle and mint tokens
+    ├── theme/         Light Origin palette, accent choices, Outfit type, shared rows and chips
     └── dashboard/     Home, Shelf, Settings and motion components
 ```
 
@@ -223,9 +224,9 @@ See [the visual guide](docs/UI_GALLERY.md) for regeneration. Rendering previews 
 
 ## Improvements and future UI
 
-Version 0.7.0 simplifies the shelf to one movable handle and a smaller rectangular panel, adds swipe-to-delete and compatible drag targets, and refreshes Home and pill navigation. The next priorities are broader device validation, accessible layouts, and safer recovery. Proposed UI work keeps the current Home / Shelf / Settings structure while adding clearer Google readiness status, better item previews, reachable selection actions, reduced motion, and layouts for large text and larger screens.
+Version 0.8.0 moves the whole app to a light OriginOS-inspired design, adds shelf search, a photo grid, a setup ring and a choice of accent colour. Version 0.7.0 simplified the shelf to one movable handle and a smaller rectangular panel, and added swipe-to-delete and compatible drag targets. The next priorities are broader device validation, accessible layouts, and safer recovery. Proposed UI work keeps the current Home / Shelf / Settings structure while adding clearer Google readiness status, better item previews, reachable selection actions, reduced motion, and layouts for large text and larger screens.
 
-Shelf search, richer filtering, undo deletion, backup/restore, and theme customization are **proposals**, with no committed release date. The [roadmap](docs/ROADMAP.md) explains the problems, suggested UI, acceptance checks, and technical limits for each direction.
+Richer filtering, undo deletion, backup/restore and a dark theme are **proposals**, with no committed release date. The [roadmap](docs/ROADMAP.md) explains the problems, suggested UI, acceptance checks, and technical limits for each direction.
 
 ### Interactive SVG UI design
 

@@ -59,7 +59,7 @@ For the prepared cloud snapshot, use `PYTHONPATH=/workspace/toolchains/shader-va
 
 ## Branding artwork
 
-[The StashDrop header](assets/stashdrop-banner.png) is AI-generated promotional artwork commissioned for this README. It is not a screenshot. Its dark navy, periwinkle, mint, stacked trays, and aurora reference the implemented theme and launcher mark. The original generated image was copied without repainting or compositing UI into it.
+[The StashDrop header](assets/stashdrop-banner.png) is AI-generated promotional artwork commissioned for this README. It is not a screenshot. Its dark navy, periwinkle, mint, stacked trays, and aurora reference the launcher mark and the dark theme used up to 0.7.0; the app itself now uses the light Origin theme. The original generated image was copied without repainting or compositing UI into it.
 
 ## Future UI direction
 

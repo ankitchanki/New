@@ -15,6 +15,7 @@ import androidx.compose.material.icons.outlined.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.*
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.*
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.platform.LocalView
@@ -25,6 +26,7 @@ import com.vibe.stashdrop.core.physics.*
 import com.vibe.stashdrop.features.dragdrop.IosCardStackDragShadow
 import com.vibe.stashdrop.features.stashshelf.*
 import com.vibe.stashdrop.ui.shelf.*
+import com.vibe.stashdrop.ui.theme.*
 
 @Composable
 fun IosFanOutStashSheet(items: List<StashItemEntity>, repository: StashRepository, onDismiss: ()->Unit, onSearch: ()->Unit,
@@ -47,18 +49,22 @@ fun IosFanOutStashSheet(items: List<StashItemEntity>, repository: StashRepositor
     LaunchedEffect(Unit) { if (!inspection) reveal.animateTo(0f,IosSpringSpecs.liquid()) }
     Box(Modifier.fillMaxSize().then(if(compact) Modifier else Modifier.background(Color.Black.copy(alpha=.24f)).clickable(onClick=onDismiss)),contentAlignment=Alignment.BottomCenter) {
         Surface(Modifier.fillMaxWidth().fillMaxHeight(if(compact) 1f else .60f).graphicsLayer { translationY=reveal.value }.clickable(interactionSource=null,indication=null) {},
-            shape=RoundedCornerShape(24.dp),color=MaterialTheme.colorScheme.surface) {
+            shape=RoundedCornerShape(28.dp),color=Origin.Ground,shadowElevation=if(compact) 0.dp else 12.dp) {
             Column(Modifier.padding(horizontal=12.dp,vertical=8.dp)) {
                 Row(Modifier.fillMaxWidth().padding(vertical=2.dp),horizontalArrangement=Arrangement.SpaceBetween,verticalAlignment=Alignment.CenterVertically) {
-                    Column(Modifier.weight(1f)) {
-                        Text("Hold a card to drag",fontSize=10.sp,style=MaterialTheme.typography.labelSmall,color=MaterialTheme.colorScheme.primary,maxLines=1,overflow=TextOverflow.Ellipsis)
+                    Column(Modifier.weight(1f).padding(start=4.dp)) {
+                        Text("Shelf",style=MaterialTheme.typography.titleLarge,color=Origin.Ink,maxLines=1)
+                        Text("Hold a card to drag",fontSize=11.sp,color=Origin.Muted,maxLines=1,overflow=TextOverflow.Ellipsis)
                     }
-                    FilledTonalIconButton(onClick=onSearch) { Icon(Icons.Outlined.Search,"Circle to Search") }
-                    IconButton(onClick=onDismiss) { Icon(Icons.Outlined.Close,"Close shelf") }
+                    IconButton(onClick=onSearch,colors=IconButtonDefaults.iconButtonColors(containerColor=MaterialTheme.colorScheme.primary,contentColor=Color.White)) {
+                        Icon(Icons.Outlined.Search,"Circle to Search",Modifier.size(20.dp)) }
+                    Spacer(Modifier.width(6.dp))
+                    IconButton(onClick=onDismiss,colors=IconButtonDefaults.iconButtonColors(containerColor=Color.White,contentColor=Origin.Ink)) {
+                        Icon(Icons.Outlined.Close,"Close shelf",Modifier.size(20.dp)) }
                 }
                 ShelfTypeFilters(filter) { filter=it; selected=emptySet() }
                 if(visible.isEmpty()) Column(Modifier.weight(1f).fillMaxWidth(),verticalArrangement=Arrangement.Center,horizontalAlignment=Alignment.CenterHorizontally) {
-                    Icon(Icons.Outlined.Inventory2,null,tint=MaterialTheme.colorScheme.primary)
+                    IconBadge(Icons.Outlined.Inventory2,MaterialTheme.colorScheme.primaryContainer,MaterialTheme.colorScheme.primary,size=48.dp,corner=16.dp)
                     Text("No ${filter.label.lowercase()} here",Modifier.padding(top=8.dp),style=MaterialTheme.typography.titleMedium,maxLines=1)
                     Text("Share to StashDrop from another app",color=MaterialTheme.colorScheme.onSurfaceVariant,maxLines=1,overflow=TextOverflow.Ellipsis,style=MaterialTheme.typography.bodySmall)
                 }
@@ -82,14 +88,15 @@ fun IosFanOutStashSheet(items: List<StashItemEntity>, repository: StashRepositor
                                 dragVelocity=androidx.compose.ui.geometry.Offset(velocity.x,velocity.y)
                             }) },
                             onClick={ haptics.select(); selected=if(chosen) selected-item.id else selected+item.id },
-                            colors=CardDefaults.cardColors(containerColor=if(chosen) MaterialTheme.colorScheme.primaryContainer else MaterialTheme.colorScheme.surfaceVariant)) {
+                            shape=RoundedCornerShape(22.dp),colors=CardDefaults.cardColors(containerColor=Color.White),
+                            border=if(chosen) BorderStroke(2.dp,MaterialTheme.colorScheme.primary) else null) {
                             if(item.mimeType.startsWith("image/") || item.mimeType.startsWith("video/")) {
                                 Box(Modifier.fillMaxWidth().padding(6.dp)) {
-                                    ShelfMediaThumbnail(item,repository.file(item),Modifier.fillMaxWidth().height(104.dp))
+                                    ShelfMediaThumbnail(item,repository.file(item),Modifier.fillMaxWidth().height(104.dp).clip(RoundedCornerShape(16.dp)))
                                     if(chosen) Icon(Icons.Outlined.CheckCircle,"Selected",Modifier.align(Alignment.TopEnd).padding(6.dp),tint=MaterialTheme.colorScheme.primary)
                                 }
                             } else Row(Modifier.fillMaxWidth().padding(8.dp),verticalAlignment=Alignment.CenterVertically) {
-                                ShelfMediaThumbnail(item,repository.file(item),Modifier.padding(end=10.dp).size(68.dp))
+                                ShelfMediaThumbnail(item,repository.file(item),Modifier.padding(end=10.dp).size(56.dp).clip(RoundedCornerShape(14.dp)))
                                 Column(Modifier.weight(1f)) {
                                     item.text?.let { Text(it.replace('\n',' '),maxLines=2,overflow=TextOverflow.Ellipsis,style=MaterialTheme.typography.bodyMedium) }
                                     if(item.text==null && !item.mimeType.startsWith("image/") && !item.mimeType.startsWith("video/"))
@@ -101,7 +108,7 @@ fun IosFanOutStashSheet(items: List<StashItemEntity>, repository: StashRepositor
                         }
                     }
                 }
-                if(selected.isNotEmpty()) Row(Modifier.fillMaxWidth(),verticalAlignment=Alignment.CenterVertically) {
+                if(selected.isNotEmpty()) Row(Modifier.padding(top=8.dp).fillMaxWidth().background(Origin.Ink,RoundedCornerShape(24.dp)).padding(end=10.dp),verticalAlignment=Alignment.CenterVertically) {
                     Box(Modifier.width(118.dp).height(88.dp).pointerInput(selected) {
                         detectDragGesturesAfterLongPress(onDragStart={haptics.confirm(); onGlobalDrag(view,currentItems.filter {it.id in currentSelected})},onDrag={change,_->change.consume()})
                     },contentAlignment=Alignment.Center) {
@@ -109,29 +116,30 @@ fun IosFanOutStashSheet(items: List<StashItemEntity>, repository: StashRepositor
                         stack.reversed().forEachIndexed { index,item ->
                             Surface(Modifier.width(92.dp).height(64.dp).graphicsLayer {
                                 rotationZ=listOf(-4f,2f,5f)[index%3]; translationY=-index*5*density; shadowElevation=8*density
-                            },shape=RoundedCornerShape(12.dp),color=MaterialTheme.colorScheme.primaryContainer) {
+                            },shape=RoundedCornerShape(14.dp),color=Color.White) {
                                 if(item.fileName!=null) ShelfMediaThumbnail(item,repository.file(item),Modifier.fillMaxSize())
                                 else Text(item.text.orEmpty(),Modifier.padding(10.dp),maxLines=2,overflow=TextOverflow.Ellipsis,style=MaterialTheme.typography.labelSmall)
                             }
                         }
-                        Text("${selected.size}",Modifier.align(Alignment.TopEnd).background(MaterialTheme.colorScheme.primary,RoundedCornerShape(12.dp)).padding(6.dp),color=MaterialTheme.colorScheme.onPrimary)
+                        Text("${selected.size}",Modifier.align(Alignment.TopEnd).padding(4.dp).background(MaterialTheme.colorScheme.primary,RoundedCornerShape(12.dp)).padding(horizontal=8.dp,vertical=3.dp),color=Color.White,fontSize=12.sp)
                     }
                     Row(Modifier.weight(1f).horizontalScroll(rememberScrollState()),horizontalArrangement=Arrangement.spacedBy(8.dp)) {
                         Button(onClick={haptics.select(); onShare(items.filter { it.id in selected },true)}) { Text("WhatsApp",maxLines=1) }
-                        OutlinedButton(onClick={haptics.select(); onShare(items.filter { it.id in selected },false)}) { Text("Share",maxLines=1) }
+                        Button(onClick={haptics.select(); onShare(items.filter { it.id in selected },false)},
+                            colors=ButtonDefaults.buttonColors(containerColor=Color.White.copy(alpha=.14f),contentColor=Color.White)) { Text("Share",maxLines=1) }
                     }
                 }
             }
         }
         deleting?.let { item ->
             Surface(Modifier.align(Alignment.Center).padding(24.dp).fillMaxWidth().clickable(interactionSource=null,indication=null) {},
-                shape=RoundedCornerShape(24.dp),color=MaterialTheme.colorScheme.surfaceVariant,shadowElevation=16.dp) {
+                shape=RoundedCornerShape(28.dp),color=Color.White,shadowElevation=16.dp) {
                 Column(Modifier.padding(24.dp),verticalArrangement=Arrangement.spacedBy(16.dp)) {
                     Text("Delete saved item?",style=MaterialTheme.typography.titleLarge)
                     Text("This removes the item and its cached file permanently.",style=MaterialTheme.typography.bodyMedium)
                     Row(Modifier.fillMaxWidth().horizontalScroll(rememberScrollState()),horizontalArrangement=Arrangement.End) {
                         TextButton(onClick={deleting=null}) { Text("Keep item") }
-                        TextButton(onClick={onDelete(item);deleting=null}) { Text("Delete permanently") }
+                        TextButton(onClick={onDelete(item);deleting=null},colors=ButtonDefaults.textButtonColors(contentColor=MaterialTheme.colorScheme.error)) { Text("Delete permanently") }
                     }
                 }
             }

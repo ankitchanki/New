@@ -61,7 +61,7 @@ class OneUiThumbDockService: LifecycleService(), SavedStateRegistryOwner, ViewMo
     private lateinit var wave: ComposeView
     private lateinit var bar: BottomBarGestureOverlay
     private lateinit var clipboard: ShizukuClipboardMonitor
-    private var settings=StashSettings()
+    private var settings by mutableStateOf(StashSettings())
     private var stash by mutableStateOf(emptyList<StashItemEntity>())
     private var absorbing by mutableStateOf(false)
     private val waveProgress=Animatable(0f)
@@ -130,7 +130,7 @@ class OneUiThumbDockService: LifecycleService(), SavedStateRegistryOwner, ViewMo
                 flags=flags or WindowManager.LayoutParams.FLAG_LAYOUT_NO_LIMITS
             }
             dock=compose().apply {
-                setContent { StashDropTheme { ThumbDockIconComposable(stash.size,absorbing,{ safely("Opening the shelf") { haptics.tick(); showSheet() } },{ safely("Circle to Search",::launchSearch) },
+                setContent { StashDropTheme(settings.accent) { ThumbDockIconComposable(stash.size,absorbing,{ safely("Opening the shelf") { haptics.tick(); showSheet() } },{ safely("Circle to Search",::launchSearch) },
                     { amount -> safely("Moving the bubble") { dragDock(amount) } },{ safely("Moving the handle",::endDockDrag) },edgeHandle=true,onDragCancel={cancelDockDrag()}) } }
                 setOnDragListener { _,event ->
                     when(event.action) {
@@ -302,7 +302,7 @@ class OneUiThumbDockService: LifecycleService(), SavedStateRegistryOwner, ViewMo
         // Compose resolves its lifecycle from the window's root view.
         host.setViewTreeLifecycleOwner(this); host.setViewTreeSavedStateRegistryOwner(this); host.setViewTreeViewModelStoreOwner(this)
         host.addView(root)
-        root.setContent { StashDropTheme { IosFanOutStashSheet(stash,stashApp.repository,::hideSheet,{ safely("Circle to Search",::launchSearch) },
+        root.setContent { StashDropTheme(settings.accent) { IosFanOutStashSheet(stash,stashApp.repository,::hideSheet,{ safely("Circle to Search",::launchSearch) },
             {items,whatsapp->runCatching { VisualLensBridge.share(this,stashApp.repository,items,whatsapp); hideSheet() }.onFailure { toast(it.message.orEmpty()) }},
             {item->lifecycleScope.launch(ui) { stashApp.repository.delete(item) }},
             {view,items->safely("Dragging cards") { startGlobalDrag(host,view,items) }},compact=true) } }

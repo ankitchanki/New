@@ -23,7 +23,7 @@ fun SwipeDeleteItem(onDeleteRequest: () -> Unit, content: @Composable () -> Unit
     SwipeToDismissBox(state,modifier=Modifier.semantics {
         customActions=listOf(CustomAccessibilityAction("Delete saved item") { onDeleteRequest(); true })
     },backgroundContent={
-        Row(Modifier.fillMaxSize().background(if(state.dismissDirection==SwipeToDismissBoxValue.Settled) Color.Transparent else MaterialTheme.colorScheme.errorContainer,RoundedCornerShape(20.dp)).padding(horizontal=20.dp),
+        Row(Modifier.fillMaxSize().background(if(state.dismissDirection==SwipeToDismissBoxValue.Settled) Color.Transparent else MaterialTheme.colorScheme.errorContainer,RoundedCornerShape(26.dp)).padding(horizontal=20.dp),
             horizontalArrangement=if(state.dismissDirection==SwipeToDismissBoxValue.StartToEnd) Arrangement.Start else Arrangement.End,
             verticalAlignment=Alignment.CenterVertically) {
             Icon(Icons.Outlined.DeleteOutline,"Delete",tint=MaterialTheme.colorScheme.onErrorContainer)

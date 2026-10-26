@@ -17,7 +17,7 @@ The app already has Home / Shelf / Settings, one movable edge handle with a comp
 | 1 — Accessibility | Dense one-line settings and visual motion can make actions hard to use | Support large text, TalkBack labels/focus, 48 dp targets, reduced motion, and higher contrast | Manual accessibility checks at large font/display sizes; readable labels and reachable actions |
 | 2 — Shelf management | Larger collections become difficult to navigate | Local text search, richer metadata and previews, selection counts, and explicit batch actions | Find and share an item from a large fixture without losing selection or collection context |
 | 2 — Safer retention | Confirmed deletion has no recovery and no archive restore exists | Undo/trash policy, storage usage, sensitive-copy controls, explicit local export/import | Recovery and round-trip restore checks; clear handling of private files, duplicates, and canceled imports |
-| 3 — Visual refinement | Current dark styling and motion offer limited customization | Adaptive themes, subtle glass, adjustable bubble size/edge behavior, responsive layouts | Device screenshots and frame/memory/battery measurements alongside accessible fallbacks |
+| 3 — Visual refinement | Light Origin styling has four accent choices but no dark mode | Dark and adaptive themes, subtle glass, adjustable bubble size/edge behavior, responsive layouts | Device screenshots and frame/memory/battery measurements alongside accessible fallbacks |
 
 ## Proposed screen direction
 
@@ -57,7 +57,7 @@ Keep copied-text saving visibly opt-in and explain that it can retain passwords 
 
 | Area | Current foundation | Proposed direction |
 | --- | --- | --- |
-| Color | Dark navy surfaces, periwinkle and mint accents | Light/dark and adaptive color options with checked contrast |
+| Color | Light grey ground, white cards, one of four checked accents | Dark and adaptive color options with checked contrast |
 | Glass | App-local specular/blur effects | Subtle depth with opaque/high-contrast fallback; preserve text readability |
 | Motion | Tuned springs, aurora pull, metaball field | Reduced-motion mode, system animation preference handling, measured frame pacing |
 | Cards | Stacked shelf and collection labels | Better previews, consistent type icons, visible selection and failure states |

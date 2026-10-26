@@ -94,15 +94,19 @@ fun ShelfMediaThumbnail(item: StashItemEntity,file: File?,modifier: Modifier=Mod
     val media=item.mimeType.startsWith("image/") || item.mimeType.startsWith("video/")
     var bitmap by remember(item.id,file?.absolutePath) { mutableStateOf(if(media && file!=null) ShelfThumbnails.cached(file,item.mimeType) else null) }
     val host=LocalView.current
-    var visible by remember { mutableStateOf(false) }
+    // Unknown until first positioned; keep an already cached preview instead of flashing the placeholder.
+    var visible by remember { mutableStateOf<Boolean?>(null) }
     LaunchedEffect(item.id,file?.absolutePath,item.mimeType,visible) {
-        bitmap=if(media && file!=null && visible) ShelfThumbnails.cached(file,item.mimeType)
-            ?: withContext(Dispatchers.IO) { ShelfThumbnails.load(file,item.mimeType) } else null
+        bitmap=when {
+            !media || file==null || visible==false -> null
+            visible==true -> ShelfThumbnails.cached(file,item.mimeType) ?: withContext(Dispatchers.IO) { ShelfThumbnails.load(file,item.mimeType) }
+            else -> ShelfThumbnails.cached(file,item.mimeType)
+        }
     }
-    val shape=RoundedCornerShape(12.dp)
+    val shape=RoundedCornerShape(16.dp)
     Box(modifier.onGloballyPositioned { coordinates ->
         visible=coordinates.boundsInWindow().overlaps(Rect(0f,0f,host.width.toFloat(),host.height.toFloat()))
-    }.clip(shape).background(MaterialTheme.colorScheme.surfaceVariant),contentAlignment=androidx.compose.ui.Alignment.Center) {
+    }.clip(shape).background(MaterialTheme.colorScheme.primaryContainer),contentAlignment=androidx.compose.ui.Alignment.Center) {
         val frame=bitmap
         if(frame!=null) Image(frame.asImageBitmap(),"${item.category().label} preview",Modifier.fillMaxSize(),contentScale=ContentScale.Crop)
         else Icon(when(item.category()) {
@@ -121,7 +125,7 @@ fun ShelfMediaThumbnail(item: StashItemEntity,file: File?,modifier: Modifier=Mod
 fun ShelfTypeFilters(selected: ShelfCategory,onSelect: (ShelfCategory)->Unit) {
     Row(Modifier.fillMaxWidth().horizontalScroll(rememberScrollState()),horizontalArrangement=Arrangement.spacedBy(8.dp)) {
         ShelfCategory.entries.forEach { type ->
-            FilterChip(selected==type,{onSelect(type)},label={Text(type.label)},shape=RoundedCornerShape(18.dp))
+            com.vibe.stashdrop.ui.theme.OriginChip(type.label,selected==type) { onSelect(type) }
         }
     }
 }

@@ -10,10 +10,10 @@ StashDrop keeps useful material in a local shelf and brings that shelf close to 
 
 | Screen | Current purpose | Typical action |
 | --- | --- | --- |
-| Home | Edge shelf status, show/hide control, recent saved items | Start the floating shelf and return to another app |
-| Shelf | Saved notes, links, attachments, type and collection filters | Add a note, move an item, share, or delete |
-| Settings | Access/setup status, Google search status, and expandable assistant integration | Configure only the access you need |
-| Gestures, clipboard & feel | Dedicated interaction preferences, reached from Settings | Tune gestures, clipboard, haptics, and springiness |
+| Home | Circle to Search card, edge shelf toggle, shelf count, clipboard switch, recent saved items | Start the floating shelf or try Google search |
+| Shelf | Search, type and collection chips, photo grid, note and link cards | Add a note, select cards, move, share, or delete |
+| Settings | Setup ring with one-tap fix, permissions, Google search status, and expandable assistant integration | Configure only the access you need |
+| Gestures, clipboard & feel | Dedicated interaction preferences, reached from Settings | Tune gestures, clipboard, haptics, springiness, and accent colour |
 
 The [visual gallery](UI_GALLERY.md) shows the implemented components with sample content. Its images are host renders; actual device permission screens come from Android.
 
@@ -84,6 +84,7 @@ The bottom gesture strip is a transparent overlay touch region above system navi
 | Auto-stash copied text | Off | Saves permitted copied text while the monitor is running |
 | Haptic feedback | On | Feedback for pulls, selection, dragging, and confirmation |
 | Springiness | 1.0 | Adjusts motion intensity within 0.5–1.5 |
+| Accent colour | Blue | Blue, Sky, Violet or Orange for buttons, switches, the edge handle and the floating shelf; each keeps white text at 4.5:1 contrast or better |
 
 Aurora waves use AGSL on Android 13+, with Canvas fallbacks below that version. Spring animation and velocity-projected paths drive motion; actual smoothness depends on the device. Blur/specular effects operate on the app's own content and do not provide general blur of arbitrary apps behind the overlay.
 

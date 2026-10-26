@@ -38,8 +38,14 @@ fun ThumbDockIconComposable(count: Int, absorbing: Boolean, onTap: ()->Unit, onH
                     onDragEnd()
                 },onDragCancel=onDragCancel) { change,amount -> change.consume(); onDrag(amount) }
             },contentAlignment=Alignment.Center) {
-            Box(Modifier.width(if(absorbing) 8.dp else 4.dp).height(44.dp)
-                .background(Ice.copy(alpha=if(absorbing) .9f else .4f),RoundedCornerShape(4.dp)))
+            // Accent pill with the shelf glyph; it widens while something is dragged onto it.
+            val accent=MaterialTheme.colorScheme.primary
+            val width by animateDpAsState(if(absorbing) 34.dp else 24.dp,IosSpringSpecs.liquid(),label="handle width")
+            Box(Modifier.width(width).height(72.dp)
+                .graphicsLayer { shadowElevation=8*density; shape=RoundedCornerShape(14.dp); clip=true }
+                .background(accent).border(1.dp,Color.White.copy(alpha=.35f),RoundedCornerShape(14.dp)),contentAlignment=Alignment.Center) {
+                Icon(Icons.Rounded.Layers,null,Modifier.size(16.dp),tint=Color.White)
+            }
         }
         return
     }
@@ -49,19 +55,21 @@ fun ThumbDockIconComposable(count: Int, absorbing: Boolean, onTap: ()->Unit, onH
     LaunchedEffect(count) { if(count>0) { pulse.animateTo(1.12f,IosSpringSpecs.landing()); pulse.animateTo(1f,IosSpringSpecs.landing()) } }
     Box(modifier.size(88.dp).pointerInput(Unit) { detectTapGestures(onTap={onTap()},onLongPress={onHold()}) }
         .pointerInput(Unit) { detectDragGestures(onDragEnd=onDragEnd,onDragCancel=onDragEnd) { change,amount -> change.consume(); onDrag(amount) } },contentAlignment=Alignment.Center) {
-        // Soft glow ring while something is dragged over the bubble.
+        val accent=MaterialTheme.colorScheme.primary
+        // Soft accent glow while something is dragged over the bubble.
         if(absorption>.01f) Box(Modifier.size(size+14.dp).graphicsLayer { alpha=absorption }
-            .background(Brush.radialGradient(listOf(Ice.copy(alpha=.45f),Mint.copy(alpha=.18f),Color.Transparent)),CircleShape))
+            .background(Brush.radialGradient(listOf(accent.copy(alpha=.35f),accent.copy(alpha=.12f),Color.Transparent)),CircleShape))
         Box(Modifier.size(size).graphicsLayer { scaleX=pulse.value; scaleY=pulse.value; shadowElevation=10*density; shape=CircleShape; clip=true }
-            .background(Brush.linearGradient(listOf(Color(0xFF2C3754),Color(0xFF151A27))))
-            .border(1.dp,Brush.linearGradient(listOf(Color.White.copy(alpha=.55f),Ice.copy(alpha=.12f),Mint.copy(alpha=.4f))),CircleShape),
+            .background(Color.White).border(1.dp,Origin.Hairline,CircleShape),
             contentAlignment=Alignment.Center) {
             if(absorption>.01f) LiquidMetaball(absorption,Modifier.fillMaxSize().graphicsLayer { alpha=absorption })
-            Icon(Icons.Rounded.Layers,"Open stash shelf",Modifier.size(24.dp),tint=Ice)
+            Box(Modifier.size(size-16.dp).background(accent,CircleShape),contentAlignment=Alignment.Center) {
+                Icon(Icons.Rounded.Layers,"Open stash shelf",Modifier.size(20.dp),tint=Color.White)
+            }
         }
         if(count>0) Box(Modifier.align(Alignment.TopEnd).padding(top=12.dp,end=12.dp).defaultMinSize(20.dp,20.dp)
-            .background(Mint,CircleShape).border(2.dp,Color(0xFF151A27),CircleShape).padding(horizontal=5.dp),contentAlignment=Alignment.Center) {
-            Text(if(count>99) "99+" else count.toString(),color=Color(0xFF0C0E15),fontSize=11.sp,fontWeight=FontWeight.SemiBold,maxLines=1)
+            .background(Origin.Ink,CircleShape).border(2.dp,Color.White,CircleShape).padding(horizontal=5.dp),contentAlignment=Alignment.Center) {
+            Text(if(count>99) "99+" else count.toString(),color=Color.White,fontSize=11.sp,fontWeight=FontWeight.SemiBold,maxLines=1)
         }
     }
 }

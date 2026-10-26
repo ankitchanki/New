@@ -7,7 +7,7 @@ The browser SVG concept is implemented as native Compose screens and interaction
 ## What was checked
 
 - Reviewed the original SVG studio/overview and the current production Compose renders of Home, Shelf, Settings, floating shelf, and the new interaction settings page.
-- Confirmed dark navy/periwinkle/mint tokens, rounded surface/card hierarchy, selection affordances, reachable sharing actions, navigation, and wrapping access descriptions.
+- Confirmed light Origin tokens (grey ground, white cards, ink text, chosen accent), rounded card hierarchy, selection affordances, reachable sharing actions, navigation, and wrapping access descriptions.
 - Regenerated eight Paparazzi baselines and copied them byte-for-byte into the README gallery with dimensions/checksums recorded in its manifest.
 - Added four Robolectric/Compose UI tests exercising actual composables and callbacks: blank/valid note entry; multi-item sharing and collection moves; deletion confirmation/cancellation; and sensitive clipboard opt-in/cancellation.
 - Retained the existing native-graphics overlay/circle regression suite. The circle results panel is height-bounded and scrollable so result actions remain reachable when space is constrained.

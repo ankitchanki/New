@@ -58,8 +58,8 @@ class DashboardInteractionTest {
         assertEquals(listOf("first","second"),shared)
         compose.onNodeWithContentDescription("More selection actions").performClick()
         compose.onNodeWithText("Move to collection").performClick()
-        compose.onNode(hasSetTextAction()).performTextClearance()
-        compose.onNode(hasSetTextAction()).performTextInput("Research")
+        compose.onNode(hasSetTextAction() and hasAnyAncestor(isDialog())).performTextClearance()
+        compose.onNode(hasSetTextAction() and hasAnyAncestor(isDialog())).performTextInput("Research")
         compose.onNodeWithText("Move selected").performClick()
         assertEquals(listOf("first","second"),moved)
         assertEquals("Research",collection)
@@ -74,12 +74,26 @@ class DashboardInteractionTest {
         compose.onNodeWithText("Enable auto-stash").performClick()
         assertEquals(listOf("auto" to true),preferences)
     }
+    @Test fun accentSwatchSendsChosenIndex() {
+        val chosen=mutableListOf<Int>()
+        screen(DashboardActions(accent={chosen+=it}),interactions=true)
+        compose.onNodeWithContentDescription("Violet accent").performScrollTo().performClick()
+        assertEquals(listOf(2),chosen)
+    }
+    @Test fun shelfSearchFiltersCards() {
+        screen(DashboardActions())
+        compose.onNodeWithContentDescription("Search your shelf").performTextInput("second")
+        compose.onNodeWithText("Second saved note").assertExists()
+        compose.onNodeWithText("First saved note").assertDoesNotExist()
+        compose.onNodeWithContentDescription("Clear search").performClick()
+        compose.onNodeWithText("First saved note").assertExists()
+    }
     @Test fun noteInputRejectsBlankAndSendsEnteredText() {
         var saved=""
         screen(DashboardActions(addText={saved=it}))
         compose.onNodeWithText("Note").performClick()
         compose.onNodeWithText("Save note").assertIsNotEnabled()
-        compose.onNode(hasSetTextAction()).performTextInput("Keep this useful idea")
+        compose.onNode(hasSetTextAction() and hasAnyAncestor(isDialog())).performTextInput("Keep this useful idea")
         compose.onNodeWithText("Save note").performClick()
         assertEquals("Keep this useful idea",saved)
     }
@@ -88,6 +102,8 @@ class DashboardInteractionTest {
         val image=java.io.File(context.cacheDir,"test-preview.png")
         val bitmap=android.graphics.Bitmap.createBitmap(80,80,android.graphics.Bitmap.Config.ARGB_8888).apply { eraseColor(android.graphics.Color.BLUE) }
         image.outputStream().use { bitmap.compress(android.graphics.Bitmap.CompressFormat.PNG,100,it) };bitmap.recycle()
+        // Decode once on the test thread: Robolectric's native decoder can abort the JVM when its first use races on an IO thread.
+        assertNotNull(com.vibe.stashdrop.ui.shelf.ShelfThumbnails.load(image,"image/png"))
         val photo=StashItemEntity("photo",null,"photo.png","image/png")
         val otp=StashItemEntity("otp","Your OTP is 654321",null,"text/plain")
         compose.setContent { StashDropTheme {

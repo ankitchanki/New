@@ -23,8 +23,8 @@ object LiquidMetaballDockShader {
             float field = 0.075/(d1*d1+0.025) + 0.030*u_absorption/(d2*d2+0.015);
             float alpha = smoothstep(0.70,0.85,field);
             float rim = exp(-abs(field-0.85)*6.0);
-            half3 tint = mix(half3(0.05,0.07,0.12),half3(0.32,0.65,1.0),half(rim));
-            tint += half3(0.30,0.06,0.25)*half(sin(uv.x*9.0+u_time)*0.5+0.5)*half(rim);
+            half3 tint = mix(half3(0.95,0.96,1.0),half3(0.24,0.35,1.0),half(rim));
+            tint += half3(0.20,0.05,0.30)*half(sin(uv.x*9.0+u_time)*0.5+0.5)*half(rim);
             return half4(tint*half(alpha),half(alpha*0.96));
         }
     """
@@ -46,8 +46,8 @@ fun LiquidMetaball(absorption: Float, modifier: Modifier = Modifier) {
             runtime.shader.setFloatUniform("u_time",time); runtime.shader.setFloatUniform("u_absorption",absorption)
             drawContext.canvas.nativeCanvas.drawRect(0f,0f,size.width,size.height,runtime.paint)
         } else {
-            drawCircle(Brush.radialGradient(listOf(Color(0xFF567BC1),Color(0xFF16181F))),size.minDimension*.43f)
-            if(absorption>.01f) drawCircle(Brush.radialGradient(listOf(Color(0xFF00E5FF),Color.Transparent)),
+            drawCircle(Brush.radialGradient(listOf(Color.White,Color(0xFFDDE3FF))),size.minDimension*.43f)
+            if(absorption>.01f) drawCircle(Brush.radialGradient(listOf(Color(0xFF3D5AFE),Color.Transparent)),
                 size.minDimension*.25f*absorption, center+Offset(cos(time),sin(time))*size.minDimension*.2f)
         }
     }

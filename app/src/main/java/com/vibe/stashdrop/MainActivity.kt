@@ -8,6 +8,7 @@ import android.os.*
 import android.provider.Settings
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
+import androidx.activity.SystemBarStyle
 import androidx.activity.enableEdgeToEdge
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.runtime.*
@@ -64,7 +65,10 @@ class MainActivity: ComponentActivity() {
         }.onFailure { message=it.message.orEmpty() }
     } }
     override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState); enableEdgeToEdge()
+        super.onCreate(savedInstanceState)
+        // Light ground behind transparent bars, so the system draws dark status and navigation icons.
+        enableEdgeToEdge(SystemBarStyle.light(android.graphics.Color.TRANSPARENT,android.graphics.Color.TRANSPARENT),
+            SystemBarStyle.light(android.graphics.Color.TRANSPARENT,android.graphics.Color.TRANSPARENT))
         val actions=DashboardActions(
             toggleDock={
                 if(OneUiThumbDockService.running.value) startService(Intent(this,OneUiThumbDockService::class.java).setAction(OneUiThumbDockService.STOP))
@@ -78,6 +82,7 @@ class MainActivity: ComponentActivity() {
             search=::startSearch,
             preference={key,value->lifecycleScope.launch { stashApp.preferences.set(key,value) }},
             bounce={value->lifecycleScope.launch { stashApp.preferences.bounce(value) }},
+            accent={index->lifecycleScope.launch { stashApp.preferences.accent(index) }},
             addText={text->lifecycleScope.launch { runCatching { stashApp.repository.addText(text) }.onFailure { message=it.message.orEmpty() } }},
             delete={item->lifecycleScope.launch { runCatching { stashApp.repository.delete(item) }.onFailure { message=it.message ?: "Could not delete item" } }},
             share={selected,whatsapp->runCatching { VisualLensBridge.share(this,stashApp.repository,selected,whatsapp) }.onFailure { message=it.message.orEmpty() }},
@@ -104,9 +109,10 @@ class MainActivity: ComponentActivity() {
             dismissCrash={ com.vibe.stashdrop.core.diagnostics.CrashReporter.clear(this); refreshSetup() },
             messageShown={ message="" },
         )
-        setContent { StashDropTheme {
-            val items by stashApp.repository.items.collectAsStateWithLifecycle(emptyList())
+        setContent {
             val settings by stashApp.preferences.settings.collectAsStateWithLifecycle(com.vibe.stashdrop.features.stashshelf.StashSettings())
+            StashDropTheme(settings.accent) {
+            val items by stashApp.repository.items.collectAsStateWithLifecycle(emptyList())
             val shizuku by stashApp.shizuku.state.collectAsStateWithLifecycle()
             val running by OneUiThumbDockService.running.collectAsStateWithLifecycle()
             val clipboardStatus by OneUiThumbDockService.clipboardStatus.collectAsStateWithLifecycle()
