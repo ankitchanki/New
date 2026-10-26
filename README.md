@@ -156,6 +156,7 @@ Version `0.8.0` uses Android version code `11` and the original StashDrop produc
 
 - [Changelog](CHANGELOG.md)
 - [Version 0.8.0 notes](docs/releases/v0.8.0.md)
+- [Version 0.8.0 signed build verification](docs/releases/v0.8.0-verification.json)
 - [Version 0.7.0 notes](docs/releases/v0.7.0.md)
 - [Version 0.7.0 signed build verification](docs/releases/v0.7.0-verification.json)
 - [Version 0.3.1 notes](docs/releases/v0.3.1.md)
@@ -210,7 +211,7 @@ Shizuku is optional for the shelf and can send the Google contextual-session req
 
 ## Verification
 
-The published **0.7.0** build passed **71 tests** with no failures, errors, or skips. Debug and release lint each reported **zero errors and 47 warnings**. APK/AAB signatures match the original production certificate; APK ZIP and bundled 64-bit native library alignment passed 16 KB checks. The [successful release workflow](https://github.com/ankitchanki/StashDrop/actions/workflows/android.yml) and [verification report](docs/releases/v0.7.0-verification.json) record the checked scope.
+The published **0.8.0** build passed **73 tests** with no failures, errors, or skips. Debug and release lint each reported **zero errors and 48 warnings**. APK/AAB signatures match the original production certificate; APK ZIP and bundled 64-bit native library alignment passed 16 KB checks. The [successful release workflow](https://github.com/ankitchanki/StashDrop/actions/workflows/android.yml) and [verification report](docs/releases/v0.8.0-verification.json) record the checked scope.
 
 Paparazzi renders the README gallery from the production Compose components. The [single movable edge handle](docs/assets/screenshots/edge-handles.png) and dedicated [interaction settings screen](docs/assets/screenshots/interactions.png) are also rendered from production Compose.
 

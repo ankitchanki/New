@@ -1,6 +1,6 @@
 # Platform support
 
-StashDrop 0.7.0 supports Android 9+ (API 28), targeting API 35. The shelf works independently of Google’s native feature availability.
+StashDrop 0.8.0 supports Android 9+ (API 28), targeting API 35. The shelf works independently of Google’s native feature availability.
 
 | Feature | Requirements and limits |
 | --- | --- |
